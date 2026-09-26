@@ -22,6 +22,21 @@ export async function recordAudit(action: string, entity: string, entityId: stri
       },
     });
   } catch (err) {
+    // Stale session after a DB reseed: userId no longer matches a User row and
+    // the FK write fails. The action/entity/details trail matters more than
+    // attribution — retry once without it instead of losing the row silently.
+    if ((err as { code?: string }).code === 'P2003' && userId) {
+      try {
+        await db.auditLog.create({
+          data: { action, entity, entityId: entityId ?? undefined, details: JSON.stringify({ ...(typeof details === 'object' && details ? details : {}), auditUserIdDropped: userId }).slice(0, 8000) },
+        });
+        console.warn('[audit] recorded without userId (stale session FK) —', action);
+        return;
+      } catch (retryErr) {
+        console.error('[audit] retry failed', action, retryErr);
+        return;
+      }
+    }
     console.error('[audit] failed to record', action, err);
   }
 }

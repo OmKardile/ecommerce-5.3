@@ -26,6 +26,17 @@ async function main() {
   const wishlist = await db.wishlist.upsert({ where: { userId: user.id }, update: {}, create: { userId: user.id } })
   await db.wishlistItem.deleteMany({ where: { wishlistId: wishlist.id } })
   await db.wishlistItem.create({ data: { wishlistId: wishlist.id, productId: product.id, priceAtAddPaise: 999900 } })
-  console.log('fixture ok: 2 inquiries + wishlist drop demo (snapshot ₹9,990 vs current ₹4,590)')
+  // moderation queue demo: one PENDING review (invisible on PDP until approved at /admin/reviews)
+  const product3 = await db.product.findFirstOrThrow({ where: { slug: 'hikvision-acusense-ip-bullet' }, select: { id: true, name: true } })
+  await db.review.deleteMany({ where: { userId: user.id, productId: product3.id } })
+  await db.review.create({
+    data: {
+      productId: product3.id, userId: user.id, rating: 4,
+      title: 'Sharp daylight image, decent low light',
+      comment: 'Mounted one at the gate — number plates are readable at night. Would like a longer pigtail in the box, otherwise solid camera for the price.',
+      isApproved: false, isVerified: false,
+    },
+  })
+  console.log('fixture ok: 2 inquiries + wishlist drop demo + 1 pending review (moderation queue)')
 }
 main().finally(() => db.$disconnect())

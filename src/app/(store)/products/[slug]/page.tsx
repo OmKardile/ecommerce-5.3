@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import {
   getRelatedProducts,
   getPriceAndRating,
+  getRatingDistribution,
   getProductBySlug,
 } from "@/server/services/catalog.service";
 import { mapProductCard } from "@/lib/serializers";
@@ -136,10 +137,11 @@ export default async function ProductDetailPage({ params }: PageProps) {
   if (!product) notFound();
 
   const session = await getCustomerSession();
-  const [enrich, related, wishlistIds] = await Promise.all([
+  const [enrich, related, wishlistIds, distribution] = await Promise.all([
     getPriceAndRating([product.id]),
     getRelatedProducts(product.id, product.category.id, 4),
     getWishlistProductIds(session?.userId ?? null),
+    getRatingDistribution(product.id),
   ]);
   const rating = enrich.ratings.get(product.id) ?? null;
   // getProductBySlug's include is type-erased upstream (service casts to ProductInclude); restore
@@ -319,10 +321,13 @@ export default async function ProductDetailPage({ params }: PageProps) {
       <section aria-label="Customer reviews" className="mt-14 grid gap-6 border-t border-border pt-10 lg:grid-cols-[240px_1fr] lg:gap-12">
         <h2 className="label-caps">Reviews</h2>
         <div className="max-w-3xl space-y-8">
-          <div className="flex items-center gap-4">
-            <span className="font-display text-4xl leading-none">{rating ? rating.avg.toFixed(1) : "—"}</span>
+          <div className="flex flex-wrap items-start gap-x-10 gap-y-4">
             <div>
-              <div className="flex items-center gap-0.5" aria-label={rating ? `Average ${rating.avg.toFixed(1)} out of 5 stars` : "No reviews yet"}>
+              <div className="flex items-baseline gap-2">
+                <span className="font-display text-4xl leading-none tabular-nums">{rating ? rating.avg.toFixed(1) : "—"}</span>
+                <span className="text-[13px] text-muted-foreground">/ 5</span>
+              </div>
+              <div className="mt-1.5 flex items-center gap-0.5" aria-label={rating ? `Average ${rating.avg.toFixed(1)} out of 5 stars` : "No reviews yet"}>
                 {[1, 2, 3, 4, 5].map((n) => (
                   <Star
                     key={n}
@@ -335,23 +340,49 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 {ratingCount > 0 ? `Based on ${ratingCount} approved review${ratingCount === 1 ? "" : "s"}` : "No approved reviews yet"}
               </p>
             </div>
+            {ratingCount > 0 && (
+              <dl className="min-w-[180px] flex-1 space-y-1" aria-label="Rating distribution">
+                {distribution.map(({ rating: star, count }) => (
+                  <div key={star} className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                    <dt className="flex w-8 shrink-0 items-center gap-0.5 tabular-nums">
+                      {star}
+                      <Star className="h-2.5 w-2.5 fill-accent text-accent" aria-hidden />
+                    </dt>
+                    <dd className="flex flex-1 items-center gap-2">
+                      <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+                        <span
+                          className="absolute inset-y-0 left-0 rounded-full bg-accent/70 transition-[width] duration-500"
+                          style={{ width: `${ratingCount ? Math.round((count / ratingCount) * 100) : 0}%` }}
+                        />
+                      </span>
+                      <span className="w-5 text-right tabular-nums">{count}</span>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )}
           </div>
 
           {product.reviews.length > 0 && (
-            <ul className="space-y-6">
+            <ul className="space-y-7">
               {product.reviews.map((review) => (
-                <li key={review.id} className="border-b border-border pb-6 last:border-0 last:pb-0">
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-0.5" aria-hidden>
+                <li key={review.id} className="group/review border-b border-border pb-6 last:border-0 last:pb-0">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <div className="flex items-center gap-0.5" aria-label={`${review.rating} out of 5 stars`}>
                       {[1, 2, 3, 4, 5].map((n) => (
-                        <Star key={n} className={`h-3.5 w-3.5 ${n <= review.rating ? "fill-accent text-accent" : "text-border"}`} />
+                        <Star key={n} className={`h-3.5 w-3.5 ${n <= review.rating ? "fill-accent text-accent" : "text-border"}`} aria-hidden />
                       ))}
                     </div>
+                    {review.isVerified && (
+                      <span className="inline-flex items-center gap-1 rounded-sm bg-[#e7ede9] px-1.5 py-0.5 text-[10px] font-medium text-[#1a3c34]">
+                        <PackageCheck className="h-3 w-3" aria-hidden /> Verified purchase
+                      </span>
+                    )}
                     <span className="text-[12px] text-muted-foreground">
-                      {review.user?.fullName ?? "Verified buyer"} · {dateFormatter.format(new Date(review.createdAt))}
+                      {review.user?.fullName ?? "Verified buyer"} · <time dateTime={new Date(review.createdAt).toISOString()}>{dateFormatter.format(new Date(review.createdAt))}</time>
                     </span>
                   </div>
-                  {review.title && <p className="mt-2 text-[15px] font-medium">{review.title}</p>}
+                  {review.title && <p className="mt-2 font-display text-[16px] leading-snug">{review.title}</p>}
                   {review.comment && <p className="mt-1 text-[14px] leading-relaxed text-foreground/85">{review.comment}</p>}
                 </li>
               ))}

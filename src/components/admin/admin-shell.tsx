@@ -20,6 +20,7 @@ import {
   Package,
   Settings,
   Shapes,
+  Star,
   Store,
   TicketPercent,
   Users,
@@ -45,7 +46,7 @@ interface NavItem {
   label: string;
   icon: LucideIcon;
   exact?: boolean;
-  badgeKey?: 'pendingReturns' | 'newInquiries';
+  badgeKey?: 'pendingReturns' | 'newInquiries' | 'pendingReviews';
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -58,6 +59,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/inventory', label: 'Inventory', icon: Warehouse },
   { href: '/admin/customers', label: 'Customers', icon: Users },
   { href: '/admin/inquiries', label: 'Trade Desk', icon: MessageSquareQuote, badgeKey: 'newInquiries' },
+  { href: '/admin/reviews', label: 'Reviews', icon: Star, badgeKey: 'pendingReviews' },
   { href: '/admin/coupons', label: 'Coupons', icon: TicketPercent },
   { href: '/admin/banners', label: 'Banners', icon: ImageIcon },
   { href: '/admin/blog', label: 'Blog', icon: Newspaper },
@@ -80,7 +82,7 @@ function roleLabel(role: string): string {
   return role.replace(/_/g, ' ');
 }
 
-function SidebarNav({ session, badges, onNavigate }: { session: AdminShellSession; badges?: { pendingReturns?: number; newInquiries?: number }; onNavigate?: () => void }) {
+function SidebarNav({ session, badges, onNavigate }: { session: AdminShellSession; badges?: { pendingReturns?: number; newInquiries?: number; pendingReviews?: number }; onNavigate?: () => void }) {
   const pathname = usePathname();
   return (
     <div className="flex h-full flex-col">
@@ -176,7 +178,7 @@ export function AdminShell({
 }: {
   session: AdminShellSession;
   children: React.ReactNode;
-  badges?: { pendingReturns?: number; newInquiries?: number };
+  badges?: { pendingReturns?: number; newInquiries?: number; pendingReviews?: number };
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   // Radix Dialog triggers hydrate with different aria/data-state attributes than

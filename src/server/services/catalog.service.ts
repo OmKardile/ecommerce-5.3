@@ -252,6 +252,16 @@ export async function getPriceAndRating(productIds: string[]) {
   return { minPrice, ratings };
 }
 
+/** Approved-review star distribution for one product (5→1 buckets). Powers the PDP summary histogram. */
+export async function getRatingDistribution(productId: string): Promise<{ rating: number; count: number }[]> {
+  const rows = await db.review.groupBy({
+    by: ['rating'],
+    where: { productId, isApproved: true },
+    _count: { _all: true },
+  });
+  return [5, 4, 3, 2, 1].map((r) => ({ rating: r, count: rows.find((x) => x.rating === r)?._count._all ?? 0 }));
+}
+
 export async function getFeaturedProducts(take = 8): Promise<ProductCard[]> {
   return db.product.findMany({
     where: { isActive: true, deletedAt: null, isFeatured: true },
