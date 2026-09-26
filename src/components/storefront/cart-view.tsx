@@ -6,12 +6,13 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Minus, Plus, ShieldCheck, Trash2, Truck, Wallet } from "lucide-react";
+import { ArrowRight, CheckCircle2, Minus, Plus, ShieldCheck, Trash2, Truck, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { useCartStore, type CartLine } from "@/store/cart-store";
 import { formatINR } from "@/lib/money";
+import { FREE_SHIPPING_THRESHOLD_PAISE } from "@/lib/constants";
 import { CartCouponBox, readAppliedCoupon, type AppliedCoupon } from "@/components/storefront/cart-coupon-box";
 import { toast } from "@/hooks/use-toast";
 
@@ -77,7 +78,7 @@ function CartRow({ line }: { line: CartLine }) {
               {line.variantName} · SKU <span className="font-mono">{line.skuCode}</span>
             </p>
           </div>
-          <p className="font-display text-base whitespace-nowrap">{formatINR(line.lineTotalPaise)}</p>
+          <p className="font-display text-base whitespace-nowrap tabular-nums">{formatINR(line.lineTotalPaise)}</p>
         </div>
 
         <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-3">
@@ -88,7 +89,7 @@ function CartRow({ line }: { line: CartLine }) {
                 aria-label="Decrease quantity"
                 onClick={() => void changeQty(line.quantity - 1)}
                 disabled={qtyBusy || removing || !line.inStock}
-                className="flex h-8 w-8 items-center justify-center text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
+                className="press flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
               >
                 <Minus className="h-3.5 w-3.5" />
               </button>
@@ -100,7 +101,7 @@ function CartRow({ line }: { line: CartLine }) {
                 aria-label="Increase quantity"
                 onClick={() => void changeQty(line.quantity + 1)}
                 disabled={qtyBusy || removing || !line.inStock || line.quantity >= maxQty}
-                className="flex h-8 w-8 items-center justify-center text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
+                className="press flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
               >
                 <Plus className="h-3.5 w-3.5" />
               </button>
@@ -242,15 +243,60 @@ export function CartView() {
           <div className="rounded-lg border border-border bg-card p-6">
             <h2 className="font-display text-xl">Summary</h2>
 
+            {/* free-shipping progress — mirrors checkout's threshold math */}
+            <div
+              className={`mt-4 rounded-lg border p-3.5 ${
+                cart.subtotalPaise >= FREE_SHIPPING_THRESHOLD_PAISE
+                  ? "border-primary/30 bg-primary/[0.05]"
+                  : "border-border bg-muted/50"
+              }`}
+              role="status"
+            >
+              {cart.subtotalPaise >= FREE_SHIPPING_THRESHOLD_PAISE ? (
+                <p className="flex items-center gap-2 text-[13px] font-medium text-primary">
+                  <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />
+                  Free shipping unlocked — this cart ships free across India.
+                </p>
+              ) : (
+                <>
+                  <p className="flex items-center justify-between gap-2 text-[13px] font-medium">
+                    <span className="inline-flex items-center gap-2">
+                      <Truck className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+                      Add {formatINR(FREE_SHIPPING_THRESHOLD_PAISE - cart.subtotalPaise)} more
+                    </span>
+                    <span className="text-[11px] font-normal text-muted-foreground tabular-nums">
+                      {Math.min(100, Math.floor((cart.subtotalPaise / FREE_SHIPPING_THRESHOLD_PAISE) * 100))}%
+                    </span>
+                  </p>
+                  <div
+                    className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-border"
+                    role="progressbar"
+                    aria-label="Progress toward free shipping"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={Math.min(100, Math.floor((cart.subtotalPaise / FREE_SHIPPING_THRESHOLD_PAISE) * 100))}
+                  >
+                    <div
+                      className="h-full rounded-full bg-primary transition-[width] duration-500 ease-out"
+                      style={{ width: `${Math.min(100, (cart.subtotalPaise / FREE_SHIPPING_THRESHOLD_PAISE) * 100)}%` }}
+                    />
+                  </div>
+                  <p className="mt-2 text-[11.5px] text-muted-foreground">
+                    for free shipping · free above {formatINR(FREE_SHIPPING_THRESHOLD_PAISE)} · pan-India delivery
+                  </p>
+                </>
+              )}
+            </div>
+
             <div className="mt-5 space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal ({cart.itemCount} items)</span>
-                <span className="font-medium">{formatINR(cart.subtotalPaise)}</span>
+                <span className="font-medium tabular-nums">{formatINR(cart.subtotalPaise)}</span>
               </div>
               {savings > 0 && (
                 <div className="flex justify-between text-primary">
                   <span>Savings vs MRP</span>
-                  <span className="font-medium">− {formatINR(savings)}</span>
+                  <span className="font-medium tabular-nums">− {formatINR(savings)}</span>
                 </div>
               )}
               {cart.bundleApplied && cart.bundleDiscountPaise > 0 && (
@@ -277,7 +323,7 @@ export function CartView() {
 
             <div className="flex items-baseline justify-between">
               <span className="text-sm font-medium">Estimated total</span>
-              <span className="font-display text-2xl">{formatINR(payableAfterCoupon)}</span>
+              <span className="font-display text-2xl tabular-nums">{formatINR(payableAfterCoupon)}</span>
             </div>
             <p className="mt-1 text-right text-[11px] text-muted-foreground">
               incl. {formatINR(cart.gstAmountPaise)} GST · taxable value {formatINR(cart.taxableBasePaise)}
@@ -312,7 +358,7 @@ export function CartView() {
                 <ShieldCheck className="h-3.5 w-3.5 text-primary" aria-hidden /> Genuine stock with serial-tracked warranty
               </p>
               <p className="flex items-center gap-1.5">
-                <Truck className="h-3.5 w-3.5 text-primary" aria-hidden /> Free shipping above ₹500 · pan-India delivery
+                <Truck className="h-3.5 w-3.5 text-primary" aria-hidden /> Pan-India delivery via Delhivery &amp; Shiprocket
               </p>
             </div>
           </div>

@@ -6,6 +6,7 @@ import { getCustomerSession } from "@/lib/session";
 import { db } from "@/lib/db";
 import { mapProductCard } from "@/lib/serializers";
 import { ProductCard } from "@/components/storefront/product-card";
+import { RecentlyViewedRail } from "@/components/storefront/recently-viewed";
 import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
@@ -184,6 +185,11 @@ export default async function HomePage() {
             <ProductCard key={p.id} product={p} wishlisted={wishlistIds.has(p.id)} />
           ))}
         </div>
+      </section>
+
+      {/* ---------- recently viewed (client island — hidden until the visitor has history) ---------- */}
+      <section className="mx-auto max-w-7xl px-4 pb-4 sm:px-6">
+        <RecentlyViewedRail />
       </section>
 
       {/* ---------- promo strip (HOME_STRIP banner) ---------- */}

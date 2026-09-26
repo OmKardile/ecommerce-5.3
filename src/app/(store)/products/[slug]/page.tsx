@@ -358,7 +358,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
             </ul>
           )}
 
-          <ReviewForm productId={product.id} loggedIn={false} />
+          {/* session is already resolved above — guests see the sign-in prompt,
+              signed-in customers get the full form (API enforces the session too). */}
+          <ReviewForm productId={product.id} loggedIn={session !== null} />
         </div>
       </section>
 
