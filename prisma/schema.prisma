@@ -327,12 +327,13 @@ model Wishlist {
 }
 
 model WishlistItem {
-  id         String   @id @default(cuid())
-  wishlistId String
-  wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
-  productId  String
-  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
+  id              String   @id @default(cuid())
+  wishlistId      String
+  wishlist        Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  priceAtAddPaise Int?     // best variant price (paise) when saved — powers the price-drop badge
+  createdAt       DateTime @default(now())
 
   @@unique([wishlistId, productId])
   @@map("wishlist_items")
@@ -616,6 +617,8 @@ model B2BInquiry {
   message     String
   productId   String?
   status      String   @default("NEW") // NEW | CONTACTED | CLOSED
+  note        String?  // trade-desk follow-up notes (quoted price, next step)
+  handledAt   DateTime? // stamped when an operator first moves the inquiry out of NEW
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

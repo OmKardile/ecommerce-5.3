@@ -49,7 +49,7 @@ export function ProductCard({ product, className, wishlisted = false }: ProductC
     <Link
       href={`/products/${product.slug}`}
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-sm",
+        "group relative flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-sm",
         className
       )}
     > 
@@ -57,12 +57,12 @@ export function ProductCard({ product, className, wishlisted = false }: ProductC
       <CompareToggle item={compareItem} variant="card" />
       <div className="relative aspect-square overflow-hidden bg-muted">
         {image ? (
-           
+          
           <img
             src={image}
             alt={product.name}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No image</div>
@@ -111,9 +111,9 @@ export function ProductCard({ product, className, wishlisted = false }: ProductC
             onClick={handleAdd}
             disabled={!defaultVariant?.inStock}
             aria-label={`Add ${product.name} to cart`}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-40 group-hover:scale-110 active:scale-95"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-4 w-4 transition-transform duration-200 group-hover:rotate-90" />
           </button>
         </div>
       </div>

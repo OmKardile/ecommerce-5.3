@@ -12,7 +12,12 @@ export async function POST(_req: Request, { params }: { params: Promise<{ produc
     await db.wishlistItem.delete({ where: { id: existing.id } });
     return ok({ added: false });
   }
-  await db.wishlistItem.create({ data: { wishlistId: wishlist.id, productId } });
+  // Snapshot the current best price so the wishlist can flag price drops later.
+  const { getPriceAndRating } = await import('@/server/services/catalog.service');
+  const [{ minPrice }] = await Promise.all([getPriceAndRating([productId])]);
+  await db.wishlistItem.create({
+    data: { wishlistId: wishlist.id, productId, priceAtAddPaise: minPrice.get(productId) ?? null },
+  });
   return ok({ added: true });
 }
 

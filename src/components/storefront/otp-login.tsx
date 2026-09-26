@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useCartStore } from "@/store/cart-store";
 import { toast } from "@/hooks/use-toast";
+import { localPhoneFromInput } from "@/lib/phone";
 
 type Step = "phone" | "otp" | "name";
 
@@ -159,7 +160,9 @@ export function OTPLogin({ redirectTo, onSuccess, compact = false }: OtpLoginPro
               autoComplete="tel-national"
               value={phone}
               onChange={(e) => {
-                setPhone(e.target.value.replace(/\D/g, "").slice(0, 10));
+                // Prefix-aware local-phone normalizer (see lib/phone.ts) — a plain
+                // first-10 cap here used to turn "+91 98765 43210" into a wrong account.
+                setPhone(localPhoneFromInput(e.target.value));
                 setError(null);
               }}
               onKeyDown={(e) => {

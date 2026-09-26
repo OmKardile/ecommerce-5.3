@@ -221,9 +221,9 @@ export default async function AdminDashboardPage() {
         <h2 className="label-caps mb-2">After-sales &amp; promotions</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <PipelineCard label="Open returns / RMA" count={m.openReturns} href="/admin/returns" tone={m.openReturns > 0 ? 'alert' : undefined} />
+          <PipelineCard label="New B2B inquiries" count={m.openInquiries} href="/admin/inquiries" tone={m.openInquiries > 0 ? 'alert' : undefined} />
           <PipelineCard label="Back-in-stock watchers" count={m.pendingStockAlerts} href="/admin/inventory" />
           <PipelineCard label="Coupon redemptions · 30d" count={m.couponRedemptions30d} href="/admin/coupons" />
-          <PipelineCard label="Discount given · 30d" count={formatINR(m.couponDiscount30dPaise)} href="/admin/coupons" />
         </div>
       </section>
 

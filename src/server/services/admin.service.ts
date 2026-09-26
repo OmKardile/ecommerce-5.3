@@ -26,6 +26,7 @@ export interface DashboardMetrics {
   // after-sales & promotions visibility
   openReturns: number;
   pendingStockAlerts: number;
+  openInquiries: number;
   couponRedemptions30d: number;
   couponDiscount30dPaise: number;
 }
@@ -63,10 +64,11 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
 
   // after-sales & promotions snapshot (kept additive — separate round-trip, same tick)
   const since30d = new Date(Date.now() - 30 * 86400000);
-  const [openReturns, pendingStockAlerts, couponAgg30d] = await Promise.all([
+  const [openReturns, pendingStockAlerts, couponAgg30d, openInquiries] = await Promise.all([
     db.orderReturn.count({ where: { status: { in: ['REQUESTED', 'APPROVED'] } } }),
     db.stockAlert.count({ where: { status: 'PENDING' } }),
     db.couponRedemption.aggregate({ where: { createdAt: { gte: since30d } }, _count: { _all: true }, _sum: { discountAmount: true } }),
+    db.b2BInquiry.count({ where: { status: 'NEW' } }),
   ]);
 
   const lowStock = lowStockInv
@@ -116,6 +118,7 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
     dailySales: [...dailyMap.entries()].map(([date, v]) => ({ date, ...v })),
     openReturns,
     pendingStockAlerts,
+    openInquiries,
     couponRedemptions30d: couponAgg30d._count._all,
     couponDiscount30dPaise: couponAgg30d._sum.discountAmount ?? 0,
   };

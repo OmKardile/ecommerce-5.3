@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { localPhoneFromInput } from "@/lib/phone";
 
 export interface BookAddress {
   id: string;
@@ -215,7 +216,7 @@ export function AccountAddressBook({ addresses }: { addresses: BookAddress[] }) 
             </div>
             <div>
               <Label htmlFor="ad-phone" className="label-caps mb-1.5 block">Mobile</Label>
-              <Input id="ad-phone" inputMode="numeric" value={form.phone} onChange={(e) => setField("phone", e.target.value.replace(/\D/g, "").slice(0, 10))} placeholder="98765 43210" className="h-10" aria-invalid={Boolean(errors.phone)} />
+              <Input id="ad-phone" inputMode="numeric" value={form.phone} onChange={(e) => setField("phone", localPhoneFromInput(e.target.value))} placeholder="98765 43210" className="h-10" aria-invalid={Boolean(errors.phone)} />
               {errors.phone && <p role="alert" className="mt-1 text-xs text-destructive">{errors.phone}</p>}
             </div>
             <div className="sm:col-span-2">

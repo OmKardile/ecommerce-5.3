@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { HeartCrack } from "lucide-react";
+import { HeartCrack, TrendingDown } from "lucide-react";
 import { getCustomerSession } from "@/lib/session";
 import { db } from "@/lib/db";
 import { getPriceAndRating } from "@/server/services/catalog.service";
@@ -38,9 +38,11 @@ export default async function AccountWishlistPage() {
     },
   });
 
-  const products = (wishlist?.items ?? []).map((i) => i.product);
+  const items = wishlist?.items ?? [];
+  const products = items.map((i) => i.product);
   const enrich = await getPriceAndRating(products.map((p) => p.id));
   const cards: ApiProductCard[] = products.map((p) => mapProductCard(p, enrich.minPrice.get(p.id) ?? 0, enrich.ratings.get(p.id)));
+  const savedMeta = new Map(items.map((i) => [i.productId, { savedAt: i.createdAt as unknown as string, priceAtAddPaise: i.priceAtAddPaise }]));
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:py-14">
@@ -68,8 +70,11 @@ export default async function AccountWishlistPage() {
           {cards.map((card) => {
             const firstInStock = card.variants.find((v) => v.inStock) ?? null;
             const chosen = firstInStock ?? card.variants[0] ?? null;
+            const meta = savedMeta.get(card.id);
+            const dropPaise = meta?.priceAtAddPaise != null ? meta.priceAtAddPaise - card.priceFromPaise : null;
+            const savedOn = meta ? new Date(meta.savedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) : null;
             return (
-              <li key={card.id} className="flex gap-4 rounded-lg border border-border bg-card p-4 sm:gap-5 sm:p-5">
+              <li key={card.id} className="group flex gap-4 rounded-lg border border-border bg-card p-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-sm sm:gap-5 sm:p-5">
                 <Link href={`/products/${card.slug}`} className="shrink-0" aria-label={card.name}>
                   {card.images[0]?.url ? (
                     <img src={card.images[0].url} alt={card.images[0].alt ?? card.name} loading="lazy" className="h-24 w-24 rounded-md border border-border object-cover sm:h-28 sm:w-28" />
@@ -95,6 +100,22 @@ export default async function AccountWishlistPage() {
                         </span>
                       )}
                     </p>
+                    {(dropPaise != null || savedOn) && (
+                      <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[11px]">
+                        {dropPaise != null && dropPaise > 0 && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
+                            <TrendingDown className="h-3 w-3" aria-hidden />
+                            Dropped {formatINR(dropPaise)} since saved
+                          </span>
+                        )}
+                        {dropPaise != null && dropPaise < 0 && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
+                            Up {formatINR(-dropPaise)} since saved
+                          </span>
+                        )}
+                        {savedOn && <span className="text-muted-foreground/70">Saved {savedOn}</span>}
+                      </div>
+                    )}
                   </div>
                   <div className="mt-3 shrink-0 sm:mt-0">
                     <WishlistActions

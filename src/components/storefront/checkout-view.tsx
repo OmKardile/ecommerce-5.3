@@ -28,6 +28,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCartStore } from "@/store/cart-store";
 import { formatINR } from "@/lib/money";
+import { localPhoneFromInput } from "@/lib/phone";
 import { COD_FEE_PAISE, DEFAULT_SHIPPING_FEE_PAISE, FREE_SHIPPING_THRESHOLD_PAISE } from "@/lib/constants";
 import { CartCouponBox, clearAppliedCoupon, readAppliedCoupon, type AppliedCoupon } from "@/components/storefront/cart-coupon-box";
 import { OTPLogin } from "@/components/storefront/otp-login";
@@ -456,7 +457,7 @@ export function CheckoutView() {
                 <Label htmlFor="f-phone" className="label-caps mb-1.5 block">Mobile number</Label>
                 <div className="flex gap-2">
                   <span className="flex h-10 shrink-0 items-center rounded-md border border-border bg-muted px-3 font-mono text-sm text-muted-foreground">+91</span>
-                  <Input id="f-phone" inputMode="numeric" value={form.phone} onChange={(e) => setField("phone", e.target.value.replace(/\D/g, "").slice(0, 10))} className="h-10" autoComplete="tel-national" aria-invalid={Boolean(formErrors.phone)} />
+                  <Input id="f-phone" inputMode="numeric" value={form.phone} onChange={(e) => setField("phone", localPhoneFromInput(e.target.value))} className="h-10" autoComplete="tel-national" aria-invalid={Boolean(formErrors.phone)} />
                 </div>
                 {formErrors.phone && <p role="alert" className="mt-1 text-xs text-destructive">{formErrors.phone}</p>}
               </div>
