@@ -463,3 +463,23 @@ Stage Summary:
 - Deploy knowledge now exists at three depths: terse runbook (deploy/DEPLOY-STEPS.md) → phased checkpoint guides (VPS + physical) → staging preview (Render) → per-variable env guide → go-live checklist.
 - Commit: docs "Task 13: patel-5.2 guide parity port" + feat "admin order drawer deep-links".
 - Next-round candidates: compare-store version bump (pn-compare-v2) if snapshot schema changes, per-product image overrides, hero swap when Unsplash reachable, purge demo inquiries + fixtures at go-live (scripts/qa-clean.ts).
+
+---
+Task ID: 14
+Agent: Z.ai Code (lead)
+Task: Cron round — status assessment → agent-browser QA → feature + [mandatory] styling pass.
+
+Work Log:
+- STATUS: Task 13 committed (0527ed3 docs parity + 739cab2 drawer deep-links), tree clean, server healthy ({status:healthy,db:up}), 7 storefront routes 200, home/track/compare/admin/dashboard browser pass with 0 console errors. Verdict: stable → feature round.
+- QA'd the candidate pool top item: GSTR-1 card already had a 12-month dropdown → upgrade instead of redo.
+- FEATURE — GSTR-1 period modes (src/components/admin/gstr1-card.tsx rewritten): segmented Month | Quarter | Custom control; quarter picker = last 8 Indian fiscal quarters (Q1 Apr–Jun … Q4 Jan–Mar, FY tag follows the April — "Jul–Sept 2026 · Q2 FY26-27"), for QRMP quarterly filers; custom range = start/end date inputs + Apply with client guards (both dates, to>=from, ≤366 days → destructive toasts) mirroring the API's server guards; period summary line ("01 Jul 2026 – 30 Sept 2026 · quarterly return (QRMP window)" / "· monthly return" / "· custom range").
+- STYLING DETAILS: 6th totals tile "B2B · B2C" (counts surfacing beyond the table footer), uniform skeleton shimmer tiles while loading (replaced the inconsistent '…' hack), FileSearch-icon empty state with two-line helper, tile hover border-primary/30, tabular-nums, sr-only loading label, mode-switch resets selection to the active list (prevents stale month value matching no quarter).
+- DECISION: replaced the initial Radix Tabs implementation with the app's plain role=tablist button-group pattern (same as order console / inquiry inbox) after Radix activation proved unreproducible under the QA harness; plain buttons match the app's other tab controls and behave identically for users.
+- QA JOURNEY (agent-browser): month fetch ?from=2026-09-01&to=2026-09-30 200 + summary ✓; quarter fetch ?from=2026-07-01&to=2026-09-30 200 + correct FY label ✓; custom reversed range (Aug→Jul) → NO fetch (guard held) ✓; valid Aug range → fetch ?from=2026-08-01&to=2026-08-31 200 + "· custom range" summary ✓; screenshots confirm segmented control/date pair/6-tile row/empty state render cleanly; CSV disabled at 0 rows ✓.
+- HARNESS NOTE (for future rounds): React 19 controlled date inputs reject synthetic Event('input') and agent-browser fill/keyboard for date fields; the working recipe is dispatching `new InputEvent('input',{bubbles:true,data, inputType:'insertText'})` via the native prototype value setter. Also: this environment's evals fail silently on `if/else` statements — use expression form; Fast Refresh can leave stale handler bindings after edits → hard-reload the page before re-testing interaction changes.
+
+Stage Summary:
+- GSTR-1 filing schedule now supports monthly, quarterly (QRMP) and custom filing windows with validated ranges — closes the "GSTR-1 period picker polish" candidate.
+- lint 0, tsc 0, no runtime errors in dev.log; all three modes browser-verified against the real API.
+- Files: src/components/admin/gstr1-card.tsx.
+- Next-round candidates: per-product image overrides (when brand images arrive), hero swap when Unsplash FwcMuEOW3O0 reachable, compare-store version bump if snapshot schema changes, purge demo inquiries + fixtures at go-live (scripts/qa-clean.ts).
