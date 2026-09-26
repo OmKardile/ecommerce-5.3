@@ -150,6 +150,7 @@ model Product {
   warrantyMonths  Int       @default(12)
   metaTitle       String?
   metaDescription String?
+  restockedAt     DateTime? // stamped when the product transitions OOS → available (powers PDP "back in stock" ribbon)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   deletedAt       DateTime?
@@ -499,15 +500,19 @@ model ShipmentEvent {
 }
 
 model OrderReturn {
-  id           String   @id @default(cuid())
-  orderId      String
-  order        Order    @relation(fields: [orderId], references: [id])
-  reason       String
-  status       String   @default("REQUESTED") // REQUESTED | APPROVED | REJECTED | RESTOCKED | REFUNDED
-  isRma        Boolean  @default(false)
-  refundAmount Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id             String   @id @default(cuid())
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id])
+  reason         String
+  status         String   @default("REQUESTED") // REQUESTED | APPROVED | REJECTED | RESTOCKED | REFUNDED
+  isRma          Boolean  @default(false)
+  refundAmount   Int      @default(0)
+  inwardCourier  String?  // courier that brought the unit back (collected at unit receipt)
+  inwardTracking String?  // courier docket / return AWB number (validated server-side)
+  inwardNote     String?  // unit condition notes from the inward check
+  inwardAt       DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@index([orderId])
   @@map("order_returns")
