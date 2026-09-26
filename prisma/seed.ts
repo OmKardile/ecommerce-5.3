@@ -586,6 +586,26 @@ async function main() {
   }
   console.log('📦 Products:', products.length, '· SKUs:', Object.keys(skuToId).length);
 
+  // ---------------- inventory demo states (low / out of stock) ----------------
+  // Deterministic post-pass so the ops console shows real LOW/OUT rows, the
+  // dashboard low-stock panel has data, and one PDP demonstrates OOS + the
+  // back-in-stock alert opt-in.
+  const demoStates: { code: string; stock: number }[] = [
+    { code: 'HIK-IP-8MP-28', stock: 0 }, // out of stock
+    { code: 'HIK-NVR-16CH', stock: 3 }, // low (threshold 5)
+    { code: 'CPP-B01-8MP-28', stock: 4 }, // low (threshold 5)
+  ];
+  for (const s of demoStates) {
+    const skuId = skuToId[s.code];
+    if (!skuId) continue;
+    const inv = await prisma.inventory.findUnique({ where: { skuId } });
+    if (!inv || inv.currentStock === s.stock) continue;
+    await prisma.inventory.update({ where: { skuId }, data: { currentStock: s.stock } });
+    await prisma.inventoryMovement.create({
+      data: { skuId, quantity: s.stock - inv.currentStock, reason: 'MANUAL_ADJUSTMENT', notes: 'Seed demo: low/out-of-stock state', referenceId: 'SEED-DEMO' },
+    });
+  }
+
   // ---------------- kit-builder bundle (ADR-006) ----------------
   const bundle = await prisma.bundle.create({
     data: {

@@ -240,8 +240,12 @@ export interface CommercialReports {
   dailySales: { date: string; orders: number; valuePaise: number }[];
 }
 
-export async function getCommercialReports(): Promise<CommercialReports> {
-  const paidWhere: Prisma.OrderWhereInput = { status: { in: PAID_STATUSES } };
+export async function getCommercialReports(days = 30): Promise<CommercialReports> {
+  // Period window: KPIs, top lists and the daily series all respect it;
+  // inventory valuation stays a live snapshot (not period-bound).
+  const windowDays = Number.isFinite(days) && [7, 30, 90, 180].includes(days) ? days : 30;
+  const since = new Date(Date.now() - windowDays * 86400000);
+  const paidWhere: Prisma.OrderWhereInput = { status: { in: PAID_STATUSES }, createdAt: { gte: since } };
   const [agg, paySplit, invAgg, itemAgg, custAgg, recentPaid] = await Promise.all([
     db.order.aggregate({
       where: paidWhere,
@@ -258,7 +262,7 @@ export async function getCommercialReports(): Promise<CommercialReports> {
       take: 8,
     }),
     db.order.groupBy({ by: ['userId'], where: paidWhere, _count: { _all: true }, _sum: { totalAmount: true }, orderBy: { _sum: { totalAmount: 'desc' } }, take: 8 }),
-    db.order.findMany({ where: { ...paidWhere, createdAt: { gte: new Date(Date.now() - 30 * 86400000) } }, select: { createdAt: true, totalAmount: true } }),
+    db.order.findMany({ where: { ...paidWhere }, select: { createdAt: true, totalAmount: true } }),
   ]);
 
   // inventory capital value = sum(sellingPrice * currentStock) across SKUs
@@ -271,7 +275,7 @@ export async function getCommercialReports(): Promise<CommercialReports> {
   const userMap = new Map(users.map((u) => [u.id, u]));
 
   const dailyMap = new Map<string, { orders: number; valuePaise: number }>();
-  for (let i = 29; i >= 0; i--) {
+  for (let i = windowDays - 1; i >= 0; i--) {
     dailyMap.set(new Date(Date.now() - i * 86400000).toISOString().slice(0, 10), { orders: 0, valuePaise: 0 });
   }
   for (const o of recentPaid) {

@@ -19,9 +19,10 @@ export function Gallery({ images, name }: { images: GalleryImage[]; name: string
       <div className="relative aspect-square overflow-hidden rounded-lg border border-border bg-muted">
         {active ? (
           <img
+            key={active.url}
             src={active.url}
             alt={active.alt ?? name}
-            className="h-full w-full object-cover"
+            className="rise-in h-full w-full object-cover"
             loading="eager"
           />
         ) : (
@@ -47,8 +48,10 @@ export function Gallery({ images, name }: { images: GalleryImage[]; name: string
               aria-label={`View image ${i + 1} of ${images.length}`}
               onClick={() => setIndex(i)}
               className={cn(
-                "relative h-20 w-20 shrink-0 overflow-hidden rounded-md border bg-muted transition-all",
-                i === index ? "border-foreground" : "border-border opacity-70 hover:opacity-100"
+                "relative h-20 w-20 shrink-0 overflow-hidden rounded-md border bg-muted transition-all duration-200 hover:scale-[1.03]",
+                i === index
+                  ? "border-primary opacity-100 ring-1 ring-primary/30"
+                  : "border-border opacity-70 hover:opacity-100"
               )}
             >
               <img src={img.url} alt="" className="h-full w-full object-cover" loading="lazy" />

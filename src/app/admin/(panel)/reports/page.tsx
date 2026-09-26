@@ -2,6 +2,7 @@
 // top products/customers, inventory valuation. Money via getCommercialReports() (paise).
 
 import { Boxes, CreditCard, IndianRupee, ReceiptText, Truck } from 'lucide-react';
+import Link from 'next/link';
 import { getCommercialReports } from '@/server/services/admin.service';
 import { formatINR } from '@/lib/money';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,25 +32,55 @@ function KpiCard({ label, value, sub }: { label: string; value: string; sub?: st
   );
 }
 
-export default async function AdminReportsPage() {
-  const r = await getCommercialReports();
+interface ReportsPageProps {
+  searchParams: Promise<{ days?: string }>;
+}
+
+const PERIODS = [7, 30, 90, 180] as const;
+
+export default async function AdminReportsPage({ searchParams }: ReportsPageProps) {
+  const sp = await searchParams;
+  const raw = Number(sp.days ?? '30');
+  const days = (PERIODS as readonly number[]).includes(raw) ? raw : 30;
+  const r = await getCommercialReports(days);
+  const periodLabel = `Last ${days} days`; 
   const codPct =
     r.prepaidValuePaise + r.codValuePaise > 0 ? Math.round((r.codValuePaise / (r.prepaidValuePaise + r.codValuePaise)) * 100) : 0;
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="label-caps">Finance</p>
-        <h1 className="mt-1 font-display text-2xl sm:text-3xl">Reports</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Paid-order economics, tax schedule and stock valuation. All figures aggregate settled (paid) orders only.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="label-caps">Finance</p>
+          <h1 className="mt-1 font-display text-2xl sm:text-3xl">Reports</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Paid-order economics, tax schedule and stock valuation. All figures aggregate settled (paid) orders only.
+          </p>
+        </div>
+        <nav aria-label="Report period" className="flex gap-1.5" role="tablist">
+          {PERIODS.map((p) => (
+            <Link
+              key={p}
+              href={`/admin/reports?days=${p}`}
+              role="tab"
+              aria-selected={p === days}
+              aria-current={p === days ? 'true' : undefined}
+              className={
+                p === days
+                  ? 'rounded-md border border-primary bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground'
+                  : 'rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground'
+              }
+            >
+              {p}d
+            </Link>
+          ))}
+        </nav>
       </div>
 
       {/* KPI row */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <KpiCard label="GMV (paid)" value={formatINR(r.gmvPaise)} sub={`${r.ordersCount} orders`} />
-        <KpiCard label="AOV" value={formatINR(r.aovPaise)} sub="average order value" />
+        <KpiCard label={`GMV (paid) · ${periodLabel}`} value={formatINR(r.gmvPaise)} sub={`${r.ordersCount} orders`} />
+        <KpiCard label="AOV" value={formatINR(r.aovPaise)} sub={`average order value · ${periodLabel.toLowerCase()}`} />
         <KpiCard
           label="Prepaid"
           value={formatINR(r.prepaidValuePaise)}
@@ -62,7 +93,7 @@ export default async function AdminReportsPage() {
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
-            <CardTitle className="font-display text-lg">Last 30 days</CardTitle>
+            <CardTitle className="font-display text-lg">{periodLabel}</CardTitle>
             <p className="text-xs text-muted-foreground">Daily paid sales (bars = order count)</p>
           </CardHeader>
           <CardContent>
@@ -117,7 +148,7 @@ export default async function AdminReportsPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="font-display text-lg">Top products</CardTitle>
-            <p className="text-xs text-muted-foreground">By revenue, paid orders</p>
+            <p className="text-xs text-muted-foreground">By revenue, paid orders · {periodLabel.toLowerCase()}</p>
           </CardHeader>
           <CardContent>
             {r.topProducts.length === 0 ? (
@@ -150,7 +181,7 @@ export default async function AdminReportsPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="font-display text-lg">Top customers</CardTitle>
-            <p className="text-xs text-muted-foreground">By lifetime paid value</p>
+            <p className="text-xs text-muted-foreground">By paid value · {periodLabel.toLowerCase()}</p>
           </CardHeader>
           <CardContent>
             {r.topCustomers.length === 0 ? (

@@ -29,6 +29,8 @@ interface CompareState {
   toggle: (item: CompareItem) => ToggleResult;
   remove: (id: string) => void;
   clear: () => void;
+  /** Drop selections the server could not resolve (stale ids after a reseed). */
+  reconcile: (validIds: string[]) => void;
 }
 
 export const useCompareStore = create<CompareState>()(
@@ -49,6 +51,12 @@ export const useCompareStore = create<CompareState>()(
       },
       remove: (id) => set({ items: get().items.filter((i) => i.id !== id) }),
       clear: () => set({ items: [] }),
+      reconcile: (validIds) => {
+        const valid = new Set(validIds);
+        const { items } = get();
+        const kept = items.filter((i) => valid.has(i.id));
+        if (kept.length !== items.length) set({ items: kept });
+      },
     }),
     {
       name: "pn-compare-v1",

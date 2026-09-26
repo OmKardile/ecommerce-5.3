@@ -157,7 +157,13 @@ export function Gstr1Card() {
               ))}
             </SelectContent>
           </Select>
-          <Button size="sm" variant="outline" onClick={exportCsv} disabled={!data || data.rows.length === 0}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={exportCsv}
+            disabled={!data || data.rows.length === 0}
+            title={!data || data.rows.length === 0 ? 'No taxable invoices in this month yet — the export unlocks with the first invoice.' : 'Download GSTR-1 rows (RFC4180) with a totals row'}
+          >
             <Download className="h-4 w-4" aria-hidden /> CSV
           </Button>
         </div>

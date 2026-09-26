@@ -398,3 +398,24 @@ Stage Summary:
 - Storefront data restored after the wipe; two new features live (Trade Desk pipeline + wishlist price-drop tracking), one real customer-facing bug fixed (+91 paste), styling details layered. Dashboard + sidebar now surface inquiry load.
 - Files: prisma/schema.prisma (+3 fields), src/lib/{phone.ts,validators?no}, src/app/api/admin/inquiries/{route,[id]/route}.ts, src/app/admin/(panel)/{inquiries/page.tsx,page.tsx,layout.tsx}, src/components/admin/{inquiry-inbox,admin-shell}.tsx, src/server/services/{admin,wishlist?no}.service.ts, src/app/api/wishlist/[productId]/route.ts, src/app/(store)/account/wishlist/page.tsx, src/components/storefront/{otp-login,checkout-view,account-address-book,product-card}.tsx, src/app/globals.css, package.json, scripts/{checkdb,qa-fixtures,qa-fixprice,qa-clean}.ts.
 - Next-round candidates: admin order detail drawer deep-links (still open), GSTR-1 period picker polish, per-product image overrides when owner sends brand-correct shots, hero swap when Unsplash FwcMuEOW3O0 reachable, purge demo inquiries at go-live.
+
+---
+Task ID: 11
+Agent: Z.ai Code (lead) — cron QA round: compare fix, reports period, inventory demo states
+Task: Cron-triggered review. Assess, QA via agent-browser, fix bugs, [mandatory] styling + features, worklog, push.
+
+Work Log:
+- STATUS: stable (Tasks 0-10 in worklog). DB intact (14 products / 4 users / 2 demo inquiries), all routes 200, health db:up, git clean at a6143b8. Browser QA (9-point) found 1 real bug + polish targets; zero console errors anywhere.
+- BUG FIX — /compare hard-load dead-end: page is server-rendered from ?ids= only, so direct visits with a saved localStorage selection showed "Nothing to compare yet" forever. Fix: CompareIdsBridge client component on /compare — (a) no ?ids= + saved items → router.replace to ?ids=… (server still re-validates); (b) ?ids= present → reconcile(): prune store entries the server could not resolve (stale ids after a reseed no longer dead-end or ghost the tray). Browser-verified both paths (stale id → clean empty state + store pruned; valid ids → full table with Lowest-price badge).
+- BUG FIX (a11y) — SalesChart aria-label hardcoded "last 30 days" → now data-length aware ("last 7/30/90/180 days").
+- FEATURE — Reports period switcher: getCommercialReports(days) parameterized (7/30/90/180 validated; KPIs, payment split, top products/customers, daily series all period-bound; inventory valuation stays a live snapshot). /admin/reports renders a 7d/30d/90d/180d Link tab row (pine active state, aria tablist) + dynamic "Last N days" chart title and KPI/sub labels. Verified 7 bars at 7d, 180 bars at 180d, labels follow.
+- FEATURE (seed) — inventory demo states: deterministic post-pass sets HIK-IP-8MP-28 = 0 (OUT), HIK-NVR-16CH = 3 (LOW), CPP-B01-8MP-28 = 4 (LOW) with MANUAL_ADJUSTMENT movement rows (SEED-DEMO). Ops console now shows real OUT/LOW pills + working status filter (verified 1 row on OUT filter); dashboard low-stock panel has data; PDP OOS + notify-me flow demonstrable (verified: 8MP variant OOS, add-to-cart disabled, notify opt-in present).
+- UX detail — GSTR-1 CSV disabled button now explains itself (title tooltip: unlocks with the first invoice in the month).
+- STYLING PASS: PDP gallery — main image crossfades via rise-in on switch, active thumbnail pine ring (border-primary + ring-primary/30), thumbs scale on hover; compare table — row hover tint + sticky first column depth shadow (.sticky-col-shadow utility); silence Next dev warning via data-scroll-behavior="smooth" on <html> (verified gone from console).
+- DESIGN DECISION (documented, not a bug): product cards bind OOS to product-level availability (any in-stock variant → card shows in stock; cheapest variant drives price) — variant-level OOS/notify-me lives on the PDP. Matches Amazon/Flipkart convention. If the owner wants variant-aware card badges, that's a future toggle.
+- Gates: lint 0, tsc 0, browser verification 6/6 PASS, console 0 errors.
+
+Stage Summary:
+- Compare selection now survives hard navigation and reseeds; Reports has real period control; inventory/OOS states are demonstrable; gallery + compare styling lifted; a11y label fixed.
+- Files: src/components/storefront/{compare-ids-bridge(new),compare?no, gallery}.tsx, src/store/compare-store.ts, src/app/(store)/compare/page.tsx, src/app/admin/(panel)/reports/page.tsx, src/components/admin/{sales-chart,gstr1-card}.tsx, src/server/services/admin.service.ts, src/app/layout.tsx, src/app/globals.css, prisma/seed.ts, scripts/qa-fixtures.ts.
+- Next-round candidates: admin order detail drawer deep-links (tel/wa.me/product links in orders console), compare-store version bump (pn-compare-v2) if schema of snapshot changes, per-product image overrides, hero swap, purge demo inquiries + fixtures at go-live.

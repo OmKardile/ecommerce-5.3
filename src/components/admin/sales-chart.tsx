@@ -26,8 +26,9 @@ function shortDate(iso: string): string {
 }
 
 export function SalesChart({ data, height = 280 }: { data: DailySalesPoint[]; height?: number }) {
+  const days = data.length;
   return (
-    <div style={{ width: '100%', height }} role="img" aria-label="Daily sales for the last 30 days">
+    <div style={{ width: '100%', height }} role="img" aria-label={`Daily paid sales for the last ${days} day${days === 1 ? '' : 's'}`}>
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e6e1d6" vertical={false} />

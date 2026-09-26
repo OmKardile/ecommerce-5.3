@@ -26,7 +26,6 @@ async function main() {
   const wishlist = await db.wishlist.upsert({ where: { userId: user.id }, update: {}, create: { userId: user.id } })
   await db.wishlistItem.deleteMany({ where: { wishlistId: wishlist.id } })
   await db.wishlistItem.create({ data: { wishlistId: wishlist.id, productId: product.id, priceAtAddPaise: 999900 } })
-  const cur = await db.productVariant.findMany({ where: { productId: product.id, isActive: true }, select: { pricePaise: true } })
-  console.log('fixture ok; current variant prices:', JSON.stringify(cur))
+  console.log('fixture ok: 2 inquiries + wishlist drop demo (snapshot ₹9,990 vs current ₹4,590)')
 }
 main().finally(() => db.$disconnect())

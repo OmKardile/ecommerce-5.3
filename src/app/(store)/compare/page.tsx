@@ -8,6 +8,7 @@ import { mapProductCard } from "@/lib/serializers";
 import { formatINR } from "@/lib/money";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CompareIdsBridge } from "@/components/storefront/compare-ids-bridge";
 import { Columns3, ShieldCheck, Truck } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -51,6 +52,9 @@ export default async function ComparePage({ searchParams }: PageProps) {
   if (products.length === 0) {
     return (
       <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+        {/* Hard-loaded without ?ids= → hydrate the URL from localStorage so the
+            comparison table renders; with ?ids= → prune unresolvable selections. */}
+        <CompareIdsBridge resolvedIds={[]} hadIdsParam={ids.length > 0} />
         <div className="mx-auto flex max-w-md flex-col items-center text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
             <Columns3 className="h-6 w-6 text-muted-foreground" aria-hidden />
@@ -150,6 +154,8 @@ export default async function ComparePage({ searchParams }: PageProps) {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-24 pt-10 sm:px-6 lg:px-8">
+      {/* Reconcile the persisted selection against what the server resolved. */}
+      <CompareIdsBridge resolvedIds={products.map((p) => p.card.id)} hadIdsParam />
       {/* header */}
       <p className="label-caps text-muted-foreground">Side-by-side</p>
       <h1 className="mt-1 font-display text-3xl text-foreground sm:text-4xl">Compare products</h1>
@@ -163,7 +169,7 @@ export default async function ComparePage({ searchParams }: PageProps) {
         <p className="mt-3 text-xs text-muted-foreground sm:hidden">Swipe sideways to see all products →</p>
       )}
 
-      <div className="mt-6 overflow-x-auto rounded-lg border border-border bg-card">
+      <div className="mt-6 overflow-x-auto rounded-lg border border-border bg-card [&_tbody>tr]:transition-colors [&_tbody>tr:hover]:bg-muted/30">
         <table className="w-full min-w-[560px] border-collapse text-left sm:min-w-[720px]">
           <caption className="sr-only">Product comparison table</caption>
           <colgroup>
@@ -176,7 +182,7 @@ export default async function ComparePage({ searchParams }: PageProps) {
           {/* product header row */}
           <thead>
             <tr className="border-b border-border">
-              <th scope="col" className="sticky left-0 z-10 bg-card px-4 py-4 align-bottom text-xs font-medium text-muted-foreground">
+              <th scope="col" className="sticky left-0 z-10 bg-card px-4 py-4 align-bottom text-xs font-medium text-muted-foreground sticky-col-shadow">
                 {products.length > 1 ? `${products.length} of ${MAX_COMPARE}` : "Product"}
               </th>
               {products.map((p) => (
@@ -203,7 +209,7 @@ export default async function ComparePage({ searchParams }: PageProps) {
           <tbody>
             {/* price row */}
             <tr className="border-b border-border">
-              <th scope="row" className="sticky left-0 z-10 bg-card px-4 py-3 text-xs font-medium text-muted-foreground">
+              <th scope="row" className="sticky left-0 z-10 bg-card px-4 py-3 text-xs font-medium text-muted-foreground sticky-col-shadow">
                 Price
               </th>
               {products.map((p) => {
@@ -230,7 +236,7 @@ export default async function ComparePage({ searchParams }: PageProps) {
             {/* compact fact rows */}
             {factRows.map((row) => (
               <tr key={row.label} className="border-b border-border last:border-b-0">
-                <th scope="row" className="sticky left-0 z-10 bg-card px-4 py-3 text-xs font-medium text-muted-foreground">
+                <th scope="row" className="sticky left-0 z-10 bg-card px-4 py-3 text-xs font-medium text-muted-foreground sticky-col-shadow">
                   {row.label}
                 </th>
                 {products.map((p, i) => (
@@ -251,7 +257,7 @@ export default async function ComparePage({ searchParams }: PageProps) {
                 </tr>
                 {specKeys.map((key) => (
                   <tr key={key} className="border-b border-border/60 last:border-b-0">
-                    <th scope="row" className="sticky left-0 z-10 bg-card px-4 py-3 text-xs font-medium text-muted-foreground">
+                    <th scope="row" className="sticky left-0 z-10 bg-card px-4 py-3 text-xs font-medium text-muted-foreground sticky-col-shadow">
                       {key}
                     </th>
                     {products.map((p, i) => (

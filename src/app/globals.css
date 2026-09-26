@@ -212,6 +212,10 @@
   .press:active {
     transform: scale(0.97);
   }
+  /* Sticky first column in wide tables — soft edge so overlap reads as depth */
+  .sticky-col-shadow {
+    box-shadow: 6px 0 6px -6px color-mix(in srgb, var(--foreground) 16%, transparent);
+  }
 }
 @keyframes rise-in {
   from {
