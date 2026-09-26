@@ -25,7 +25,7 @@ export default function PrivacyPolicyPage() {
           <div className="space-y-4 text-[15px] leading-relaxed text-foreground/90">
             <p>
               This policy is framed under the Information Technology Act, 2000 and the (Reasonable Security Practices
-              and Procedures and Sensitive Personal Data or Information) Rules, 2011. Patel Networks (MegaTech),
+              and Procedures and Sensitive Personal Data or Information) Rules, 2011. Patel Networks (MegaTechzy),
               Surat, Gujarat is the data fiduciary for information collected on this store. By using the store you
               agree to the practices described here and to the{" "}
               <Link href="/terms" className="underline underline-offset-2 hover:text-foreground">
@@ -149,7 +149,7 @@ export default function PrivacyPolicyPage() {
                 <Phone className="h-4 w-4 text-primary" aria-hidden /> Grievance contact
               </p>
               <p className="mt-2 text-muted-foreground">
-                Patel Networks (MegaTech), Surat Central Hub, Surat, Gujarat {STORE.originPin}
+                Patel Networks (MegaTechzy), Surat Central Hub, Surat, Gujarat {STORE.originPin}
                 <br />
                 {STORE.supportPhone} · {STORE.email}
               </p>

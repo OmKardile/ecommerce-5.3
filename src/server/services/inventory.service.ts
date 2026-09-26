@@ -135,6 +135,10 @@ export async function adjustStock(params: {
           const totalAfter = siblings.reduce((n, s) => n + (s.currentStock - s.reservedStock), 0);
           const totalBefore = totalAfter - params.delta;
           wishlistTransition = totalBefore <= 0 && totalAfter > 0;
+          if (wishlistTransition) {
+            // stamp the recovery moment — powers the PDP "back in stock" ribbon
+            await tx.product.update({ where: { id: productId }, data: { restockedAt: new Date() } });
+          }
           return {
             currentStock: updated.currentStock,
             reservedStock: updated.reservedStock,

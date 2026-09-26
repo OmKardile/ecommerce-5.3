@@ -24,7 +24,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Star } from "lucide-react";
+import { Star, PackageCheck } from "lucide-react";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -43,6 +43,7 @@ interface PdpProduct {
   documents: unknown;
   metaTitle: string | null;
   metaDescription: string | null;
+  restockedAt: Date | null;
   brand: { id: string; name: string; slug: string };
   category: { id: string; name: string; slug: string };
   images: { url: string; altText: string | null }[];
@@ -153,6 +154,13 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const warranty = `${product.warrantyMonths}-month brand warranty`;
   const categoryHref = `/products?category=${product.category.slug}`;
 
+  // "Back in stock" ribbon — shown for 14 days after the OOS → available transition.
+  const RESTOCK_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
+  const backInStock =
+    card.inStock &&
+    product.restockedAt !== null &&
+    Date.now() - new Date(product.restockedAt).getTime() < RESTOCK_WINDOW_MS;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -231,6 +239,15 @@ export default async function ProductDetailPage({ params }: PageProps) {
             {product.modelNumber && (
               <p className="mt-3 text-[13px] text-muted-foreground">
                 Model <span className="font-mono text-[12px] text-foreground">{product.modelNumber}</span>
+              </p>
+            )}
+            {backInStock && (
+              <p
+                className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/[0.06] px-3.5 py-1.5 text-[13px] font-medium text-primary"
+                role="status"
+              >
+                <PackageCheck className="h-4 w-4" aria-hidden />
+                Back in stock — fresh arrival at the Surat hub
               </p>
             )}
           </div>

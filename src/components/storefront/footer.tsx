@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Phone, Mail, MapPin, ShieldCheck, Truck, FileText } from "lucide-react";
+import { Phone, Mail, MapPin, ShieldCheck, Truck, FileText, Lock } from "lucide-react";
 import { STORE } from "@/lib/constants";
 
 const shopLinks = [
@@ -57,7 +57,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 py-12 sm:px-6 md:grid-cols-4">
         <div className="col-span-2 md:col-span-1">
           <p className="font-display text-xl font-semibold">Patel Networks</p>
-          <p className="label-caps mt-1 !text-[9px] !tracking-[0.3em]">MEGATECH · SURAT</p>
+          <p className="label-caps mt-1 !text-[9px] !tracking-[0.3em]">MEGATECHZY · SURAT</p>
           <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-muted-foreground">
             Commercial CCTV, surveillance and structured networking hardware for retail buyers, installers and system
             integrators across India.
@@ -116,11 +116,26 @@ export function Footer() {
       </div>
 
       <div className="border-t border-border">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 text-[12px] text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p>© {new Date().getFullYear()} Patel Networks (MegaTech). GSTIN {STORE.gstin}. All rights reserved.</p>
-          <p>
-            Payments secured by Razorpay · Shipping by Shiprocket &amp; Delhivery · Jurisdiction: Surat, Gujarat
-          </p>
+        <div className="mx-auto max-w-7xl px-4 py-5 text-[12px] text-muted-foreground sm:px-6">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p>© {new Date().getFullYear()} Patel Networks (MegaTechzy). GSTIN {STORE.gstin}. All rights reserved.</p>
+            <p>
+              Payments secured by Razorpay · Shipping by Shiprocket &amp; Delhivery · Jurisdiction: Surat, Gujarat
+            </p>
+          </div>
+          <div className="mt-3 flex flex-col gap-2 border-t border-border/60 pt-3 sm:flex-row sm:items-center sm:justify-between">
+            <p>
+              Surveillance Hardware Procurement Platform/Store · India — authored by{" "}
+              <span className="text-foreground/80">Omkar Kardile / MegaTechzy — Patel Networks</span>
+            </p>
+            <Link
+              href="/admin/login"
+              className="inline-flex w-fit items-center gap-1.5 transition-colors hover:text-foreground"
+              aria-label="Staff and admin panel login"
+            >
+              <Lock className="h-3 w-3" aria-hidden /> Staff / Admin Panel
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

@@ -45,7 +45,7 @@ export default async function ContactPage({
               <MapPin className="h-5 w-5 text-primary" aria-hidden />
               <h2 className="mt-4 font-display text-lg tracking-tight">Surat hub</h2>
               <address className="mt-2 text-[13px] not-italic leading-relaxed text-muted-foreground">
-                Patel Networks (MegaTech)
+                Patel Networks (MegaTechzy)
                 <br />
                 Surat Central Hub
                 <br />

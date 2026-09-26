@@ -37,7 +37,7 @@ export default async function AdminLoginPage({
           </div>
 
           <p className="mt-6 text-center text-[11px] text-sidebar-foreground/40">
-            Patel Networks (MegaTech) · GSTIN 24AAACP1234F1Z8 · Surat, Gujarat
+            Patel Networks (MegaTechzy) · GSTIN 24AAACP1234F1Z8 · Surat, Gujarat
           </p>
         </div>
       </div>

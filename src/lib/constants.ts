@@ -2,7 +2,7 @@
 
 export const STORE = {
   name: 'Patel Networks',
-  legalName: 'Patel Networks (MegaTech)',
+  legalName: 'Patel Networks (MegaTechzy)',
   tagline: 'Surveillance & networking hardware, delivered India-wide',
   gstin: process.env.STORE_GSTIN ?? '24AAACP1234F1Z8',
   originPin: '395003',

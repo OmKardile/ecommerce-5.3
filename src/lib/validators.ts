@@ -195,9 +195,24 @@ export const stockAlertSchema = z.object({
 });
 
 // ---------- admin: returns queue ----------
-export const returnActionSchema = z.object({
-  action: z.enum(['APPROVE', 'REJECT', 'MARK_RESTOCKED', 'MARK_REFUNDED']),
-});
+export const returnActionSchema = z
+  .object({
+    action: z.enum(['APPROVE', 'REJECT', 'MARK_RESTOCKED', 'MARK_REFUNDED']),
+    // courier-inward evidence — REQUIRED for MARK_RESTOCKED, optional elsewhere
+    inwardCourier: z.string().trim().min(2).max(60).optional(),
+    inwardTracking: z
+      .string()
+      .trim()
+      .regex(/^[A-Za-z0-9][A-Za-z0-9-]{4,39}$/, 'Docket number must be 5-40 letters/digits/dashes')
+      .optional(),
+    inwardNote: z.string().trim().max(300).optional(),
+  })
+  .superRefine((v, ctx) => {
+    if (v.action === 'MARK_RESTOCKED') {
+      if (!v.inwardCourier) ctx.addIssue({ code: 'custom', message: 'Return courier is required', path: ['inwardCourier'] });
+      if (!v.inwardTracking) ctx.addIssue({ code: 'custom', message: 'Courier docket / return AWB number is required', path: ['inwardTracking'] });
+    }
+  });
 export const serialNumbersSchema = z.object({
   orderItemId: z.string().min(1),
   serialNumbers: z.array(z.string().trim().min(1).max(60)).max(200),

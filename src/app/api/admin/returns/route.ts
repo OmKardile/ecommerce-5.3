@@ -29,7 +29,15 @@ export async function PATCH(req: Request) {
   if (!returnId) return fail('Missing return id (?id=)', 400);
 
   try {
-    await actOnReturn(returnId, data.action, session.userId, session.fullName || session.email);
+    await actOnReturn(
+      returnId,
+      data.action,
+      session.userId,
+      session.fullName || session.email,
+      data.action === 'MARK_RESTOCKED'
+        ? { inwardCourier: data.inwardCourier, inwardTracking: data.inwardTracking, inwardNote: data.inwardNote }
+        : undefined,
+    );
     return ok({ updated: true, action: data.action });
   } catch (err) {
     if (err instanceof TransitionError) return fail(err.message, 409);

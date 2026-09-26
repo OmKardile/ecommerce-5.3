@@ -3,7 +3,7 @@
 // AdminShell — dark command-center chrome (sidebar + operator header) around a light content area.
 // Sidebar tokens come from globals.css (--sidebar #142a24 family). No gradients, no neon.
 
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -177,6 +177,14 @@ export function AdminShell({
   badges?: { pendingReturns?: number };
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  // Radix Dialog triggers hydrate with different aria/data-state attributes than
+  // SSR emits (dev-only warning, seen on every admin page) — gate the mobile
+  // Sheet until after mount so the SSR tree and first client render agree.
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   return (
     <div className="min-h-screen flex bg-background">
@@ -189,6 +197,7 @@ export function AdminShell({
         {/* Operator header — page-agnostic */}
         <header className="sticky top-0 z-30 bg-sidebar text-sidebar-foreground border-b border-sidebar-border">
           <div className="flex h-14 items-center gap-3 px-4 sm:px-6">
+            {mounted && (
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
                 <Button
@@ -205,6 +214,7 @@ export function AdminShell({
                 <SidebarNav session={session} badges={badges} onNavigate={() => setMobileOpen(false)} />
               </SheetContent>
             </Sheet>
+            )}
 
             <div className="flex items-center gap-2 min-w-0">
               <span className="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-sidebar-border bg-sidebar-accent/60 px-2 py-1 text-[11px] font-medium tracking-wide">

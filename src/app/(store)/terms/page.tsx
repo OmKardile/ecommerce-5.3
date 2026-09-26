@@ -17,7 +17,7 @@ export default function TermsPage() {
     <PageShell
       eyebrow="Terms of sale"
       title="The terms behind the tax invoice"
-      lede="These terms govern every sale made on this store by Patel Networks (MegaTech), Surat. They are written for a commercial trade — plain, and matched to how the warehouse actually runs."
+      lede="These terms govern every sale made on this store by Patel Networks (MegaTechzy), Surat. They are written for a commercial trade — plain, and matched to how the warehouse actually runs."
       aside="Last reviewed: Feb 2026"
     >
       <ContentContainer>
@@ -25,7 +25,7 @@ export default function TermsPage() {
           <div className="space-y-4 text-[15px] leading-relaxed text-foreground/90">
             <p>
               <FileSignature className="mb-0.5 mr-1 inline h-4 w-4 text-primary" aria-hidden />
-              The seller is <strong className="font-semibold">Patel Networks (MegaTech)</strong>, Surat, Gujarat —
+              The seller is <strong className="font-semibold">Patel Networks (MegaTechzy)</strong>, Surat, Gujarat —
               GSTIN {STORE.gstin}, state code {STORE.originStateCode}. The buyer is the account holder placing the
               order: a retail consumer, or a business purchasing for trade use. Placing an order on the store
               constitutes acceptance of these terms, the{" "}

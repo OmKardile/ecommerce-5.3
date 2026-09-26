@@ -6,9 +6,9 @@ import { getBrands } from "@/server/services/catalog.service";
 import { STORE } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "About Patel Networks — Surveillance & Networking Hardware from Surat | MegaTech",
+  title: "About Patel Networks — Surveillance & Networking Hardware from Surat | MegaTechzy",
   description:
-    "Patel Networks (MegaTech) is a Surat-based distributor of CCTV, surveillance and networking hardware — authorized Hikvision, Dahua, CP Plus, WD and D-Link stock with GST invoicing and serial-tracked warranty.",
+    "Patel Networks (MegaTechzy) is a Surat-based distributor of CCTV, surveillance and networking hardware — authorized Hikvision, Dahua, CP Plus, WD and D-Link stock with GST invoicing and serial-tracked warranty.",
   robots: { index: true, follow: true },
   alternates: { canonical: "/about" },
 };
@@ -43,7 +43,7 @@ export default async function AboutPage() {
     <PageShell
       eyebrow="About Patel Networks"
       title="A counter, a warehouse, and a ledger that adds up"
-      lede="Patel Networks — trading as MegaTech — supplies CCTV, surveillance and structured networking hardware to retail buyers, installers and system integrators across India, from a single fulfillment hub in Surat, Gujarat."
+      lede="Patel Networks — trading as MegaTechzy — supplies CCTV, surveillance and structured networking hardware to retail buyers, installers and system integrators across India, from a single fulfillment hub in Surat, Gujarat."
       aside="Surat, Gujarat · Origin PIN 395003"
     >
       <ContentContainer>
@@ -52,7 +52,7 @@ export default async function AboutPage() {
           <div className="space-y-4 text-[15px] leading-relaxed text-foreground/90">
             <p>
               Patel Networks began as a trade counter serving electricians and security contractors in Surat&apos;s
-              commercial hardware market, and grew into a focused distribution business under the MegaTech name. The
+              commercial hardware market, and grew into a focused distribution business under the MegaTechzy name. The
               trade is specific: cameras, recorders, surveillance-rated storage, cable, connectors and the networking
               hardware that ties a site together. We do not sell general electronics — depth in one category is the
               service.

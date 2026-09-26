@@ -290,7 +290,16 @@ export async function applyShipmentTrackingEvent(params: {
       void (await import('./notification.service')).sendWhatsAppTemplate(order.deliveryPhone, 'out_for_delivery', [order.deliveryName, order.orderNumber, shipment.courierName ?? 'Courier', shipment.awb ?? '', order.deliveryCity]);
     }
     if (params.status === 'DELIVERED') {
-      if (order.status === 'SHIPPED' || order.status === 'OUT_FOR_DELIVERY') {
+      // Carriers sometimes deliver straight from SHIPPED (missed OFD scan —
+      // same-city / locker drops). The FSM requires SHIPPED → OUT_FOR_DELIVERY
+      // → DELIVERED, so reconstruct the missing OFD scan before delivering.
+      // (Fix found by RMA E2E: the raw SHIPPED → DELIVERED attempt always
+      // threw a TransitionError which the catch below silently swallowed,
+      // leaving real orders stuck in SHIPPED forever.)
+      if (order.status === 'SHIPPED') {
+        await transitionOrder(order.id, 'OUT_FOR_DELIVERY', 'Out for delivery (reconstructed from carrier POD stream)', 'CARRIER');
+      }
+      if (order.status === 'OUT_FOR_DELIVERY' || order.status === 'SHIPPED') {
         await transitionOrder(order.id, 'DELIVERED', 'Delivered (carrier POD)', 'CARRIER');
       }
       if (order.paymentMethod === 'COD') {

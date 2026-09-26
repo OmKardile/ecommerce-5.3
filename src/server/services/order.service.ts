@@ -477,7 +477,16 @@ export async function listReturnsForAdmin(status?: string) {
     where: status ? { status } : undefined,
     orderBy: { createdAt: 'desc' },
     take: 100,
-    include: {
+    select: {
+      id: true,
+      reason: true,
+      status: true,
+      refundAmount: true,
+      inwardCourier: true,
+      inwardTracking: true,
+      inwardNote: true,
+      inwardAt: true,
+      createdAt: true,
       order: {
         select: {
           id: true,
@@ -501,8 +510,15 @@ export async function countOpenReturns(): Promise<number> {
 
 export type ReturnAction = 'APPROVE' | 'REJECT' | 'MARK_RESTOCKED' | 'MARK_REFUNDED';
 
+/** Courier-inward evidence captured at unit receipt (MARK_RESTOCKED). */
+export interface ReturnInward {
+  inwardCourier?: string;
+  inwardTracking?: string;
+  inwardNote?: string;
+}
+
 /** Drive the RMA row + the order FSM together, with restock & refund side effects. */
-export async function actOnReturn(returnId: string, action: ReturnAction, adminId: string, adminName: string): Promise<{ ok: true }> {
+export async function actOnReturn(returnId: string, action: ReturnAction, adminId: string, adminName: string, inward?: ReturnInward): Promise<{ ok: true }> {
   const ret = await db.orderReturn.findUnique({ where: { id: returnId }, include: { order: { include: { items: true, payments: true, user: { select: { phone: true } } } } } });
   if (!ret) throw new TransitionError('Return request not found');
   const order = ret.order;
@@ -535,8 +551,23 @@ export async function actOnReturn(returnId: string, action: ReturnAction, adminI
       for (const item of order.items) {
         await adjustStock({ skuId: item.skuId, delta: item.quantity, reason: 'RETURN_RESTOCK', referenceId: order.id, notes: `Return ${order.orderNumber}` });
       }
-      await db.orderReturn.update({ where: { id: returnId }, data: { status: 'RESTOCKED', isRma: true } });
-      await transitionOrder(order.id, 'RETURNED', `Returned unit received & restocked by ${adminName}`, changedBy);
+      await db.orderReturn.update({
+        where: { id: returnId },
+        data: {
+          status: 'RESTOCKED',
+          isRma: true,
+          inwardCourier: inward?.inwardCourier ?? null,
+          inwardTracking: inward?.inwardTracking ?? null,
+          inwardNote: inward?.inwardNote ?? null,
+          inwardAt: new Date(),
+        },
+      });
+      await transitionOrder(
+        order.id,
+        'RETURNED',
+        `Returned unit received & restocked by ${adminName}${inward?.inwardCourier ? ` — inward via ${inward.inwardCourier} docket ${inward.inwardTracking}` : ''}`,
+        changedBy,
+      );
       break;
     }
     case 'MARK_REFUNDED': {
@@ -549,6 +580,6 @@ export async function actOnReturn(returnId: string, action: ReturnAction, adminI
     }
   }
 
-  void recordAudit(`RETURN_${action}`, 'ORDER', order.id, { returnId, action, orderNumber: order.orderNumber }, adminId);
+  void recordAudit(`RETURN_${action}`, 'ORDER', order.id, { returnId, action, orderNumber: order.orderNumber, ...(action === 'MARK_RESTOCKED' && inward ? { inward } : {}) }, adminId);
   return { ok: true };
 }
