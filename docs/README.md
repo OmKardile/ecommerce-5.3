@@ -23,6 +23,7 @@ The implementation was built from scratch by a multi-agent team; the authoritati
 | [SECURITY.md](./SECURITY.md) | Auth design, RBAC matrix, validation, idempotency, rate limits, hardening checklist |
 | [DECISIONS.md](./DECISIONS.md) | Conflict resolutions C1-C12 and ADR-020/021 with priority rationale |
 | [DEVELOPMENT.md](./DEVELOPMENT.md) | Local setup, commands, structure walkthrough, QA workflow, PR checklist |
+| [STOCK-MONITOR-RESEARCH.md](./STOCK-MONITOR-RESEARCH.md) | **DRAFT — not implemented**: employee stock-monitor panel research, schema + API drafts, rollout plan, open questions |
 
 ## Business identity
 

@@ -149,6 +149,21 @@ export async function getRelatedProducts(productId: string, categoryId: string, 
   });
 }
 
+/** Install-completing accessories for the cart rail: cables, connectors, power & tools. */
+export async function getInstallAccessories(take = 4): Promise<ProductCard[]> {
+  const categories = await db.category.findMany({
+    where: { slug: { in: ['cables-wiring', 'connectors-accessories'] }, isActive: true },
+    select: { id: true },
+  });
+  if (!categories.length) return [];
+  return db.product.findMany({
+    where: { categoryId: { in: categories.map((c) => c.id) }, isActive: true, deletedAt: null },
+    include: productCardInclude,
+    take,
+    orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+  });
+}
+
 export interface QuickSearchHit {
   id: string;
   slug: string;

@@ -84,7 +84,15 @@ Zero-trust commerce: the client never sends prices, totals, fees, or stock. `car
 
 ## Audit logging
 
-`recordAudit()` (notification.service) writes `audit_logs` rows (action, entity, entityId, details JSON, userId) — fire-and-forget with internal error trapping. Audited actions include: `ORDER_CREATED`, `ORDER_STATUS_TRANSITION`, `ORDER_SERIALS_CAPTURED`, `SHIPMENT_CREATED`, `SHIPMENT_SCAN_SIMULATED`, `STOCK_ADJUSTED`, `SETTINGS_UPDATED`, `COUPON_CREATED/UPDATED/DELETED`, `BANNER_*`, `POST_*`, `WHATSAPP_DISPATCH`, `WHATSAPP_DISPATCH_SIMULATED`.
+`recordAudit()` (notification.service) writes `audit_logs` rows (action, entity, entityId, details JSON, userId) — fire-and-forget with internal error trapping. Audited actions include: `ORDER_CREATED`, `ORDER_STATUS_TRANSITION`, `ORDER_SERIALS_CAPTURED`, `SHIPMENT_CREATED`, `SHIPMENT_SCAN_SIMULATED`, `STOCK_ADJUSTED`, `SETTINGS_UPDATED`, `COUPON_CREATED/UPDATED/DELETED`, `BANNER_*`, `POST_*`, `INQUIRY_STATUS`, `REVIEW_APPROVE/UNAPPROVE/DELETE`, `WHATSAPP_DISPATCH`, `WHATSAPP_DISPATCH_SIMULATED`.
+
+**Stale-session self-heal**: if the session's `userId` no longer matches a `User` row (e.g. after a DB reseed), the FK write fails with Prisma `P2003`; `recordAudit` retries once WITHOUT `userId`, embedding the dropped id in `details.auditUserIdDropped` so the trail survives. A `console.warn` marks the event — re-login restores full attribution.
+
+## Webhook authentication
+
+- **Razorpay** (`/api/webhooks/razorpay`): HMAC signature (`x-razorpay-signature`) verified with `WEBHOOK_SECRET` via timing-safe compare; 401 on mismatch.
+- **WhatsApp** (`/api/webhooks/whatsapp`): Meta hub subscription verify token checked on GET; payload processing on POST.
+- **Carrier tracking** (`/api/webhooks/shipping`): shared secret `SHIPPING_WEBHOOK_TOKEN` (header `x-webhook-token` or `?token=`). Set → enforced 401; unset → sandbox posture with a per-request `console.warn` so a tokenless production deploy is visible in logs immediately.
 
 ## Security headers, cookies, CSRF
 

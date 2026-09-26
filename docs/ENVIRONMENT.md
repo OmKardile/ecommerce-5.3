@@ -36,6 +36,7 @@ Simulated flow: `POST /api/payments/razorpay/simulate` (sandbox-only; refuses wi
 | `SHIPROCKET_PASSWORD` | with the above | — |
 | `SHIPROCKET_API_URL` | optional | Defaults to `https://apiv2.shiprocket.in/v1/external` |
 | `DELHIVERY_API_KEY` | optional | Delhivery direct always uses the simulator until keyed; carrier scans still sync the order FSM |
+| `SHIPPING_WEBHOOK_TOKEN` | optional (required in production) | Shared secret for `POST /api/webhooks/shipping` (header `x-webhook-token` or `?token=`). Unset = sandbox posture with a per-request warning |
 
 Pickup postcode is hardcoded to the Surat hub `395003` in the provider calls (matches `STORE.originPin`).
 

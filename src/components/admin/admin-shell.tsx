@@ -192,6 +192,12 @@ export function AdminShell({
 
   return (
     <div className="min-h-screen flex bg-background">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground focus:shadow-lg"
+      >
+        Skip to content
+      </a>
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex w-60 shrink-0 flex-col fixed inset-y-0 left-0 bg-sidebar text-sidebar-foreground border-r border-sidebar-border z-40">
         <SidebarNav session={session} badges={badges} />

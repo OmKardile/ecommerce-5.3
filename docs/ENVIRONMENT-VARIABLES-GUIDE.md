@@ -319,6 +319,16 @@ SHIPROCKET_PASSWORD="your_shiprocket_account_password"
 
 **Simulation behavior**: unset or `placeholder` → always routes to the simulator. Carrier scans still sync the order FSM either way, so nothing blocks on this key.
 
+#### SHIPPING_WEBHOOK_TOKEN
+
+**What it does**: Shared secret guarding `POST /api/webhooks/shipping` (carrier tracking events). Without it that endpoint accepted unauthenticated status pushes (anyone could post `DELIVERED` for a guessed AWB).
+
+**Where used**: `src/app/api/webhooks/shipping/route.ts`.
+
+**How to get it**: any long random string (`openssl rand -hex 16`). Configure the same value as a custom header `x-webhook-token` (or append `?token=…`) in the Shiprocket/Delhivery webhook settings.
+
+**Simulation behavior**: unset → events are accepted **but every accept logs `set SHIPPING_WEBHOOK_TOKEN before go-live`** in the server log, keeping the sandbox ergonomic while making a tokenless production deploy immediately visible. Set → requests without the exact token get `401`.
+
 ### SMS OTP — Fast2SMS-compatible (DLT)
 
 #### SMS_GATEWAY_API_KEY
