@@ -13,6 +13,12 @@ The implementation was built from scratch by a multi-agent team; the authoritati
 | [DATABASE.md](./DATABASE.md) | All 34 Prisma models, relationships, money-in-paise rationale, portability, seed, PostgreSQL switch |
 | [DEPLOYMENT.md](./DEPLOYMENT.md) | Client VPS self-hosting: Docker Compose, nginx, migrations, backups, logging, SSL |
 | [ENVIRONMENT.md](./ENVIRONMENT.md) | Every environment variable, required vs optional, simulation behavior |
+| [../deploy/ENV-SETUP.md](../deploy/ENV-SETUP.md) | `.env` setup runbook: fill-in order, credential sources, sim→live verification, rotation, troubleshooting |
+| [ENVIRONMENT-VARIABLES-GUIDE.md](./ENVIRONMENT-VARIABLES-GUIDE.md) | Every `.env` variable explained (what/where/how-to-obtain), compose-only vars, patel-5.2 parity table |
+| [VPS-SETUP-GUIDE.md](./VPS-SETUP-GUIDE.md) | Production on a cloud VPS: phased Docker Compose deployment with checkpoints, TLS, backups, hardening, rollback |
+| [PHYSICAL-SERVER-SETUP-GUIDE.md](./PHYSICAL-SERVER-SETUP-GUIDE.md) | Production on bare metal: hardware specs, OS install, SSH, network, BIOS, power resilience, monitoring |
+| [RENDER-DEPLOYMENT.md](./RENDER-DEPLOYMENT.md) | Staging preview (auto-deploy on commit): Render Docker runtime + managed Postgres, never touches production data |
+| [PRODUCTION-CHECKLIST.md](./PRODUCTION-CHECKLIST.md) | Go-live vendor onboarding (Razorpay KYC, Shiprocket, WhatsApp/DLT) + pre-flight smoke test |
 | [API.md](./API.md) | Full endpoint catalog with methods, auth, shapes, error codes |
 | [SECURITY.md](./SECURITY.md) | Auth design, RBAC matrix, validation, idempotency, rate limits, hardening checklist |
 | [DECISIONS.md](./DECISIONS.md) | Conflict resolutions C1-C12 and ADR-020/021 with priority rationale |

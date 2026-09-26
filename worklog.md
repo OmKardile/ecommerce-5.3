@@ -419,3 +419,47 @@ Stage Summary:
 - Compare selection now survives hard navigation and reseeds; Reports has real period control; inventory/OOS states are demonstrable; gallery + compare styling lifted; a11y label fixed.
 - Files: src/components/storefront/{compare-ids-bridge(new),compare?no, gallery}.tsx, src/store/compare-store.ts, src/app/(store)/compare/page.tsx, src/app/admin/(panel)/reports/page.tsx, src/components/admin/{sales-chart,gstr1-card}.tsx, src/server/services/admin.service.ts, src/app/layout.tsx, src/app/globals.css, prisma/seed.ts, scripts/qa-fixtures.ts.
 - Next-round candidates: admin order detail drawer deep-links (tel/wa.me/product links in orders console), compare-store version bump (pn-compare-v2) if schema of snapshot changes, per-product image overrides, hero swap, purge demo inquiries + fixtures at go-live.
+
+---
+Task ID: 12
+Agent: Z.ai Code (lead) — .env requirements guide round
+Task: User request "also create likewise guides for all the .env requirements" — matching the deploy/DEPLOY-STEPS.md runbook style, covering every environment variable the project consumes.
+
+Work Log:
+- RE-VERIFIED THE FULL INVENTORY first: grepped process.env.* across src/, prisma/, scripts/ (20 distinct vars — matches docs/ENVIRONMENT.md), plus compose-only vars consumed outside Next.js (POSTGRES_USER/PASSWORD/DB by the postgres image, RUN_MIGRATIONS by docker-entrypoint.sh, PORT by the standalone server, NEXT_PUBLIC_APP_URL + PRISMA_PROVIDER as Dockerfile build args). WhatsApp template union re-checked (now 7 incl. address_updated); admin bootstrap semantics confirmed (fires only while no user matches ADMIN_EMAIL); password hash scheme confirmed (scrypt N=16384/r=8/p=1, 64-byte key) for the rotation procedure.
+- GAP FOUND: DEPLOY-STEPS.md step 3 says `cp .env.example .env` but .env.example DID NOT EXIST in the repo (planned by agent 3-b per docs/ENVIRONMENT.md, never committed) and .gitignore's `.env*` would have ignored it anyway.
+- CREATED .env.example (committed template): 9 active sim-safe keys (DATABASE_URL SQLite line, JWT_SECRET, NEXT_PUBLIC_APP_URL, ADMIN_EMAIL/ADMIN_PASSWORD, POSTGRES trio, RUN_MIGRATIONS) + fully commented optional blocks for Razorpay trio, Shiprocket/Delhivery, SMS DLT trio, WhatsApp trio, STORE_GSTIN / NEXT_PUBLIC_SUPPORT_WHATSAPP, PORT. Every block documents behavior-when-unset (deterministic simulation), generation commands (openssl rand -hex 32/16/base64 18), and the runtime-vs-build-time distinction for NEXT_PUBLIC_*.
+- CREATED deploy/ENV-SETUP.md (the "likewise" runbook, 7 sections): §0 env-flow table (runtime reads vs build-time inlining vs compose env_file vs Dockerfile args); §1 sandbox zero-config walkthrough; §2 VPS fill-in order (DB trio → JWT_SECRET → admin bootstrap → origin → rest-left-unset-by-design sim launch); §3 credential sources (Razorpay dashboard API keys + webhook secret pairing, Shiprocket account creds with the hardcoded 395003 pickup caveat, Fast2SMS DLT sender+template registration, Meta WhatsApp Cloud API system-user token + 7-template list + /api/webhooks/whatsapp verify token); §4 sim→live verification checklist per subsystem (simulate 403, no [SIMULATED SMS] lines, real AWBs, audit rows without SIMULATED marker); §5 rotation & hygiene (JWT_SECRET invalidates sessions+OTPs, ADMIN_PASSWORD is bootstrap-only + scrypt recipe for hash reset, POSTGRES_PASSWORD rotate-inside-pg-then-recreate, .env off-VPS vault copy alongside DB backups); §6 symptom→variable troubleshooting map (8 rows); §7 variable→code provenance table (file-level audit trail so future greps can re-verify).
+- WIRED THE CROSS-LINKS: DEPLOY-STEPS.md step 3 now points to ENV-SETUP.md; docs/ENVIRONMENT.md header corrected (".env.example will mirror" → "exists, committed") + runbook link; docs/README.md index gained the ENV-SETUP row.
+- GITIGNORE: added `!.env.example` opt-in under `.env*`; verified with `git check-ignore -v` (template negated, real .env still ignored) + node dotenv-syntax parse (9 active keys, no malformed lines).
+- Docs-only round by design (user asked for guides): no runtime code touched, lint/tsc/browser QA not applicable beyond syntax checks.
+
+Stage Summary:
+- All .env requirements now documented three ways: reference table (docs/ENVIRONMENT.md), committed template (.env.example), step-by-step runbook (deploy/ENV-SETUP.md) — cross-linked from each other.
+- Fixed a real go-live blocker: the missing .env.example that DEPLOY-STEPS.md step 3 depends on.
+- Files: .env.example (new), deploy/ENV-SETUP.md (new), .gitignore, deploy/DEPLOY-STEPS.md, docs/ENVIRONMENT.md, docs/README.md.
+- Next-round candidates (unchanged pool): admin order detail drawer deep-links, compare-store version bump if snapshot schema changes, per-product image overrides, hero swap, purge demo inquiries + fixtures at go-live.
+
+---
+Task ID: 13
+Agent: Z.ai Code (lead) + 3 doc subagents (internal IDs 12-a/12-b/12-c)
+Task: User request — "check env example from 5.2 repo; it also has docs related to it (RENDER-DEPLOYMENT / VPS-SETUP-GUIDE / PHYSICAL-SERVER-SETUP-GUIDE / ENVIRONMENT-VARIABLES-GUIDE); have their contents in our md files, don't want any required info from that project to be left."
+
+Work Log:
+- Cloned OmKardile/patel-5.2 to /tmp/patel-5.2 and read ALL four guides + production-deployment-checklist.md + .env.example + docker-compose.yml + scripts/backup-db.sh in full.
+- AUDIT RESULT: our committed .env.example / docs/ENVIRONMENT.md / deploy/ENV-SETUP.md (previous round, this commit) are code-verified and a superset for our stack; the real gaps were the four named guides + the go-live checklist. Confirmed via grep that DIRECT_URL, JWT_EXPIRES_IN, WHATSAPP_API_URL, WHATSAPP_BUSINESS_ACCOUNT_ID, CLOUDINARY_*, NEXT_PUBLIC_RAZORPAY_KEY_ID are NOT read by 5.3 code — each is now explicitly documented as "do not set; no effect" instead of silently dropped.
+- Wrote 5 new guides (3 parallel subagents, then orchestrator review for stack anachronisms — Caddy/PgBouncer/pm2/Supabase appear ONLY as "difference from 5.2" notes, never as live commands):
+  - docs/RENDER-DEPLOYMENT.md (262 ln): staging preview, auto-deploy on commit; Docker runtime primary (bun.lock, image parity), native Node fallback with the in-build provider sed; managed staging Postgres; NODE_ENV useContext-crash warning; cost tiers; staging-DB isolation rule.
+  - docs/VPS-SETUP-GUIDE.md (658 ln): phased A–I with ✅ checkpoints — Docker-only host, .env fill, compose up, seed/restore-from-backup data paths, DNS, certbot TLS (replaces Caddy), deploy/backup.sh cron, UFW 22/80/443, update+rollback, quick reference, official links.
+  - docs/PHYSICAL-SERVER-SETUP-GUIDE.md (986 ln): hardware min/rec tables + don'ts + old-PC tips, Ubuntu 24.04 install (Rufus/dd), SSH keys, netplan/UFW/port-forward/DuckDNS, BIOS AC-Power-Recovery, power-cut @reboot belt-and-braces, monitoring (UptimeRobot), 24h soak.
+  - docs/ENVIRONMENT-VARIABLES-GUIDE.md (586 ln): per-variable what/where/how-to-obtain for all 26 vars (app + compose-only), sim-trigger rules as exact code conditions, platform setup (sandbox/Render/VPS), security practices, 8-row 5.2 parity table.
+  - docs/PRODUCTION-CHECKLIST.md (329 ln): vendor onboarding (Razorpay KYC + webhook events, Shiprocket Surat 395003 pickup + tracking webhook, Meta System User + code-canonical template list with 5.2 sample bodies, DLT PTLNET) + 12-step smoke test adapted to our routes + E1–E4 extended checks (wishlist price-drop, Trade Desk, RMA, /track).
+- Cross-linked everything: docs/README.md index (+5 rows), docs/ENVIRONMENT.md header, deploy/DEPLOY-STEPS.md §5 (stale "seed-images.json not in repo" caveat fixed — it IS committed).
+- FEATURE (candidate-pool item, found as uncommitted WIP from the interrupted previous session — completed & verified): admin order detail drawer deep-links. GET /api/admin/orders/[id] now flattens item→sku→variant→product into productSlug; OrderFulfillmentConsole adds tel: deep-link on rows (stopPropagation keeps sheet closed), tel:/wa.me/Google-Maps links in the sheet, PDP link on each line item's product name, sr-only SheetTitle in the skeleton branch (Radix a11y), aria-labels. scripts/rma-e2e.sh SKU fixture refreshed.
+- QA (agent-browser, admin session): orders table renders; drawer opens (GET /api/admin/orders/[id] 200); all 5 hrefs verified — track.delhivery AWB, /products/optilink-gigabit-fiber-media-converter (PDP 200), tel:9226503668, wa.me/919226503668?text=…, maps query with full address; no console errors; lint 0; tsc 0.
+
+Stage Summary:
+- Nothing required from patel-5.2 is left behind: 5.2's four guides + checklist are ported AND every 5.2-only variable/construct has an explicit 5.3 disposition (used / renamed / adapted / do-not-set).
+- Deploy knowledge now exists at three depths: terse runbook (deploy/DEPLOY-STEPS.md) → phased checkpoint guides (VPS + physical) → staging preview (Render) → per-variable env guide → go-live checklist.
+- Commit: docs "Task 13: patel-5.2 guide parity port" + feat "admin order drawer deep-links".
+- Next-round candidates: compare-store version bump (pn-compare-v2) if snapshot schema changes, per-product image overrides, hero swap when Unsplash reachable, purge demo inquiries + fixtures at go-live (scripts/qa-clean.ts).

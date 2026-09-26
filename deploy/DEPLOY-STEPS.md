@@ -36,6 +36,10 @@ openssl rand -hex 16        # -> POSTGRES_PASSWORD (also fix DATABASE_URL to mat
 openssl rand -hex 16        # -> RAZORPAY_WEBHOOK_SECRET (optional for now)
 ```
 
+> Full walkthrough: **[ENV-SETUP.md](./ENV-SETUP.md)** — per-variable sources
+> (Razorpay/Shiprocket/Fast2SMS/Meta dashboards), sim→live verification
+> checklist, rotation procedures, and the symptom→variable troubleshooting map.
+
 Edit `.env`:
 - `DATABASE_URL=postgresql://<POSTGRES_USER>:<POSTGRES_PASSWORD>@db:5432/<POSTGRES_DB>?schema=public` — host **must be `db`** (compose network), not localhost.
 - `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` (SUPER_ADMIN bootstrap on first `/admin/login`).
@@ -66,9 +70,13 @@ curl -fsS http://127.0.0.1:3000/api/health  # direct to app only if the debug po
 Expect JSON `{"status":"healthy","db":"up",...}`. Then open `http://patelnetworks.in` once DNS is live.
 
 First admin: log in at `/admin/login` with `ADMIN_EMAIL`/`ADMIN_PASSWORD` → SUPER_ADMIN is bootstrapped, then change the password.
-Optional seed catalog: the builder-stage image has bun + full deps:
+Optional seed catalog: the builder-stage image has bun + full deps (`prisma/seed-images.json` is committed, so the seed runs as-is):
 `docker build --target builder -t patel-builder . && docker run --rm --network patelnetworks_internal --env-file .env -v "$PWD/prisma:/app/prisma" patel-builder bun prisma/seed.ts`
-(caveat: `prisma/seed-images.json` is not currently in the repo — seed may fail until it is added; admin + products can also be managed from the admin console.)
+(admin + products can also be managed from the admin console.)
+
+> Fuller, checkpoint-by-checkpoint deployment guides: **[docs/VPS-SETUP-GUIDE.md](../docs/VPS-SETUP-GUIDE.md)**
+> (cloud VPS) and **[docs/PHYSICAL-SERVER-SETUP-GUIDE.md](../docs/PHYSICAL-SERVER-SETUP-GUIDE.md)** (bare metal).
+> A staging preview with auto-deploy on commit: **[docs/RENDER-DEPLOYMENT.md](../docs/RENDER-DEPLOYMENT.md)**.
 
 ## 6. DNS
 

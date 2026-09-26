@@ -1,6 +1,6 @@
 # Environment variables
 
-Verified against the codebase (grep of `process.env.*` across `src/` and `prisma/`). The sandbox `.env` currently carries only `DATABASE_URL`; everything else falls back to the documented defaults or activates simulation. `.env.example` (authored by agent 3-b, see worklog) will mirror this table with placeholder values — **never commit real secrets**.
+Verified against the codebase (grep of `process.env.*` across `src/` and `prisma/`). The committed template **`.env.example`** mirrors this table with sim-safe placeholder values — `cp .env.example .env` then fill; **never commit real secrets**. Step-by-step walkthrough (where to obtain each credential, sim→live verification, rotation, troubleshooting): **[deploy/ENV-SETUP.md](../deploy/ENV-SETUP.md)**. Per-variable deep reference (what it does / where used / how to obtain / patel-5.2 parity): **[ENVIRONMENT-VARIABLES-GUIDE.md](./ENVIRONMENT-VARIABLES-GUIDE.md)**. The sandbox `.env` currently carries only `DATABASE_URL`; everything else falls back to the documented defaults or activates simulation.
 
 Simulation detection conventions actually used in code:
 
