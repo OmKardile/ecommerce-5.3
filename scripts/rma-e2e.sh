@@ -15,7 +15,7 @@ V=$(curl -s -c $CJ -X POST $B/api/auth/otp/verify -H 'Content-Type: application/
 echo "verify: $V"
 
 echo "== 2. add to cart (fiber converter, in-stock) =="
-curl -s -b $CJ -c $CJ -X POST $B/api/cart/item -H 'Content-Type: application/json' -d '{"skuId":"cmuihaejh006alt0jjijz7tqc","quantity":1}' | head -c 80; echo ""
+curl -s -b $CJ -c $CJ -X POST $B/api/cart/item -H 'Content-Type: application/json' -d '{"skuId":"cmuini0dy006aokt9fizhrw7c","quantity":1}' | head -c 80; echo ""
 
 echo "== 3. create COD order =="
 ORDER=$(curl -s -b $CJ -w '\nHTTP:%{http_code}' -X POST $B/api/orders -H 'Content-Type: application/json' -d "{

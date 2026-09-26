@@ -49,6 +49,7 @@ interface ItemRow {
   unitPrice: number;
   totalPrice: number;
   serialNumbers: string | null;
+  productSlug: string | null;
 }
 
 interface PaymentRow {
@@ -317,7 +318,15 @@ export function OrderFulfillmentConsole({ initialStatus = 'ALL' }: { initialStat
                           </Badge>
                         )}
                       </div>
-                      <span className="text-[11px] text-muted-foreground">{o.deliveryPhone}</span>
+                      {/* tel: deep-link — stopPropagation keeps the row's sheet closed */}
+                      <a
+                        href={`tel:${o.deliveryPhone}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-[11px] text-muted-foreground hover:text-primary tabular-nums"
+                        aria-label={`Call ${o.deliveryName}`}
+                      >
+                        {o.deliveryPhone}
+                      </a>
                     </TableCell>
                     <TableCell className="text-center text-xs tabular-nums">{o.items.reduce((n, i) => n + i.quantity, 0)}</TableCell>
                     <TableCell className="text-right text-xs font-medium tabular-nums whitespace-nowrap">{formatINR(o.totalAmount)}</TableCell>
@@ -390,6 +399,9 @@ function OrderDetailSheet({
       <SheetContent className="w-full sm:max-w-xl overflow-y-auto thin-scrollbar p-0" side="right">
         {loading && !detail ? (
           <div className="p-6 space-y-4">
+            {/* Radix requires a Title inside Content at mount — the skeleton
+                branch renders none, so keep an invisible one for a11y */}
+            <SheetTitle className="sr-only">Order detail</SheetTitle>
             <Skeleton className="h-8 w-48" />
             <Skeleton className="h-24 w-full" />
             <Skeleton className="h-40 w-full" />
@@ -433,7 +445,24 @@ function OrderDetailSheet({
                 </h3>
                 <div className="text-sm space-y-0.5">
                   <p className="font-medium">{detail.deliveryName}</p>
-                  <p className="text-muted-foreground">{detail.deliveryPhone}</p>
+                  <p className="flex flex-wrap items-center gap-x-2 text-muted-foreground">
+                    <a
+                      href={`tel:${detail.deliveryPhone}`}
+                      className="tabular-nums hover:text-primary"
+                      aria-label={`Call ${detail.deliveryName}`}
+                    >
+                      {detail.deliveryPhone}
+                    </a>
+                    <a
+                      href={waLink(detail.deliveryPhone)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-0.5 text-xs text-primary underline underline-offset-2"
+                      aria-label={`WhatsApp ${detail.deliveryName}`}
+                    >
+                      WhatsApp
+                    </a>
+                  </p>
                   <p className="text-muted-foreground">
                     {detail.deliveryLine1}
                     {detail.deliveryLine2 ? `, ${detail.deliveryLine2}` : ''}
@@ -442,6 +471,15 @@ function OrderDetailSheet({
                   <p className="text-muted-foreground">
                     {detail.deliveryCity}, {detail.deliveryState} — {detail.deliveryPincode}
                   </p>
+                  <a
+                    href={mapsLink(detail)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-primary underline underline-offset-2"
+                    aria-label={`Open delivery address in Google Maps for ${detail.orderNumber}`}
+                  >
+                    <MapPin className="h-3 w-3" aria-hidden /> Open in Maps
+                  </a>
                 </div>
               </div>
               <div>
@@ -717,7 +755,21 @@ function SerialEditor({ item, onSaved }: { item: ItemRow; onSaved: () => void })
     <div className="rounded-md border border-border p-3 space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
         <div>
-          <p className="font-medium text-xs">{item.productName}</p>
+          <p className="font-medium text-xs">
+            {item.productSlug ? (
+              <a
+                href={`/products/${item.productSlug}`}
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-primary hover:underline underline-offset-2"
+                aria-label={`Open ${item.productName} on the storefront`}
+              >
+                {item.productName}
+              </a>
+            ) : (
+              item.productName
+            )}
+          </p>
           <p className="text-[11px] text-muted-foreground">
             {item.variantName} · <span className="font-mono">{item.skuCode}</span> · ×{item.quantity} · {formatINR(item.totalPrice)}
           </p>
@@ -738,4 +790,24 @@ function SerialEditor({ item, onSaved }: { item: ItemRow; onSaved: () => void })
       </div>
     </div>
   );
+}
+
+// ---------- deep-link helpers (used by the order detail sheet) ----------
+
+function waLink(phone: string): string {
+  const digits = phone.replace(/\D/g, '').replace(/^91/, '');
+  const text = encodeURIComponent('Hello from Patel Networks — regarding your order.');
+  return `https://wa.me/91${digits}?text=${text}`;
+}
+
+function mapsLink(order: OrderRow): string {
+  const parts = [
+    order.deliveryLine1,
+    order.deliveryLine2,
+    order.deliveryLandmark,
+    order.deliveryCity,
+    order.deliveryState,
+    order.deliveryPincode,
+  ].filter(Boolean);
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parts.join(', '))}`;
 }
