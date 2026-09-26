@@ -1,0 +1,15 @@
+{
+  "_comment": "Real product/scene imagery, locally hosted under /public/images/seed/. Sources + licensing notes: see public/images/seed/SOURCES.md. Demo assets — swap for licensed originals before production.",
+  "hero": ["/images/seed/hero/01.jpg"],
+  "dome": ["/images/seed/dome/02.png", "/images/seed/dome/03.jpg", "/images/seed/dome/01.png"],
+  "bullet": ["/images/seed/bullet/01.png", "/images/seed/bullet/02.jpg", "/images/seed/bullet/03.png"],
+  "dvr": ["/images/seed/dvr/01.png", "/images/seed/dvr/02.png"],
+  "nvr": ["/images/seed/nvr/01.jpg"],
+  "hdd": ["/images/seed/hdd/01.png"],
+  "monitor": ["/images/seed/monitor/01.jpg"],
+  "coax": ["/images/seed/coax/01.jpg"],
+  "cat6": ["/images/seed/cat6/01.jpg"],
+  "connector": ["/images/seed/connector/01.jpg"],
+  "fiber": ["/images/seed/fiber/01.jpg"],
+  "poe": ["/images/seed/poe/01.jpg"]
+}

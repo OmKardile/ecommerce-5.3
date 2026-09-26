@@ -1,0 +1,131 @@
+# =============================================================================
+# Patel Networks / MegaTech — production stack for the client's Ubuntu VPS
+# App (Next.js standalone) + PostgreSQL 16 + Nginx reverse proxy, one network.
+#
+# RULES (Task 0):
+#   - Client-owned VPS only. NO Supabase / Firebase / managed DB.
+#   - NO secrets in this file or in the repo — everything comes from .env
+#     (cp .env.example .env, then fill; .env is git-ignored). Compose also
+#     reads .env for ${...} interpolation used below.
+#   - Only Nginx is exposed to the internet (80/443). App and DB stay internal.
+#
+# Runbook: deploy/DEPLOY-STEPS.md   |   Backups: deploy/backup.sh
+# =============================================================================
+
+name: patelnetworks
+
+services:
+  # ---------------------------------------------------------------- app -----
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # NEXT_PUBLIC_APP_URL is baked into client bundles at build time; set it
+      # to the public origin once DNS is live (also keep it in .env for
+      # runtime reads — metadataBase/sitemap/robots):
+      # args:
+      #   NEXT_PUBLIC_APP_URL: https://patelnetworks.in
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    # State by design: the app is stateless; product/media images are
+    # URL-based (seed + admin-managed URLs), so no volume is required today.
+    # If user-uploaded files are introduced later, mount a named volume at the
+    # path the code writes to AND back it up — e.g.:
+    # volumes:
+    #   - uploads:/app/uploads
+    # No host ports published: Nginx is the single ingress. Emergency direct
+    # access (bypassing Nginx) for debugging:
+    # ports:
+    #   - "127.0.0.1:3000:3000"
+    restart: unless-stopped
+    healthcheck:
+      # Mirrors the Dockerfile HEALTHCHECK. NOTE: /api/health answers 200 even
+      # when the DB is unreachable (status:"degraded"), so this verifies the
+      # app is serving; DB liveness is checked by the db service below. Check
+      # `docker compose exec app node -e "...json..."` for full status.
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    networks:
+      - internal
+
+  # ----------------------------------------------------------------- db -----
+  db:
+    image: postgres:16-alpine
+    env_file: .env
+    # POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB are read from .env via
+    # env_file (see .env.example). Never hardcode them here.
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Deliberately NOT published to the host. If you ever need psql from the
+    # VPS without entering the container, prefer:
+    #   docker compose exec db psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+    # A host bind would expose 5432 to the network — avoid unless firewalled.
+    # ports:
+    #   - "127.0.0.1:5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER:-patel}\" -d \"$${POSTGRES_DB:-patelnetworks}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - internal
+
+  # -------------------------------------------------------------- nginx -----
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+      # Uncomment when provisioning SSL (see deploy/DEPLOY-STEPS.md step 7):
+      # - ./nginx/certbot-www:/var/www/certbot:ro
+      # - ./nginx/certbot-conf:/etc/letsencrypt:ro
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - internal
+
+  # =========================================================================
+  # OPTIONAL SERVICES (commented out — not required by the current build).
+  # =========================================================================
+  # redis:
+  #   # Add ONLY if a feature needs it (rate-limit store, queue, sessions).
+  #   # Nothing in the current codebase talks to Redis.
+  #   image: redis:7-alpine
+  #   command: ["redis-server", "--appendonly", "yes"]
+  #   volumes:
+  #     - redisdata:/data
+  #   restart: unless-stopped
+  #   networks:
+  #     - internal
+  #
+  # minio:
+  #   # Add ONLY if the client moves from URL-based product images to
+  #   # self-hosted S3-compatible object storage. Mount a volume for /data,
+  #   # set MINIO_ROOT_USER/MINIO_ROOT_PASSWORD in .env, and keep it OFF the
+  #   # public internet (serve buckets through Nginx with caching).
+  #   image: minio/minio:latest
+  #   command: ["server", "/data", "--console-address", ":9001"]
+  #   volumes:
+  #     - miniodata:/data
+  #   restart: unless-stopped
+  #   networks:
+  #     - internal
+
+volumes:
+  pgdata:
+
+networks:
+  internal:
+    driver: bridge

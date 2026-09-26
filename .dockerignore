@@ -1,0 +1,47 @@
+# =============================================================================
+# Patel Networks / MegaTech — Docker build context exclusions
+# Keeps the image build small and, critically, keeps the sandbox's ARM/node_modules
+# artifacts and secrets OUT of the production image. (Created by Task 3-b.)
+# =============================================================================
+
+# dependencies (rebuilt inside the image from bun.lock)
+node_modules
+bun.lockb
+
+# next.js build output (rebuilt in the builder stage)
+.next
+out
+
+# version control & sandbox tooling
+.git
+.gitignore
+.zscripts
+skills
+tool-results
+examples
+mini-services
+tests
+docs
+download
+upload
+db
+
+# secrets & local env — NEVER bake into an image
+.env
+.env.*
+!.env.example
+
+# logs & scratch
+*.log
+dev.log
+server.log
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+b.jpg
+c.jpg
+
+# deployment kit files not needed inside the image
+nginx
+deploy
+Caddyfile
+backups

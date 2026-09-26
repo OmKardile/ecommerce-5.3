@@ -1,0 +1,662 @@
+// Patel Networks / MegaTech — Unified commerce schema
+// PORTABILITY NOTE: This schema is 100% valid for BOTH SQLite (sandbox dev)
+// and PostgreSQL (client VPS production). To deploy on PostgreSQL:
+//   1. Change provider to "postgresql"  2. npx prisma db push  3. bun run prisma/seed.ts
+// Guarantees: no Prisma enums (string + Zod), no native arrays (Json), all money = integer paise.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// 1. IDENTITY & ACCESS
+// ============================================================
+
+model User {
+  id           String    @id @default(cuid())
+  phone        String    @unique
+  email        String?   @unique
+  passwordHash String?
+  fullName     String?
+  role         String    @default("CUSTOMER") // CUSTOMER | SUPER_ADMIN | ADMIN | INVENTORY_MANAGER | ORDER_MANAGER | CONTENT_MANAGER
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  customer Customer?
+  cart     Cart?
+  wishlist Wishlist?
+  orders   Order[]
+  reviews  Review[]
+  auditLogs AuditLog[]
+
+  @@index([role])
+  @@map("users")
+}
+
+model OtpVerification {
+  id         String   @id @default(cuid())
+  phone      String
+  codeHash   String
+  expiresAt  DateTime
+  isVerified Boolean  @default(false)
+  attempts   Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([phone, createdAt])
+  @@map("otp_verifications")
+}
+
+model Customer {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName      String
+  companyName   String?
+  gstin         String?
+  isB2BVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  addresses Address[]
+
+  @@map("customers")
+}
+
+model Address {
+  id            String    @id @default(cuid())
+  customerId    String
+  customer      Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  recipientName String
+  phone         String
+  addressLine1  String
+  addressLine2  String?
+  landmark      String?
+  city          String
+  state         String
+  pincode       String
+  isDefault     Boolean   @default(false)
+  type          String    @default("HOME") // HOME | WORK | WAREHOUSE
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([customerId])
+  @@map("addresses")
+}
+
+// ============================================================
+// 2. CATALOG — Category > Brand > Product > Variant > SKU
+// ============================================================
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  imageUrl    String?
+  parentId    String?
+  parent      Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryTree")
+  hsnCode     String     @default("8525")
+  gstRate     Int        @default(18) // percent
+  sortOrder   Int        @default(0)
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  products Product[]
+
+  @@index([parentId])
+  @@map("categories")
+}
+
+model Brand {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  logoUrl     String?
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+
+  @@map("brands")
+}
+
+model Product {
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique
+  brandId         String
+  brand           Brand     @relation(fields: [brandId], references: [id])
+  categoryId      String
+  category        Category  @relation(fields: [categoryId], references: [id])
+  shortDesc       String?
+  description     String
+  modelNumber     String?
+  isActive        Boolean   @default(true)
+  isFeatured      Boolean   @default(false)
+  isCodAllowed    Boolean   @default(true) // ADR-004 selective COD
+  specifications  String?   // JSON object of key/value specs
+  documents       String?   // JSON array [{title,url}] datasheets & manuals
+  warrantyMonths  Int       @default(12)
+  metaTitle       String?
+  metaDescription String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  images   ProductImage[]
+  variants ProductVariant[]
+  reviews  Review[]
+  wishlistItems WishlistItem[]
+
+  @@index([brandId])
+  @@index([categoryId])
+  @@index([isActive, isFeatured])
+  @@map("products")
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  altText   String?
+  sortOrder Int      @default(0)
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+model ProductVariant {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name       String
+  attributes String   // JSON map (ADR-005 multi-attribute)
+  skuId      String   @unique
+  sku        Sku      @relation(fields: [skuId], references: [id], onDelete: Cascade)
+  isActive   Boolean  @default(true)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([productId])
+  @@map("product_variants")
+}
+
+model Sku {
+  id           String   @id @default(cuid())
+  code         String   @unique
+  barcode      String?  @unique
+  mrp          Int      // paise
+  sellingPrice Int      // paise, GST inclusive
+  weightGrams  Int      @default(500)
+  dimensions   String?  // JSON {l,w,h} cm
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  variant     ProductVariant?
+  inventory   Inventory?
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+  bundleItems BundleItem[]
+  movements   InventoryMovement[]
+  stockAlerts StockAlert[]
+
+  @@map("skus")
+}
+
+// ============================================================
+// 3. INVENTORY — stock lives ONLY at SKU level
+// ============================================================
+
+model Inventory {
+  id                String   @id @default(cuid())
+  skuId             String   @unique
+  sku               Sku      @relation(fields: [skuId], references: [id], onDelete: Cascade)
+  currentStock      Int      @default(0)
+  reservedStock     Int      @default(0)
+  lowStockThreshold Int      @default(5)
+  updatedAt         DateTime @updatedAt
+
+  @@map("inventory")
+}
+
+// reason: PURCHASE_RECEIPT | ORDER_RESERVED | ORDER_DISPATCHED | ORDER_CANCELLED_RESTOCK | RETURN_RESTOCK | MANUAL_ADJUSTMENT | DAMAGED_WRITE_OFF
+model InventoryMovement {
+  id          String   @id @default(cuid())
+  skuId       String
+  sku         Sku      @relation(fields: [skuId], references: [id], onDelete: Cascade)
+  quantity    Int
+  reason      String
+  referenceId String?
+  notes       String?
+  createdById String?
+  createdAt   DateTime @default(now())
+
+  @@index([skuId, createdAt])
+  @@index([reason])
+  @@map("inventory_movements")
+}
+
+// ============================================================
+// 4. KIT BUILDER (ADR-006)
+// slot: recorder | camera | hdd | power | cable | connector
+// ============================================================
+
+model Bundle {
+  id          String       @id @default(cuid())
+  name        String
+  slug        String       @unique
+  description String?
+  discountPct Int          @default(5)
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  items BundleItem[]
+
+  @@map("bundles")
+}
+
+model BundleItem {
+  id         String  @id @default(cuid())
+  bundleId   String
+  bundle     Bundle  @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  skuId      String
+  sku        Sku     @relation(fields: [skuId], references: [id])
+  slot       String
+  quantity   Int     @default(1)
+  isOptional Boolean @default(false)
+
+  @@unique([bundleId, skuId, slot])
+  @@map("bundle_items")
+}
+
+// ============================================================
+// 5. CART & WISHLIST
+// ============================================================
+
+model Cart {
+  id         String   @id @default(cuid())
+  userId     String?  @unique
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guestToken String?  @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  items CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  skuId     String
+  sku       Sku      @relation(fields: [skuId], references: [id])
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, skuId])
+  @@map("cart_items")
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items WishlistItem[]
+}
+
+model WishlistItem {
+  id         String   @id @default(cuid())
+  wishlistId String
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([wishlistId, productId])
+  @@map("wishlist_items")
+}
+
+// ============================================================
+// 6. ORDERS, PAYMENTS, FULFILLMENT
+// status: PENDING_PAYMENT | COD_PENDING | PAID | CONFIRMED | PROCESSING | PACKED | SHIPPED | OUT_FOR_DELIVERY | DELIVERED | CANCELLED | RETURN_REQUESTED | RETURNED | REFUNDED
+// ============================================================
+
+model Order {
+  id                 String    @id @default(cuid())
+  orderNumber        String    @unique
+  userId             String
+  user               User      @relation(fields: [userId], references: [id])
+  status             String    @default("PENDING_PAYMENT")
+  paymentMethod      String    @default("RAZORPAY") // RAZORPAY | COD
+  isB2B              Boolean   @default(false)
+  gstin              String?
+  companyName        String?
+  subtotal           Int
+  discountAmount     Int       @default(0)
+  bundleDiscount     Int       @default(0)
+  bundleName         String?
+  couponCode         String?
+  shippingAmount     Int       @default(0)
+  codFee             Int       @default(0)
+  gstAmount          Int
+  cgstAmount         Int       @default(0)
+  sgstAmount         Int       @default(0)
+  igstAmount         Int       @default(0)
+  totalAmount        Int
+  deliveryName       String
+  deliveryPhone      String
+  deliveryLine1      String
+  deliveryLine2      String?
+  deliveryLandmark   String?
+  deliveryCity       String
+  deliveryState      String
+  deliveryPincode    String
+  customerNote       String?
+  estimatedDeliveryAt DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+
+  items         OrderItem[]
+  statusHistory OrderStatusHistory[]
+  payments      Payment[]
+  shipments     Shipment[]
+  returns       OrderReturn[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id            String @id @default(cuid())
+  orderId       String
+  order         Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  skuId         String
+  sku           Sku    @relation(fields: [skuId], references: [id])
+  productName   String
+  variantName   String
+  skuCode       String
+  hsnCode       String
+  quantity      Int
+  unitPrice     Int
+  taxRate       Int
+  taxAmount     Int
+  lineDiscount  Int    @default(0)
+  totalPrice    Int
+  serialNumbers String? // JSON string[] — hardware serials for RMA/warranty (ADR-014)
+  isCodAllowed  Boolean @default(true)
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model OrderStatusHistory {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    String
+  comment   String?
+  changedBy String?
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@map("order_status_history")
+}
+
+// status: INITIATED | SUCCESS | FAILED | REFUNDED ; method: ONLINE | COD
+model Payment {
+  id               String   @id @default(cuid())
+  orderId          String
+  order            Order    @relation(fields: [orderId], references: [id])
+  gateway          String   @default("RAZORPAY")
+  gatewayOrderId   String?  @unique
+  gatewayPaymentId String?  @unique
+  amount           Int
+  currency         String   @default("INR")
+  method           String   @default("ONLINE")
+  status           String   @default("INITIATED")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  events PaymentEvent[]
+
+  @@index([orderId])
+  @@map("payments")
+}
+
+model PaymentEvent {
+  id        String   @id @default(cuid())
+  paymentId String?
+  payment   Payment? @relation(fields: [paymentId], references: [id])
+  eventId   String   @unique
+  eventType String
+  payload   String
+  createdAt DateTime @default(now())
+
+  @@map("payment_events")
+}
+
+// provider: SHIPROCKET | DELHIVERY ; status: MANIFESTED | PICKED_UP | IN_TRANSIT | OUT_FOR_DELIVERY | DELIVERED | RTO_INITIATED | RTO_DELIVERED | CANCELLED
+model Shipment {
+  id                 String    @id @default(cuid())
+  orderId            String
+  order              Order     @relation(fields: [orderId], references: [id])
+  provider           String    @default("SHIPROCKET")
+  courierName        String?
+  providerShipmentId String?
+  awb                String?   @unique
+  trackingUrl        String?
+  labelUrl           String?
+  status             String    @default("MANIFESTED")
+  estimatedDeliveryAt DateTime?
+  dispatchedAt       DateTime?
+  deliveredAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  events ShipmentEvent[]
+
+  @@unique([orderId])
+  @@map("shipments")
+}
+
+model ShipmentEvent {
+  id         String   @id @default(cuid())
+  shipmentId String
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  eventId    String   @unique
+  status     String
+  location   String?
+  occurredAt DateTime
+  payload    String
+  createdAt  DateTime @default(now())
+
+  @@index([shipmentId])
+  @@map("shipment_events")
+}
+
+model OrderReturn {
+  id           String   @id @default(cuid())
+  orderId      String
+  order        Order    @relation(fields: [orderId], references: [id])
+  reason       String
+  status       String   @default("REQUESTED") // REQUESTED | APPROVED | REJECTED | RESTOCKED | REFUNDED
+  isRma        Boolean  @default(false)
+  refundAmount Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([orderId])
+  @@map("order_returns")
+}
+
+// ============================================================
+// 7. MARKETING & CONTENT
+// ============================================================
+
+model Coupon {
+  id               String    @id @default(cuid())
+  code             String    @unique
+  description      String?
+  type             String    @default("PERCENT") // PERCENT | FIXED
+  value            Int       // percent (0-100) or paise
+  minOrderValue    Int?
+  maxDiscountValue Int?
+  startsAt         DateTime?
+  endsAt           DateTime?
+  usageLimit       Int?
+  usedCount        Int       @default(0)
+  isActive         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  redemptions CouponRedemption[]
+
+  @@map("coupons")
+}
+
+model CouponRedemption {
+  id             String   @id @default(cuid())
+  couponId       String
+  coupon         Coupon   @relation(fields: [couponId], references: [id])
+  orderId        String
+  discountAmount Int
+  createdAt      DateTime @default(now())
+
+  @@unique([couponId, orderId])
+  @@map("coupon_redemptions")
+}
+
+model Banner {
+  id        String    @id @default(cuid())
+  title     String
+  subtitle  String?
+  imageUrl  String
+  linkUrl   String?
+  placement String    @default("HOME_HERO") // HOME_HERO | HOME_STRIP
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("banners")
+}
+
+model Post {
+  id             String    @id @default(cuid())
+  title          String
+  slug           String    @unique
+  excerpt        String?
+  content        String
+  coverImageUrl  String?
+  status         String    @default("DRAFT") // DRAFT | PUBLISHED
+  publishedAt    DateTime?
+  tags           String?   // JSON string[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("posts")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating     Int      @default(5)
+  title      String?
+  comment    String?
+  isVerified Boolean  @default(false)
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@unique([productId, userId])
+  @@index([productId, isApproved])
+  @@map("reviews")
+}
+
+model B2BInquiry {
+  id          String   @id @default(cuid())
+  name        String
+  phone       String
+  email       String?
+  companyName String?
+  gstin       String?
+  message     String
+  productId   String?
+  status      String   @default("NEW") // NEW | CONTACTED | CLOSED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("b2b_inquiries")
+}
+
+// Back-in-stock notify-me requests (one per SKU + phone; re-request resets to PENDING)
+model StockAlert {
+  id         String    @id @default(cuid())
+  skuId      String
+  sku        Sku       @relation(fields: [skuId], references: [id], onDelete: Cascade)
+  phone      String
+  status     String    @default("PENDING") // PENDING | NOTIFIED | EXPIRED
+  notifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([skuId, phone])
+  @@index([skuId, status])
+  @@map("stock_alerts")
+}
+
+// ============================================================
+// 8. PLATFORM
+// ============================================================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String?
+  details   String?  // JSON
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model Setting {
+  key       String   @id
+  value     String   // JSON
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
