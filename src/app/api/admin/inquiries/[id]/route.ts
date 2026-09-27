@@ -3,7 +3,7 @@
 // Server-side FSM: status must move forward only; NEW→CLOSED is allowed
 // (junk/spam). Stamps handledAt the first time the row leaves NEW.
 
-import { fail, ok, parseBody, requireAnyAdmin } from '@/lib/api-helpers';
+import { fail, ok, parseBody, requirePermission } from '@/lib/api-helpers';
 import { db } from '@/lib/db';
 import { recordAudit } from '@/server/services/notification.service';
 import { z } from 'zod';
@@ -16,7 +16,7 @@ const patchSchema = z.object({
 const RANK: Record<string, number> = { NEW: 0, CONTACTED: 1, CLOSED: 2 };
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireAnyAdmin();
+  const session = await requirePermission('inquiries');
   if (!session) return fail('Unauthorized', 401);
 
   const { id } = await params;

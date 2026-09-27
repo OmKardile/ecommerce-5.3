@@ -12,6 +12,7 @@ import {
   ClipboardList,
   Image as ImageIcon,
   LayoutDashboard,
+  UserCog,
   Undo2,
   LogOut,
   type LucideIcon,
@@ -33,7 +34,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
-import { ROLES, ROLE_LABELS, STOCK_MONITOR_ROLES, STORE, type Role } from '@/lib/constants';
+import { ROLES, ROLE_LABELS, SCOPE_LABELS, STORE, type PermissionScope, type Role } from '@/lib/constants';
 import { api } from '@/components/admin/api';
 
 export interface AdminShellSession {
@@ -41,6 +42,9 @@ export interface AdminShellSession {
   email: string;
   fullName: string;
   role: string;
+  /** Granted scope keys — empty for the Owner (who passes every gate implicitly). */
+  permissions: string[];
+  isOwner: boolean;
 }
 
 interface NavItem {
@@ -49,35 +53,36 @@ interface NavItem {
   icon: LucideIcon;
   exact?: boolean;
   badgeKey?: 'pendingReturns' | 'newInquiries' | 'pendingReviews';
-  /** Roles that see this entry; omitted = managers only (never STAFF). */
-  roles?: Role[];
+  /** Permission scope this section belongs to; omitted = dashboard (everyone). */
+  scope?: PermissionScope;
+  /** Owner-only section (staff management). */
+  ownerOnly?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-  { href: '/admin/orders', label: 'Orders', icon: ClipboardList },
-  { href: '/admin/returns', label: 'Returns & DOA', icon: Undo2, badgeKey: 'pendingReturns' },
-  { href: '/admin/products', label: 'Products', icon: Package },
-  { href: '/admin/categories', label: 'Categories', icon: Shapes },
-  { href: '/admin/brands', label: 'Brands', icon: Boxes },
-  { href: '/admin/inventory', label: 'Inventory', icon: Warehouse },
-  { href: '/admin/stock-monitor', label: 'Stock Monitor', icon: Radar, roles: STOCK_MONITOR_ROLES },
-  { href: '/admin/customers', label: 'Customers', icon: Users },
-  { href: '/admin/inquiries', label: 'Trade Desk', icon: MessageSquareQuote, badgeKey: 'newInquiries' },
-  { href: '/admin/reviews', label: 'Reviews', icon: Star, badgeKey: 'pendingReviews' },
-  { href: '/admin/coupons', label: 'Coupons', icon: TicketPercent },
-  { href: '/admin/banners', label: 'Banners', icon: ImageIcon },
-  { href: '/admin/blog', label: 'Blog', icon: Newspaper },
-  { href: '/admin/reports', label: 'Reports', icon: BarChart3 },
-  { href: '/admin/settings', label: 'Settings', icon: Settings },
+  { href: '/admin/orders', label: 'Orders', icon: ClipboardList, scope: 'orders' },
+  { href: '/admin/returns', label: 'Returns & DOA', icon: Undo2, badgeKey: 'pendingReturns', scope: 'returns' },
+  { href: '/admin/products', label: 'Products', icon: Package, scope: 'products' },
+  { href: '/admin/categories', label: 'Categories', icon: Shapes, scope: 'categories' },
+  { href: '/admin/brands', label: 'Brands', icon: Boxes, scope: 'brands' },
+  { href: '/admin/inventory', label: 'Inventory', icon: Warehouse, scope: 'inventory' },
+  { href: '/admin/stock-monitor', label: 'Stock Monitor', icon: Radar, scope: 'stock_monitor' },
+  { href: '/admin/customers', label: 'Customers', icon: Users, scope: 'customers' },
+  { href: '/admin/inquiries', label: 'Trade Desk', icon: MessageSquareQuote, badgeKey: 'newInquiries', scope: 'inquiries' },
+  { href: '/admin/reviews', label: 'Reviews', icon: Star, badgeKey: 'pendingReviews', scope: 'reviews' },
+  { href: '/admin/coupons', label: 'Coupons', icon: TicketPercent, scope: 'coupons' },
+  { href: '/admin/banners', label: 'Banners', icon: ImageIcon, scope: 'banners' },
+  { href: '/admin/blog', label: 'Blog', icon: Newspaper, scope: 'blog' },
+  { href: '/admin/reports', label: 'Reports', icon: BarChart3, scope: 'reports' },
+  { href: '/admin/settings', label: 'Settings', icon: Settings, scope: 'settings' },
+  { href: '/admin/staff', label: 'Staff & access', icon: UserCog, ownerOnly: true },
 ];
 
 function roleBadgeClass(role: string): string {
   switch (role) {
     case ROLES.SUPER_ADMIN:
       return 'bg-[#f7f6f1] text-[#142a24] border-transparent';
-    case ROLES.ADMIN:
-      return 'bg-sidebar-accent text-sidebar-accent-foreground border-sidebar-border';
     default:
       return 'bg-transparent text-sidebar-foreground/80 border-sidebar-border';
   }
@@ -97,7 +102,11 @@ function SidebarNav({ session, badges, onNavigate }: { session: AdminShellSessio
       </div>
 
       <nav aria-label="Admin sections" className="flex-1 overflow-y-auto thin-scrollbar px-3 py-4 space-y-0.5">
-        {NAV_ITEMS.filter((item) => (item.roles ? item.roles.includes(session.role as Role) : session.role !== ROLES.STAFF)).map((item) => {
+        {NAV_ITEMS.filter((item) => {
+          if (item.ownerOnly) return session.isOwner;
+          if (!item.scope) return session.isOwner || session.permissions.length === 0; // dashboard: owner, or staff with no scopes yet
+          return session.isOwner || session.permissions.includes(item.scope);
+        }).map((item) => {
           const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
           const Icon = item.icon;
           return (
@@ -138,6 +147,9 @@ function SidebarNav({ session, badges, onNavigate }: { session: AdminShellSessio
         <SignOutButton />
         <p className="px-3 pt-1 text-[10px] leading-relaxed text-sidebar-foreground/40">
           {session.fullName || session.email} · Signed in as {roleLabel(session.role)}
+          {!session.isOwner && session.permissions.length > 0 && (
+            <> — {session.permissions.map((p) => SCOPE_LABELS[p as PermissionScope] ?? p).join(', ')}</>
+          )}
         </p>
       </div>
     </div>

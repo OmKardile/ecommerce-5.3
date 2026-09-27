@@ -2,6 +2,18 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-27 — Task 23 (role overhaul: Owner + scoped Staff, D-12; login-loop fix)
+
+**Change — the account model you asked for**
+- **Two operator roles remain**: `SUPER_ADMIN` (**Owner** — implicitly full access) and `STAFF` (**Staff** — dynamic scope). `ADMIN`, `INVENTORY_MANAGER`, `ORDER_MANAGER`, `CONTENT_MANAGER` are **removed**: legacy rows migrate to STAFF with a mapped scope (`scripts/migrate-legacy-roles.ts`, idempotent, safe to keep).
+- **Per-staff scope**: new `User.permissions` JSON column (validated scope keys). The Owner grants functions at staff creation and edits them any time — **15 grantable scopes** (orders, returns, products, categories, brands, inventory, stock_monitor, customers, inquiries, reviews, coupons, banners, blog, reports, settings), grouped in the wizard with quick presets (Counter / Warehouse / Fulfillment / Catalog / Content desk).
+- **Permission gates**: new `requirePermission(scope)` + `requireOwner()` in `api-helpers` re-read the operator's DB row **per request** — scope edits and deactivations take effect on the staff's **next request, no re-login**. All 39 gated admin route files (~58 call sites) moved off `requireRole`/`requireAnyAdmin`; fixed-role constants deleted. Route → scope map documented in the layout + technical docs.
+- **Staff & access console** (`/admin/staff`, owner-only, in nav + sweep): accounts table (Owner/Staff chips, scope chips, active state), **3-step creation wizard** (identity → account type & function grid → review; password generator), per-account editor (rename / reset password / scope change / deactivate), and an owner **"Your login" card** (change own email +/or password, current password always required; wrong current password → 403).
+- **Owner self-service + second superadmin**: the wizard's account-type step creates Staff or another Superadmin; owners cannot be scoped or deactivated from the dialog (implicit full access).
+- **Bug found & fixed during E2E — login redirect loop**: a JWT can verify at the edge while its user row is gone (post-wipe/reseed), so panel-layout → `/admin/login` ping-ponged with the proxy (ERR_TOO_MANY_REDIRECTS). New `GET /admin/logout` escape hatch: the layout routes dead sessions there to actually clear the cookie, then login renders — self-healing.
+- **Seed**: 4 scoped staff personas (warehouse `inventory@…/warehouse@2026`, fulfillment `orders@…/fulfill@2026`, content `content@…/content@2026`, counter `staff@…/counter@2026`).
+- **Verified live (browser)**: wizard create → new staff lands on their section with single-entry nav; deep-link `/admin/orders` bounces back; scope added by owner → staff nav/API update immediately; scoped staff hitting `/api/admin/products|orders|staff` → 401, wall → 200; owner password change + revert + wrong-current-password 403; second superadmin sees all 17 nav entries; admin sweep 0px overflow at 375/768/1280 (incl. `/admin/staff`); lint 0 · tsc 0. Sandbox dev server reaped twice mid-round → keeper restarts.
+
 ## 2026-09-27 — Task 22 (role display naming: Owner-first ladder, D-11)
 
 **Change — roles now read the way the shop thinks**

@@ -17,48 +17,55 @@ export const STORE = {
 
 export const ROLES = {
   SUPER_ADMIN: 'SUPER_ADMIN',
-  ADMIN: 'ADMIN',
-  INVENTORY_MANAGER: 'INVENTORY_MANAGER',
-  ORDER_MANAGER: 'ORDER_MANAGER',
-  CONTENT_MANAGER: 'CONTENT_MANAGER',
   STAFF: 'STAFF',
   CUSTOMER: 'CUSTOMER',
 } as const;
 export type Role = (typeof ROLES)[keyof typeof ROLES];
 
-// Human-facing names for the role ladder (D-11) — the DB keys above are
-// frozen API surface; only this map decides what people read in the UI.
-// Ladder: Owner (store owner, every permission) → Manager (general) →
-// scoped managers → Floor Staff (stock-monitor persona) → Customer.
+// Human-facing names (D-11/D-12): the DB keys above are frozen API surface;
+// only this map decides what people read in the UI.
+// Ladder: Owner (store owner, every permission incl. staff management) →
+// Staff (dynamic scope, granted per-account by the owner) → Customer.
 export const ROLE_LABELS: Record<Role, string> = {
   SUPER_ADMIN: 'Owner',
-  ADMIN: 'Manager',
-  INVENTORY_MANAGER: 'Inventory Manager',
-  ORDER_MANAGER: 'Orders Manager',
-  CONTENT_MANAGER: 'Content Manager',
-  STAFF: 'Floor Staff',
+  STAFF: 'Staff',
   CUSTOMER: 'Customer',
 } as const;
 
-export const ADMIN_ROLES: Role[] = [
-  ROLES.SUPER_ADMIN,
-  ROLES.ADMIN,
-  ROLES.INVENTORY_MANAGER,
-  ROLES.ORDER_MANAGER,
-  ROLES.CONTENT_MANAGER,
-];
+// ---------------------------------------------------------------------------
+// Permission scopes (D-12): the owner grants per-staff scopes at account
+// creation (wizard at /admin/staff). Owner always passes every gate.
+// `staff` itself is NOT grantable — /admin/staff is inherently owner-only.
+// ---------------------------------------------------------------------------
+export const PERMISSION_SCOPES = [
+  { key: 'orders', label: 'Orders & fulfillment', group: 'Fulfillment', description: 'Order pipeline, packing, shipments, serials' },
+  { key: 'returns', label: 'Returns & DOA', group: 'Fulfillment', description: 'RMA queue, DOA claims, refunds' },
+  { key: 'products', label: 'Products', group: 'Catalog & stock', description: 'Create and edit products, variants, SKUs' },
+  { key: 'categories', label: 'Categories', group: 'Catalog & stock', description: 'Category tree' },
+  { key: 'brands', label: 'Brands', group: 'Catalog & stock', description: 'Brand directory' },
+  { key: 'inventory', label: 'Inventory', group: 'Catalog & stock', description: 'Stock levels, adjustments, imports, variance approval' },
+  { key: 'stock_monitor', label: 'Stock Monitor', group: 'Catalog & stock', description: 'Live wall, count sessions, discrepancy reports' },
+  { key: 'customers', label: 'Customers', group: 'People & support', description: 'Customer directory and profiles' },
+  { key: 'inquiries', label: 'Trade Desk', group: 'People & support', description: 'B2B / bulk inquiries' },
+  { key: 'reviews', label: 'Reviews', group: 'People & support', description: 'Moderate product reviews' },
+  { key: 'coupons', label: 'Coupons', group: 'Content & marketing', description: 'Discount codes' },
+  { key: 'banners', label: 'Banners', group: 'Content & marketing', description: 'Homepage promo banners' },
+  { key: 'blog', label: 'Blog', group: 'Content & marketing', description: 'Posts and guides' },
+  { key: 'reports', label: 'Reports', group: 'Insights & config', description: 'Sales reports, GSTR-1 export' },
+  { key: 'settings', label: 'Settings', group: 'Insights & config', description: 'Store config (sensitive)' },
+] as const;
+export type PermissionScope = (typeof PERMISSION_SCOPES)[number]['key'];
+export const PERMISSION_KEYS: readonly PermissionScope[] = PERMISSION_SCOPES.map((s) => s.key);
+export const SCOPE_LABELS: Record<PermissionScope, string> = Object.fromEntries(
+  PERMISSION_SCOPES.map((s) => [s.key, s.label]),
+) as Record<PermissionScope, string>;
 
-// Stock Monitor persona (ADR-010): counter/floor staff observe and report —
-// they get the monitor endpoints ONLY, never the general admin surface.
-export const STOCK_MONITOR_ROLES: Role[] = [...ADMIN_ROLES, ROLES.STAFF];
-
-// Roles allowed to decide adjustment requests / apply count variances
-// (mirrors the inventory console's mutation gate).
-export const INVENTORY_DECISION_ROLES: Role[] = [
-  ROLES.SUPER_ADMIN,
-  ROLES.ADMIN,
-  ROLES.INVENTORY_MANAGER,
-];
+/** Parse the User.permissions JSON column into validated scope keys. */
+export function parsePermissions(value: unknown): PermissionScope[] {
+  if (!Array.isArray(value)) return [];
+  const valid = new Set<string>(PERMISSION_KEYS);
+  return value.filter((v): v is PermissionScope => typeof v === 'string' && valid.has(v));
+}
 
 export const ORDER_STATUSES = [
   'PENDING_PAYMENT',

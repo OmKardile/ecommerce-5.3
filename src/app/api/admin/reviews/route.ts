@@ -5,12 +5,12 @@
 // invisible on the PDP until approved here.
 
 import type { NextRequest } from 'next/server';
-import { fail, ok, requireAnyAdmin } from '@/lib/api-helpers';
+import { fail, ok, requirePermission } from '@/lib/api-helpers';
 import { db } from '@/lib/db';
 import { Prisma } from '@prisma/client';
 
 export async function GET(req: NextRequest) {
-  const session = await requireAnyAdmin();
+  const session = await requirePermission('reviews');
   if (!session) return fail('Unauthorized', 401);
 
   const sp = req.nextUrl.searchParams;

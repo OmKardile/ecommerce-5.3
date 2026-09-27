@@ -2,11 +2,11 @@
 
 import type { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
-import { fail, ok, requireAnyAdmin } from '@/lib/api-helpers';
+import { fail, ok, requirePermission } from '@/lib/api-helpers';
 import { getStockHistory } from '@/server/services/inventory.service';
 
 export async function GET(req: NextRequest) {
-  const session = await requireAnyAdmin();
+  const session = await requirePermission('inventory');
   if (!session) return fail('Unauthorized', 401);
 
   const skuId = req.nextUrl.searchParams.get('skuId');

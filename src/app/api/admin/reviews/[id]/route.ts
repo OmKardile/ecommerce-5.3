@@ -2,7 +2,7 @@
 // DELETE /api/admin/reviews/[id] — remove a review outright (spam/abuse).
 // Both actions are audit-logged; the PDP only ever renders isApproved rows.
 
-import { fail, ok, parseBody, requireAnyAdmin } from '@/lib/api-helpers';
+import { fail, ok, parseBody, requirePermission } from '@/lib/api-helpers';
 import { db } from '@/lib/db';
 import { recordAudit } from '@/server/services/notification.service';
 import { z } from 'zod';
@@ -12,7 +12,7 @@ const patchSchema = z.object({
 });
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireAnyAdmin();
+  const session = await requirePermission('reviews');
   if (!session) return fail('Unauthorized', 401);
 
   const { id } = await params;
@@ -40,7 +40,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireAnyAdmin();
+  const session = await requirePermission('reviews');
   if (!session) return fail('Unauthorized', 401);
 
   const { id } = await params;

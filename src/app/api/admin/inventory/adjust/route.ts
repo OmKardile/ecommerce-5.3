@@ -1,16 +1,14 @@
 // POST /api/admin/inventory/adjust — manual stock adjustment with mandatory reason code.
 // Transactional + immutable movement audit. INVENTORY_MANAGER / ADMIN / SUPER_ADMIN only.
 
-import { fail, ok, parseBody, requireRole } from '@/lib/api-helpers';
+import { fail, ok, parseBody, requirePermission } from '@/lib/api-helpers';
 import { stockAdjustSchema } from '@/lib/validators';
-import { ROLES } from '@/lib/constants';
 import { adjustStock, InventoryError } from '@/server/services/inventory.service';
 import { recordAudit } from '@/server/services/notification.service';
 
-const INVENTORY_ROLES = [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.INVENTORY_MANAGER];
 
 export async function POST(req: Request) {
-  const session = await requireRole(INVENTORY_ROLES);
+  const session = await requirePermission('inventory');
   if (!session) return fail('Unauthorized', 401);
 
   const { data, error } = await parseBody(req, stockAdjustSchema);

@@ -4,12 +4,11 @@
 import type { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
 import { fail, ok } from '@/lib/api-helpers';
-import { requireRole } from '@/lib/api-helpers';
-import { STOCK_MONITOR_ROLES } from '@/lib/constants';
+import { requirePermission } from '@/lib/api-helpers';
 import { getWallProjection } from '@/server/services/stock-monitor.service';
 
 export async function GET(req: NextRequest) {
-  const session = await requireRole(STOCK_MONITOR_ROLES);
+  const session = await requirePermission('stock_monitor');
   if (!session) return fail('Unauthorized', 401);
 
   const q = req.nextUrl.searchParams.get('q') ?? undefined;

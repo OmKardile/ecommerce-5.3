@@ -1,12 +1,12 @@
 // GET /api/admin/inventory/export — CSV download of the SKU matrix.
 
-import { fail, requireAnyAdmin } from '@/lib/api-helpers';
+import { fail, requirePermission } from '@/lib/api-helpers';
 import { db } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const session = await requireAnyAdmin();
+  const session = await requirePermission('inventory');
   if (!session) return fail('Unauthorized', 401);
 
   const rows = await db.inventory.findMany({

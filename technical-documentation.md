@@ -23,7 +23,7 @@ src/
     admin/
       login/          ← standalone login (outside panel chrome)
       (panel)/        ← 15 console pages, server-layout gated + role badges
-    api/              ← 75 route files (all mutations; Zod-validated DTOs)
+    api/              ← 78 route files (all mutations; Zod-validated DTOs)
   components/
     storefront/       ← product cards, gallery, variant selector, cart, reviews…
     admin/            ← client islands per console module + shared shell
@@ -62,7 +62,7 @@ scripts/              ← qa-fixtures.ts / qa-clean.ts / checkdb.ts / rma-e2e.sh
 | Admin | email+password (scrypt N=16384,r=8,p=1); JWT cookie `pn_admin_session`; role bootstrap via `ADMIN_EMAIL/PASSWORD` | Login 8 / 10 min / email |
 | Cookies | httpOnly, `sameSite=lax`, `secure` in prod | Role isolation: admin login clears customer cookie and vice versa |
 
-RBAC roles: `SUPER_ADMIN, ADMIN, INVENTORY_MANAGER, ORDER_MANAGER, CONTENT_MANAGER, STAFF` — enforced per-route via `requireRole([...])` (products/categories/brands/settings: admin+; inventory mutations: +INVENTORY_MANAGER; orders/shipments/returns/serials: +ORDER_MANAGER; content (banners/posts/coupons): +CONTENT_MANAGER; stock-monitor endpoints: +STAFF via `STOCK_MONITOR_ROLES`, decision endpoints via `INVENTORY_DECISION_ROLES`). STAFF sessions are additionally fenced to `/admin/stock-monitor*` server-side (proxy injects `x-pathname`; panel layout redirects). Human-facing names come from the `ROLE_LABELS` map (`lib/constants`, D-11): Owner (SUPER_ADMIN), Manager (ADMIN), Inventory/Orders/Content Manager, Floor Staff (STAFF) — DB role keys stay frozen. No admin route is Owner-exclusive today (plain ADMIN passes every gate); the Owner account is the env-bootstrapped identity ("Store Owner").
+RBAC (D-12): two operator roles — `SUPER_ADMIN` (**Owner**, implicitly passes every gate; can change own login and mint more owners) and `STAFF` (scope = `User.permissions` JSON, 15 validated keys: orders, returns, products, categories, brands, inventory, stock_monitor, customers, inquiries, reviews, coupons, banners, blog, reports, settings). Gates are `requirePermission(scope)` / `requireOwner()` in `api-helpers` — they **re-read the user row per request**, so owner edits apply on the staff's next request (no re-login). Fixed legacy roles (`ADMIN`, `INVENTORY_MANAGER`, `ORDER_MANAGER`, `CONTENT_MANAGER`) are removed; `scripts/migrate-legacy-roles.ts` migrates old rows idempotently. The panel layout mirrors the gates server-side via the proxy's `x-pathname` header (deep links into non-granted sections bounce to the staff's first granted section; `/admin` dashboard = Owner / scope-less staff only; dead-JWT sessions route through `GET /admin/logout` to clear the cookie — prevents proxy↔layout redirect loops). Route → scope map lives in `(panel)/layout.tsx` SECTIONS; stock-monitor decision endpoints (variance apply, request decide, session close) require the `inventory` scope, observation/reporting requires `stock_monitor`.
 
 ## Integrations (dual-mode)
 

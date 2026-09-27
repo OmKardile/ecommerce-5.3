@@ -1,12 +1,10 @@
 // /api/admin/posts — GET list + POST create. CONTENT_MANAGER / ADMIN / SUPER_ADMIN.
 
 import { db } from '@/lib/db';
-import { fail, ok, parseBody, requireAnyAdmin, requireRole } from '@/lib/api-helpers';
+import { fail, ok, parseBody, requirePermission } from '@/lib/api-helpers';
 import { adminPostSchema } from '@/lib/validators';
-import { ROLES } from '@/lib/constants';
 import { recordAudit } from '@/server/services/notification.service';
 
-const CONTENT_ROLES = [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.CONTENT_MANAGER];
 
 function slugify(name: string): string {
   return name
@@ -17,7 +15,7 @@ function slugify(name: string): string {
 }
 
 export async function GET() {
-  const session = await requireAnyAdmin();
+  const session = await requirePermission('blog');
   if (!session) return fail('Unauthorized', 401);
 
   const posts = await db.post.findMany({ orderBy: { createdAt: 'desc' } });
@@ -25,7 +23,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const session = await requireRole(CONTENT_ROLES);
+  const session = await requirePermission('blog');
   if (!session) return fail('Unauthorized', 401);
 
   const { data, error } = await parseBody(req, adminPostSchema);

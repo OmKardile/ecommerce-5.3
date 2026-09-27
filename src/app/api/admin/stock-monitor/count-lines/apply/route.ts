@@ -1,13 +1,12 @@
 // POST /api/admin/stock-monitor/count-lines/apply — manager converts one counted
 // variance into a real MANUAL_ADJUSTMENT movement (one click, audited).
 
-import { fail, ok, parseBody, requireRole } from '@/lib/api-helpers';
-import { INVENTORY_DECISION_ROLES } from '@/lib/constants';
+import { fail, ok, parseBody, requirePermission } from '@/lib/api-helpers';
 import { countLineApplySchema } from '@/lib/validators';
 import { applyCountLine, StockMonitorError } from '@/server/services/stock-monitor.service';
 
 export async function POST(req: Request) {
-  const session = await requireRole(INVENTORY_DECISION_ROLES);
+  const session = await requirePermission('inventory');
   if (!session) return fail('Unauthorized', 401);
 
   const { data, error } = await parseBody(req, countLineApplySchema);

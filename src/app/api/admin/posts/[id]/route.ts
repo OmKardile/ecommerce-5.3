@@ -1,15 +1,13 @@
 // /api/admin/posts/[id] — PATCH (edit; PUBLISH sets publishedAt) + DELETE.
 
 import { db } from '@/lib/db';
-import { fail, ok, parseBody, requireRole } from '@/lib/api-helpers';
+import { fail, ok, parseBody, requirePermission } from '@/lib/api-helpers';
 import { adminPostSchema } from '@/lib/validators';
-import { ROLES } from '@/lib/constants';
 import { recordAudit } from '@/server/services/notification.service';
 
-const CONTENT_ROLES = [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.CONTENT_MANAGER];
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireRole(CONTENT_ROLES);
+  const session = await requirePermission('blog');
   if (!session) return fail('Unauthorized', 401);
 
   const { id } = await params;
@@ -46,7 +44,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireRole(CONTENT_ROLES);
+  const session = await requirePermission('blog');
   if (!session) return fail('Unauthorized', 401);
 
   const { id } = await params;

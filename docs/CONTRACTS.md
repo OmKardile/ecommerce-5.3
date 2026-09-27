@@ -23,7 +23,7 @@
 - `@/lib/gst`: splitGstInclusive(priceInclusivePaise, gstRatePercent) -> {base, gst, cgst, sgst, igst} (cgst/sgst populated when intra-state); isSameState(srcPin, dstPin); computeCartTotals(items, opts) server-side.
 - `@/lib/pincodes`: resolveZone(pin6) -> {zone, etaDays, codAvailable, express}; isServiceable(pin); estimateDelivery(pin) -> Date.
 - `@/lib/constants`: ROLES, ORDER_STATUSES (enum-like string unions), ORDER_TRANSITIONS (valid map), MOVEMENT_REASONS, PAYMENT_STATUSES, PAYMENT_METHODS, SHIPMENT_STATUSES, ZONES, STORE (name, gstin, originPin, originState, supportPhone, whatsapp).
-- `@/lib/session`: getSessionUser(), getAdminSession(), requireCustomer(), requireRole(roles[]), setCustomerSession(), setAdminSession(), clearSessions() (jose HS256, cookies pn_session / pn_admin_session).
+- `@/lib/session`: getSessionUser(), getAdminSession(), requireCustomer(), setCustomerSession(), setAdminSession(), clearAdminSession(), clearSessions() (jose HS256, cookies pn_session / pn_admin_session). `@/lib/api-helpers`: requirePermission(scope) / requireOwner() — DB-fresh gates (D-12); every admin mutation is permission-scoped, Owner passes implicitly.
 - `@/lib/rate-limit`: rateLimit(key, limit, windowMs) -> {ok, remaining}.
 - `@/lib/validators`: zod schemas: otpRequestSchema, otpVerifySchema, checkoutSchema, addressSchema, productQuerySchema, cartItemSchema, couponSchema, adminSchemas…
 - `@/server/db`: prisma singleton.
@@ -42,7 +42,7 @@
 
 ## Server conventions
 - ALL mutations via API route handlers (NO server actions). Zod-validate every input. Money math server-side only.
-- Stock monitor (ADR-10): STAFF+ read endpoints (`STOCK_MONITOR_ROLES`), decision endpoints (`INVENTORY_DECISION_ROLES`); every stock change — approvals and count-variance applies — writes a real `InventoryMovement` (MANUAL_ADJUSTMENT, referenceId = request/session) inside one transaction; proposals carry reason-validated deltas (DAMAGED/MISSING < 0, FOUND > 0, WRONG_LOCATION = 0); count sessions snapshot expected stock at open and each line applies at most once (`appliedAt`). STAFF console surface fenced server-side to `/admin/stock-monitor*`.
+- Stock monitor (ADR-10 + D-12): wall/history/count endpoints require the `stock_monitor` permission; decision endpoints (variance apply, request decide, session close) require `inventory`; every stock change — approvals and count-variance applies — writes a real `InventoryMovement` (MANUAL_ADJUSTMENT, referenceId = request/session) inside one transaction; proposals carry reason-validated deltas (DAMAGED/MISSING < 0, FOUND > 0, WRONG_LOCATION = 0); count sessions snapshot expected stock at open and each line applies at most once (`appliedAt`). Staff page access is fenced server-side by the panel layout (proxy `x-pathname`).
 - Inventory-critical ops inside prisma.$transaction with { maxWait: 15000, timeout: 30000 }.
 - Availability check: currentStock - reservedStock >= qty else 409 INSUFFICIENT_STOCK.
 - Order create: reserve stock (reservedStock++ + movement ORDER_RESERVED) for every item; prepaid -> PENDING_PAYMENT then PAID on capture; COD -> COD_PENDING (respect COD ceiling Rs 15,000 paise = 1500000, per-product isCodAllowed, zone codAvailable).

@@ -3,10 +3,10 @@
 // shipments + tracking events.
 
 import { db } from '@/lib/db';
-import { fail, ok, requireAnyAdmin } from '@/lib/api-helpers';
+import { fail, ok, requirePermission } from '@/lib/api-helpers';
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireAnyAdmin();
+  const session = await requirePermission('orders');
   if (!session) return fail('Unauthorized', 401);
 
   const { id } = await params;

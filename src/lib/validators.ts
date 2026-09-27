@@ -349,3 +349,33 @@ export const stockRequestDecisionSchema = z.object({
 export const countLineApplySchema = z.object({
   lineId: z.string().min(1),
 });
+
+// ---------------------------------------------------------------------------
+// Staff & access management (D-12) — owner-only surface
+// ---------------------------------------------------------------------------
+
+export const staffCreateSchema = z.object({
+  fullName: z.string().trim().min(2).max(80),
+  email: z.string().trim().toLowerCase().email(),
+  password: z.string().min(8).max(72),
+  accountType: z.enum(['STAFF', 'SUPER_ADMIN']),
+  permissions: z.array(z.string()).default([]),
+});
+
+export const staffUpdateSchema = z.object({
+  fullName: z.string().trim().min(2).max(80).optional(),
+  password: z.string().min(8).max(72).optional(),
+  permissions: z.array(z.string()).optional(),
+  isActive: z.boolean().optional(),
+});
+
+export const ownerCredentialsSchema = z
+  .object({
+    currentPassword: z.string().min(1),
+    email: z.string().trim().toLowerCase().email().optional(),
+    newPassword: z.string().min(8).max(72).optional(),
+  })
+  .refine((d) => Boolean(d.email || d.newPassword), {
+    message: 'Provide a new email and/or a new password',
+    path: ['email'],
+  });

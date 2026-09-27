@@ -3,8 +3,7 @@
 //   GET  — manager queue (?status=PENDING|APPROVED|REJECTED|all). Decision roles only.
 
 import type { NextRequest } from 'next/server';
-import { fail, ok, parseBody, requireRole } from '@/lib/api-helpers';
-import { INVENTORY_DECISION_ROLES, STOCK_MONITOR_ROLES } from '@/lib/constants';
+import { fail, ok, parseBody, requirePermission } from '@/lib/api-helpers';
 import { stockAdjustmentRequestSchema } from '@/lib/validators';
 import {
   listAdjustmentRequests,
@@ -13,7 +12,7 @@ import {
 } from '@/server/services/stock-monitor.service';
 
 export async function GET(req: NextRequest) {
-  const session = await requireRole(INVENTORY_DECISION_ROLES);
+  const session = await requirePermission('inventory');
   if (!session) return fail('Unauthorized', 401);
 
   const status = req.nextUrl.searchParams.get('status');
@@ -23,7 +22,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: Request) {
-  const session = await requireRole(STOCK_MONITOR_ROLES);
+  const session = await requirePermission('stock_monitor');
   if (!session) return fail('Unauthorized', 401);
 
   const { data, error } = await parseBody(req, stockAdjustmentRequestSchema);

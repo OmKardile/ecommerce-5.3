@@ -2,7 +2,8 @@
 
 import { NextResponse } from 'next/server';
 import type { ZodSchema } from 'zod';
-import { ADMIN_ROLES, type Role } from '@/lib/constants';
+import { ROLES, parsePermissions, type PermissionScope } from '@/lib/constants';
+import { db } from '@/lib/db';
 import { getAdminSession, getCustomerSession, type AdminSession, type CustomerSession } from '@/lib/session';
 
 export function ok<T>(data: T, status = 200) {
@@ -41,15 +42,37 @@ export async function requireAdmin(): Promise<AdminSession | null> {
   return getAdminSession();
 }
 
-export async function requireRole(allowed: Role[]): Promise<AdminSession | null> {
+/**
+ * Permission gate (D-12): the DB row is re-read per request, so scope edits
+ * made by the owner take effect on the staff's NEXT request — no re-login.
+ * SUPER_ADMIN (Owner) passes every scope; STAFF passes when their granted
+ * `permissions` include the scope; `scope='any'` admits any active operator.
+ * Legacy/fixed roles (pre-D-12) get no access.
+ */
+export async function requirePermission(scope: PermissionScope | 'any'): Promise<AdminSession | null> {
   const session = await getAdminSession();
   if (!session) return null;
-  if (!allowed.includes(session.role)) return null;
-  return session;
+  const user = await db.user.findUnique({
+    where: { id: session.userId },
+    select: { role: true, isActive: true, deletedAt: true, permissions: true },
+  });
+  if (!user || user.deletedAt || !user.isActive) return null;
+  if (user.role === ROLES.SUPER_ADMIN) return session;
+  if (user.role !== ROLES.STAFF) return null;
+  if (scope === 'any') return session;
+  return parsePermissions(user.permissions).includes(scope) ? session : null;
 }
 
-export async function requireAnyAdmin(): Promise<AdminSession | null> {
-  return requireRole(ADMIN_ROLES);
+/** Owner-only gate (staff management, owner credentials). */
+export async function requireOwner(): Promise<AdminSession | null> {
+  const session = await getAdminSession();
+  if (!session) return null;
+  const user = await db.user.findUnique({
+    where: { id: session.userId },
+    select: { role: true, isActive: true, deletedAt: true },
+  });
+  if (!user || user.deletedAt || !user.isActive || user.role !== ROLES.SUPER_ADMIN) return null;
+  return session;
 }
 
 export function clientIp(req: Request): string {

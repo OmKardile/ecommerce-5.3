@@ -1,6 +1,6 @@
 # Database
 
-Single Prisma schema at `prisma/schema.prisma` with **34 models**, table names mapped to snake_case via `@@map`. The schema header documents the portability contract:
+Single Prisma schema at `prisma/schema.prisma` with **38 models**, table names mapped to snake_case via `@@map`. The schema header documents the portability contract:
 
 ```
 // PORTABILITY NOTE: This schema is 100% valid for BOTH SQLite (sandbox dev)
@@ -8,13 +8,13 @@ Single Prisma schema at `prisma/schema.prisma` with **34 models**, table names m
 // no native arrays (Json/Json-string), all money = integer paise.
 ```
 
-## Entity map (all 34 models)
+## Entity map (all 38 models)
 
 Identity & access:
 
 | Model | Key fields / relations |
 | --- | --- |
-| `User` | phone (unique), email (unique, optional), passwordHash (staff), fullName, role (string: CUSTOMER/SUPER_ADMIN/ADMIN/INVENTORY_MANAGER/ORDER_MANAGER/CONTENT_MANAGER), isActive, deletedAt; has customer, cart, wishlist, orders, reviews, auditLogs; index on role |
+| `User` | phone (unique), email (unique, optional), passwordHash (staff), fullName, role (string: CUSTOMER/SUPER_ADMIN/STAFF — D-12 removed the fixed manager roles), permissions (JSON array of permission-scope keys for STAFF, nullable), isActive, deletedAt; has customer, cart, wishlist, orders, reviews, auditLogs, countSessionsOpened; index on role |
 | `OtpVerification` | phone, codeHash (sha256), expiresAt, isVerified, attempts; index (phone, createdAt) |
 | `Customer` | userId (unique, cascade) -> User; fullName, companyName, gstin, isB2BVerified; has addresses |
 | `Address` | customerId (cascade) -> Customer; recipientName, phone, addressLine1/2, landmark, city, state, pincode, isDefault, type (HOME/WORK/WAREHOUSE); index on customerId |
@@ -53,6 +53,14 @@ Orders, payments, fulfillment:
 | `Shipment` | orderId (UNIQUE — one shipment row per order, updated on re-book), provider (SHIPROCKET/DELHIVERY), courierName, providerShipmentId, awb (unique), trackingUrl, labelUrl, status (MANIFESTED/PICKED_UP/IN_TRANSIT/OUT_FOR_DELIVERY/DELIVERED/RTO_INITIATED/RTO_DELIVERED/CANCELLED), estimatedDeliveryAt, dispatchedAt, deliveredAt |
 | `ShipmentEvent` | shipmentId (cascade), eventId (UNIQUE — idempotency), status, location, occurredAt, payload; index shipmentId |
 | `OrderReturn` | orderId, reason, status (REQUESTED/APPROVED/REJECTED/RESTOCKED/REFUNDED), isRma, refundAmount; index orderId |
+
+Stock monitor (ADR-010):
+
+| Model | Key fields / relations |
+| --- | --- |
+| `StockCountSession` | title, status (OPEN/COUNTING/SUBMITTED/CLOSED/CANCELLED), scopeKind (CATEGORY/BRAND/ALL) + scope refs, expected snapshot (JSON), openedById (User), counts per scope; index status |
+| `StockCountLine` | sessionId (cascade), skuId, expectedQty, countedQty (nullable), variance (derived on write), appliedAt + appliedMovementId (single-apply marker); unique (sessionId, skuId) |
+| `StockAdjustmentRequest` | skuId, delta (reason-validated), reason (DAMAGED/MISSING/FOUND/WRONG_LOCATION/OTHER), note, status (PENDING/APPROVED/REJECTED), proposedById, decidedById, movementId (backfill on approve) |
 
 Marketing & content:
 

@@ -1,13 +1,12 @@
 // POST /api/admin/stock-monitor/adjustment-requests/[id]/decide — manager approves
 // (creates the real InventoryMovement when delta ≠ 0) or rejects. Audited.
 
-import { fail, ok, parseBody, requireRole } from '@/lib/api-helpers';
-import { INVENTORY_DECISION_ROLES } from '@/lib/constants';
+import { fail, ok, parseBody, requirePermission } from '@/lib/api-helpers';
 import { stockRequestDecisionSchema } from '@/lib/validators';
 import { decideAdjustment, StockMonitorError } from '@/server/services/stock-monitor.service';
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireRole(INVENTORY_DECISION_ROLES);
+  const session = await requirePermission('inventory');
   if (!session) return fail('Unauthorized', 401);
   const { id } = await params;
 

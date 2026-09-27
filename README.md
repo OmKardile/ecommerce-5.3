@@ -3,7 +3,7 @@
 E-commerce + operations platform for **Patel Networks** (Surat, Gujarat): CCTV, surveillance and networking hardware retail & B2B trade. Storefront brand: **MegaTech** (by Patel Networks); store-ops console: **Patel Networks Operations Console**.
 
 > Stack: **Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 · shadcn/ui · Prisma ORM · SQLite (dev) / PostgreSQL (prod) · bun**
-> 35 Prisma models · 48 pages · 67 API route handlers · money always integer paise
+> 38 Prisma models · 50 pages · 78 API route handlers · 2 operator roles (Owner + scoped Staff) · money always integer paise
 > Appearance: editorial light theme (default) · **trust-pine dark mode** via the nav toggle (storefront header, mobile drawer, admin chrome)
 
 ---

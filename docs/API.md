@@ -92,7 +92,7 @@ Guest carts ride the `pn_cart_id` cookie; all lines re-priced/re-stocked server-
 
 ## Admin
 
-All under `/api/admin/**`; every route requires an admin cookie and most writes audit-log via `recordAudit`. Roles: `CATALOG = SUPER_ADMIN|ADMIN`, `CONTENT = SUPER_ADMIN|ADMIN|CONTENT_MANAGER`, `INVENTORY = SUPER_ADMIN|ADMIN|INVENTORY_MANAGER`, `ORDER = SUPER_ADMIN|ADMIN|ORDER_MANAGER`, `SETTINGS = SUPER_ADMIN|ADMIN`.
+All under `/api/admin/**`; every route requires an admin cookie and most writes audit-log via `recordAudit`. Permission scopes (D-12, Owner passes all): products/categories/brands → `products`/`categories`/`brands`; coupons/banners/posts → `coupons`/`banners`/`blog`; inventory → `inventory`; orders/shipments/serials → `orders`; returns → `returns`; settings → `settings`; reports → `reports`; customers → `customers`; inquiries → `inquiries`; reviews → `reviews`; stock-monitor observation → `stock_monitor`, decision endpoints → `inventory`; staff management + own-login change → Owner only (`requireOwner`). Gates are DB-fresh (`requirePermission` re-reads the user per request).
 
 | Method & path | Auth (writes) | Purpose / key shapes |
 | --- | --- | --- |

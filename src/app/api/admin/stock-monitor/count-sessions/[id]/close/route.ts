@@ -1,12 +1,11 @@
 // POST /api/admin/stock-monitor/count-sessions/[id]/close — manager closes a
 // reviewed count session. INVENTORY_MANAGER / ADMIN / SUPER_ADMIN only.
 
-import { fail, ok, requireRole } from '@/lib/api-helpers';
-import { INVENTORY_DECISION_ROLES } from '@/lib/constants';
+import { fail, ok, requirePermission } from '@/lib/api-helpers';
 import { closeCountSession, StockMonitorError } from '@/server/services/stock-monitor.service';
 
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireRole(INVENTORY_DECISION_ROLES);
+  const session = await requirePermission('inventory');
   if (!session) return fail('Unauthorized', 401);
   const { id } = await params;
 

@@ -4,8 +4,7 @@
 
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { fail, ok, parseBody, requireRole } from '@/lib/api-helpers';
-import { ROLES } from '@/lib/constants';
+import { fail, ok, parseBody, requirePermission } from '@/lib/api-helpers';
 import { adjustStock, InventoryError } from '@/server/services/inventory.service';
 import { recordAudit } from '@/server/services/notification.service';
 
@@ -18,10 +17,9 @@ const importRowSchema = z.object({
 
 const importSchema = z.object({ rows: z.array(importRowSchema).min(1).max(500) });
 
-const INVENTORY_ROLES = [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.INVENTORY_MANAGER];
 
 export async function POST(req: Request) {
-  const session = await requireRole(INVENTORY_ROLES);
+  const session = await requirePermission('inventory');
   if (!session) return fail('Unauthorized', 401);
 
   const { data, error } = await parseBody(req, importSchema);

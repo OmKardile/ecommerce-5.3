@@ -1,16 +1,14 @@
 // POST /api/admin/orders/transition — move an order through the strict FSM (ADR-010).
 // ORDER_MANAGER / ADMIN / SUPER_ADMIN only. TransitionError -> 409.
 
-import { fail, ok, parseBody, requireRole } from '@/lib/api-helpers';
+import { fail, ok, parseBody, requirePermission } from '@/lib/api-helpers';
 import { orderTransitionSchema } from '@/lib/validators';
-import { ROLES } from '@/lib/constants';
 import { transitionOrder, TransitionError } from '@/server/services/order.service';
 import { recordAudit } from '@/server/services/notification.service';
 
-const ORDER_ROLES = [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.ORDER_MANAGER];
 
 export async function POST(req: Request) {
-  const session = await requireRole(ORDER_ROLES);
+  const session = await requirePermission('orders');
   if (!session) return fail('Unauthorized', 401);
 
   const { data, error } = await parseBody(req, orderTransitionSchema);

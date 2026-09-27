@@ -8,6 +8,13 @@ For the owner and staff. Everything is clickable in the admin console at **/admi
 2. The **Dashboard** is your morning: pipeline cards (orders to verify, processing, shipped), alerts in red when action is waiting (open returns, new trade inquiries, reviews to moderate), low/out-of-stock lists, 30-day sales chart.
 3. Left sidebar shows live **count badges** on Returns, Trade Desk and Reviews when something needs you.
 
+## Staff accounts & your own login
+
+- **New staff member**: Owner → **Staff & access** in the sidebar → *New account* → step 1 identity (password generator included) → step 2 pick Staff or Superadmin, then tick the functions they should have (or use a preset like Counter / Warehouse / Fulfillment) → step 3 review → create. Share the credentials privately.
+- **Change someone's access**: same page → *Edit* next to the account → rename, reset password (generated on demand), tick/untick functions, or deactivate. Changes are live on their next click.
+- **Your own login**: Owner → **Staff & access** → *Your login* card → new email and/or new password; the current password is always required. This is also where extra **Superadmin (Owner)** accounts are created — use sparingly.
+- Scoped staff hitting a URL they don't have bounces them to their home section; the APIs behind it refuse too (401). All of it is audited.
+
 ## Where do I do X?
 
 | I want to… | Go to | Notes |
@@ -60,6 +67,6 @@ For the owner and staff. Everything is clickable in the admin console at **/admi
 
 ## Security notes for staff
 
-- Never share the Owner login; ask the owner to create per-person admin users with the right **role** (orders vs inventory vs content vs `STAFF` counter access) so audit trails name the right person. Roles display as **Owner · Manager · Inventory Manager · Orders Manager · Content Manager · Floor Staff**. Sandbox demo: `staff@patelnetworks.in / counter@2026` sees the Stock Monitor only.
+- Never share the Owner login; ask the owner to create per-person accounts at **Staff & access** (`/admin/staff`) — the wizard picks exactly which **functions** each staff member gets (orders, inventory, stock monitor, content…). Roles display as **Owner** (full access, that's you as the store owner) or **Staff** (scoped). Scope edits apply on the staff's next click — no re-login needed.
 - The carrier tracking webhook needs `SHIPPING_WEBHOOK_TOKEN` set in production — the server warns loudly until it is.
 - Log out on shared machines (button in the sidebar footer).

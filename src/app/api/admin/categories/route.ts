@@ -1,12 +1,10 @@
 // /api/admin/categories — GET tree/list + POST create. ADMIN / SUPER_ADMIN for writes.
 
 import { db } from '@/lib/db';
-import { fail, ok, parseBody, requireAnyAdmin, requireRole } from '@/lib/api-helpers';
+import { fail, ok, parseBody, requirePermission } from '@/lib/api-helpers';
 import { adminCategorySchema } from '@/lib/validators';
-import { ROLES } from '@/lib/constants';
 import { recordAudit } from '@/server/services/notification.service';
 
-const CATALOG_ROLES = [ROLES.SUPER_ADMIN, ROLES.ADMIN];
 
 function slugify(name: string): string {
   return name
@@ -17,7 +15,7 @@ function slugify(name: string): string {
 }
 
 export async function GET() {
-  const session = await requireAnyAdmin();
+  const session = await requirePermission('categories');
   if (!session) return fail('Unauthorized', 401);
 
   const categories = await db.category.findMany({
@@ -28,7 +26,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const session = await requireRole(CATALOG_ROLES);
+  const session = await requirePermission('categories');
   if (!session) return fail('Unauthorized', 401);
 
   const { data, error } = await parseBody(req, adminCategorySchema);

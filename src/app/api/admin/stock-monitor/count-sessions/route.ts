@@ -2,19 +2,18 @@
 // (scope snapshot), GET list recent sessions. STAFF+ (ADR-010).
 
 import { db } from '@/lib/db';
-import { fail, ok, parseBody, requireRole } from '@/lib/api-helpers';
-import { STOCK_MONITOR_ROLES } from '@/lib/constants';
+import { fail, ok, parseBody, requirePermission } from '@/lib/api-helpers';
 import { stockCountSessionCreateSchema } from '@/lib/validators';
 import { listCountSessions, openCountSession, StockMonitorError } from '@/server/services/stock-monitor.service';
 
 export async function GET() {
-  const session = await requireRole(STOCK_MONITOR_ROLES);
+  const session = await requirePermission('stock_monitor');
   if (!session) return fail('Unauthorized', 401);
   return ok({ sessions: await listCountSessions() });
 }
 
 export async function POST(req: Request) {
-  const session = await requireRole(STOCK_MONITOR_ROLES);
+  const session = await requirePermission('stock_monitor');
   if (!session) return fail('Unauthorized', 401);
 
   const { data, error } = await parseBody(req, stockCountSessionCreateSchema);

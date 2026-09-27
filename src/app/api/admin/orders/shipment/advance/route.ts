@@ -3,8 +3,7 @@
 // carrier webhook would (via applyShipmentTrackingEvent).
 
 import { z } from 'zod';
-import { fail, ok, parseBody, requireRole } from '@/lib/api-helpers';
-import { ROLES } from '@/lib/constants';
+import { fail, ok, parseBody, requirePermission } from '@/lib/api-helpers';
 import { applyShipmentTrackingEvent } from '@/server/services/shipping.service';
 import { recordAudit } from '@/server/services/notification.service';
 
@@ -14,10 +13,9 @@ const advanceSchema = z.object({
   location: z.string().trim().max(80).optional(),
 });
 
-const ORDER_ROLES = [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.ORDER_MANAGER];
 
 export async function POST(req: Request) {
-  const session = await requireRole(ORDER_ROLES);
+  const session = await requirePermission('orders');
   if (!session) return fail('Unauthorized', 401);
 
   const { data, error } = await parseBody(req, advanceSchema);

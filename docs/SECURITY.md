@@ -26,18 +26,15 @@ Security posture of the Patel Networks build, grounded in the implemented code. 
 
 ## RBAC role matrix
 
-Roles on `User.role`: `SUPER_ADMIN`, `ADMIN`, `INVENTORY_MANAGER`, `ORDER_MANAGER`, `CONTENT_MANAGER`, `CUSTOMER`. Admin APIs enforce via `requireAnyAdmin()` / `requireRole([...])`; customers via `requireCustomer()`. Actual arrays per route family (verified in code):
+Roles on `User.role`: `SUPER_ADMIN` (**Owner**) and `STAFF` (**Staff**) for operators, `CUSTOMER` for the storefront (D-12 removed the fixed manager roles). Admin APIs enforce via `requirePermission(scope)` / `requireOwner()` — both **re-read the User row per request**, so a deactivated account or a scope edit takes effect on the next request, without waiting for session expiry. The Owner passes every gate implicitly; Staff pass only when their `User.permissions` scope (15 validated keys, granted via the `/admin/staff` wizard) includes the route's scope. The panel layout mirrors the gates server-side (deep links into non-granted sections redirect to the staff's first granted section); dead-JWT sessions (user wiped/deactivated) route through `GET /admin/logout` to clear the cookie instead of looping. Owner-only routes: `GET/POST /api/admin/staff`, `PATCH /api/admin/staff/[id]`, `POST /api/admin/account/credentials` (own login change, current password required). Auth flows unchanged: rate-limited admin login (8/10min/email), role isolation on login.
 
-| Capability | SUPER_ADMIN | ADMIN | INVENTORY_MANAGER | ORDER_MANAGER | CONTENT_MANAGER |
-| --- | --- | --- | --- | --- | --- |
-| Admin reads (orders, products, customers, inventory, settings GET, reports) | yes | yes | yes | yes | yes |
-| Product/category/brand create/update/delete | yes | yes | no | no | no |
-| Inventory view/export | yes | yes | yes | yes | yes |
-| Inventory adjust + CSV import | yes | yes | yes | no | no |
-| Order transitions, serials, AWB booking, scan simulator | yes | yes | no | yes | no |
-| Coupons / banners / posts CRUD | yes | yes | no | no | yes |
-| Settings PUT | yes | yes | no | no | no |
-| Admin login/logout | yes | yes | yes | yes | yes |
+| Capability | Owner | Staff (scoped) |
+| --- | --- | --- |
+| Any section the staff was granted (reads + writes within it) | yes (implicit) | yes, per scope key |
+| Sections not granted | yes | no — page redirects + API 401 |
+| Staff & access console (accounts, scopes, password resets) | yes | never |
+| Change own login (email/password) | yes (current password required) | no (owner resets for them) |
+| Deactivate/reactivate accounts | yes | no |
 
 Customers have no admin surface at all; storefront customer APIs only ever operate on the session's own data (order lookup by owner-or-admin, addresses by customerId, etc.).
 

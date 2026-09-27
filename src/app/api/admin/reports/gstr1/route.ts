@@ -1,11 +1,11 @@
 // GET /api/admin/reports/gstr1?from=&to= — statutory GSTR-1 style schedule (ADR-017).
 
 import type { NextRequest } from 'next/server';
-import { fail, ok, requireAnyAdmin } from '@/lib/api-helpers';
+import { fail, ok, requirePermission } from '@/lib/api-helpers';
 import { getGstr1Schedule } from '@/server/services/admin.service';
 
 export async function GET(req: NextRequest) {
-  const session = await requireAnyAdmin();
+  const session = await requirePermission('reports');
   if (!session) return fail('Unauthorized', 401);
 
   const sp = req.nextUrl.searchParams;

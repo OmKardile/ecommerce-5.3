@@ -69,10 +69,8 @@ CART → CHECKOUT (address, GSTIN optional, COD or Razorpay)
 
 | Role | Owns |
 |---|---|
-| SUPER_ADMIN / ADMIN | everything |
-| ORDER_MANAGER | orders, shipments, serials, returns/RMA |
-| INVENTORY_MANAGER | stock adjust/import, low-stock, watchers |
-| CONTENT_MANAGER | banners, blog, coupons |
+| Owner (SUPER_ADMIN) | everything — including staff accounts, their function scopes, and their own login (D-12) |
+| Staff | only the functions the owner granted (orders, returns, products, categories, brands, inventory, stock monitor, customers, trade desk, reviews, coupons, banners, blog, reports, settings) — set at account creation via the `/admin/staff` wizard, editable any time |
 
 ## Vendor / third-party accounts needed at go-live
 

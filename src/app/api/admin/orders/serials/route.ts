@@ -2,15 +2,13 @@
 // (RMA / warranty traceability, ADR-014). ORDER_MANAGER / ADMIN / SUPER_ADMIN only.
 
 import { db } from '@/lib/db';
-import { fail, ok, parseBody, requireRole } from '@/lib/api-helpers';
+import { fail, ok, parseBody, requirePermission } from '@/lib/api-helpers';
 import { serialNumbersSchema } from '@/lib/validators';
-import { ROLES } from '@/lib/constants';
 import { recordAudit } from '@/server/services/notification.service';
 
-const ORDER_ROLES = [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.ORDER_MANAGER];
 
 export async function POST(req: Request) {
-  const session = await requireRole(ORDER_ROLES);
+  const session = await requirePermission('orders');
   if (!session) return fail('Unauthorized', 401);
 
   const { data, error } = await parseBody(req, serialNumbersSchema);

@@ -71,6 +71,8 @@ async function main() {
   console.log('🧹 Cleaned');
 
   // ---------------- users ----------------
+  // D-12 account model: SUPER_ADMIN (Owner, implicitly full) + STAFF whose
+  // scope is a granted `permissions` list (set via the /admin/staff wizard).
   const adminPass = process.env.ADMIN_PASSWORD ?? 'patel@admin2026';
   const admin = await prisma.user.create({
     data: {
@@ -81,13 +83,14 @@ async function main() {
       passwordHash: hashPassword(adminPass),
     },
   });
-  // staff accounts (RBAC demo)
+  // staff accounts (scoped personas)
   await prisma.user.create({
     data: {
       phone: '+919899000002',
       email: 'inventory@patelnetworks.in',
-      fullName: 'Warehouse Manager',
-      role: 'INVENTORY_MANAGER',
+      fullName: 'Warehouse Desk',
+      role: 'STAFF',
+      permissions: ['inventory', 'stock_monitor', 'products'],
       passwordHash: hashPassword('warehouse@2026'),
     },
   });
@@ -96,8 +99,19 @@ async function main() {
       phone: '+919899000003',
       email: 'orders@patelnetworks.in',
       fullName: 'Fulfillment Desk',
-      role: 'ORDER_MANAGER',
+      role: 'STAFF',
+      permissions: ['orders', 'returns'],
       passwordHash: hashPassword('fulfill@2026'),
+    },
+  });
+  await prisma.user.create({
+    data: {
+      phone: '+919899000005',
+      email: 'content@patelnetworks.in',
+      fullName: 'Content Desk',
+      role: 'STAFF',
+      permissions: ['banners', 'blog', 'coupons'],
+      passwordHash: hashPassword('content@2026'),
     },
   });
   // counter staff — Stock Monitor persona (ADR-010): observe & report only
@@ -107,11 +121,15 @@ async function main() {
       email: 'staff@patelnetworks.in',
       fullName: 'Counter Staff',
       role: 'STAFF',
+      permissions: ['stock_monitor'],
       passwordHash: hashPassword('counter@2026'),
     },
   });
   console.log('👤 Admin:', admin.email);
-  console.log('👤 Staff (stock monitor): staff@patelnetworks.in / counter@2026');
+  console.log('👤 Staff (warehouse): inventory@patelnetworks.in / warehouse@2026');
+  console.log('👤 Staff (fulfillment): orders@patelnetworks.in / fulfill@2026');
+  console.log('👤 Staff (content): content@patelnetworks.in / content@2026');
+  console.log('👤 Staff (counter): staff@patelnetworks.in / counter@2026');
 
   const customer = await prisma.user.create({
     data: {

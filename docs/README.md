@@ -10,7 +10,7 @@ The implementation was built from scratch by a multi-agent team; the authoritati
 | --- | --- |
 | [README.md](./README.md) | This overview: identity, feature map, stack, quick start |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Modular-monolith layout, services, session design, order FSM, dual-mode integrations, design system |
-| [DATABASE.md](./DATABASE.md) | All 35 Prisma models, relationships, money-in-paise rationale, portability, seed, PostgreSQL switch |
+| [DATABASE.md](./DATABASE.md) | All 38 Prisma models, relationships, money-in-paise rationale, portability, seed, PostgreSQL switch |
 | [DEPLOYMENT.md](./DEPLOYMENT.md) | Client VPS self-hosting: Docker Compose, nginx, migrations, backups, logging, SSL |
 | [ENVIRONMENT.md](./ENVIRONMENT.md) | Every environment variable, required vs optional, simulation behavior |
 | [../deploy/ENV-SETUP.md](../deploy/ENV-SETUP.md) | `.env` setup runbook: fill-in order, credential sources, sim→live verification, rotation, troubleshooting |
@@ -23,7 +23,7 @@ The implementation was built from scratch by a multi-agent team; the authoritati
 | [SECURITY.md](./SECURITY.md) | Auth design, RBAC matrix, validation, idempotency, rate limits, hardening checklist |
 | [DECISIONS.md](./DECISIONS.md) | Conflict resolutions C1-C12 and ADR-020/021 with priority rationale |
 | [DEVELOPMENT.md](./DEVELOPMENT.md) | Local setup, commands, structure walkthrough, QA workflow, PR checklist |
-| [STOCK-MONITOR-RESEARCH.md](./STOCK-MONITOR-RESEARCH.md) | **DRAFT — not implemented**: employee stock-monitor panel research, schema + API drafts, rollout plan, open questions |
+| [STOCK-MONITOR-RESEARCH.md](./STOCK-MONITOR-RESEARCH.md) | **IMPLEMENTED (Task 21)**: employee stock-monitor panel research, schema + API record; v2 candidates parked |
 
 ## Business identity
 
@@ -53,11 +53,12 @@ Admin (`/admin`, own chrome, role-scoped):
 - Returns & DOA (full RMA: approve → courier inward → QC → refund → restock) · Trade Desk (B2B inquiry FSM `NEW → CONTACTED → CLOSED`) · Reviews moderation (approve / un-publish / delete — nothing publishes unapproved)
 - Products (list/new/edit with variants, SKUs, images, specs), categories, brands
 - Inventory console (SKU matrix, adjust with reason codes, movement ledger, CSV export/import) + **Requests & counts** tab (approve staff stock corrections, apply count variances)
+- **Staff & access (owner-only, D-12)**: 3-step account wizard (identity → account type + function scopes → review), per-account editor (rename / password reset / scopes / deactivate), owner "Your login" self-service; scope edits apply on the staff's next request
 - **Stock Monitor** (STAFF-facing): state-tile stock wall with kiosk mode, human-phrased movement history, discrepancy reports, cycle-count sessions — employees observe and propose, managers dispose (ADR-10)
 - Customers (CRM, LTV, B2B badge, wa.me links), coupons, banners, blog editor
 - Reports (sales 30-day chart, tax summary, GSTR-1 schedule with CSV export, top products/customers, inventory valuation), settings (COD rules, fees, cutoff, announcement)
 
-APIs: 75 route files under `/api/**` — auth, account, cart, catalog, coupon, shipping, orders, payments, webhooks, admin surface, health. See [API.md](./API.md).
+APIs: 78 route files under `/api/**` — auth, account, cart, catalog, coupon, shipping, orders, payments, webhooks, admin surface, health. See [API.md](./API.md).
 
 ## Tech stack
 
@@ -85,7 +86,7 @@ bun run dev            # Next dev server on http://localhost:3000 (logs tee'd to
 Seeded logins:
 
 - Admin: `superadmin@patelnetworks.in` / `patel@admin2026` (override via `ADMIN_EMAIL`/`ADMIN_PASSWORD`)
-- Staff demos: `inventory@patelnetworks.in` / `warehouse@2026`, `orders@patelnetworks.in` / `fulfill@2026`
+- Staff demos: `inventory@patelnetworks.in` / `warehouse@2026`, `orders@patelnetworks.in` / `fulfill@2026`, `content@patelnetworks.in` / `content@2026`, `staff@patelnetworks.in` / `counter@2026`
 - Test customer: phone `+91 98765 43210` — in the sandbox the OTP is printed to `dev.log` under `[SIMULATED SMS]`
 
 Useful commands: `bun run lint`, `bunx tsc --noEmit`, `bun run db:generate`, `bun run build` (standalone output).

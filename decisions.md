@@ -4,6 +4,14 @@ Older records: conflict resolutions **C1..C12** and **ADR-020/021** live in [`do
 
 ---
 
+## D-12 · 2026-09-27 · Role overhaul: Owner + dynamically-scoped Staff (fixed roles removed)
+
+**Context**: Owner's spec — the store owner has full permissions **including changing their own login and creating other superadmins**; the general `ADMIN` role is removed; **every other operator role becomes Staff whose scope the owner sets at account creation via a wizard** ("which functions u want this staff to have").
+
+**Decision**: (1) **Two operator roles**: `SUPER_ADMIN` (Owner — implicitly passes every gate; can change own email/password with current-password confirmation; can create more superadmins) and `STAFF` (scope lives in a new `User.permissions` JSON column — 15 validated scope keys, one per console section). Legacy fixed roles (`ADMIN`, `INVENTORY_MANAGER`, `ORDER_MANAGER`, `CONTENT_MANAGER`) are deleted from the model; an idempotent `scripts/migrate-legacy-roles.ts` maps existing rows to STAFF + scope. (2) **DB-fresh permission gates**: `requirePermission(scope)` / `requireOwner()` re-read the operator row per request, so scope edits and deactivations apply on the staff's **next request without re-login**; all admin routes moved off fixed role lists. Panel layout mirrors the gates server-side (deep links into non-granted sections bounce to the staff's first granted section; `/admin` dashboard is Owner/scope-less-staff only). (3) **Wizard over forms**: `/admin/staff` (owner-only) has a 3-step creation flow — identity → account type (Staff / Superadmin) + grouped function checkboxes with role presets → review — plus per-account editing (rename, password reset, scope change, deactivate). (4) **Dead-session escape hatch**: `GET /admin/logout` clears stale-but-valid JWTs (user wiped/recreated), breaking the proxy↔layout redirect loop found during E2E.
+
+**Rejected**: keeping a general ADMIN role "for convenience" (the whole point is least-privilege by default); encoding scopes in the JWT (stale until re-login — violates live-edit requirement); storing scopes as a scalar list (SQLite has no scalar lists — JSON column instead); deleting legacy users outright (audit history must keep attributing).
+
 ## D-11 · 2026-09-27 · Role display naming: the owner reads "Owner", not "Super Admin"
 
 **Context**: Owner asked "so you have named superadmin as manager (basically store owner who has ALL the permissions)" — their mental model is Owner-first, but the UI rendered `SUPER_ADMIN` as "SUPER ADMIN" and the account as "Platform Superadmin", while the "Manager" word actually belonged to the scoped roles. A route-by-route permission audit (all 75 handlers) also confirmed no admin API is Owner-exclusive today — plain `ADMIN` walks the same surface — so hierarchy was carried by labels and identity (env bootstrap), not by permissions.

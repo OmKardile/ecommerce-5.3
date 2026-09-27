@@ -1,8 +1,7 @@
 // /api/admin/stock-monitor/count-sessions/[id] — GET detail (lines + expected vs
 // counted), PATCH submit counted quantities in bulk. STAFF+ (ADR-010).
 
-import { fail, ok, parseBody, requireRole } from '@/lib/api-helpers';
-import { STOCK_MONITOR_ROLES } from '@/lib/constants';
+import { fail, ok, parseBody, requirePermission } from '@/lib/api-helpers';
 import { stockCountSubmitSchema } from '@/lib/validators';
 import {
   getCountSessionDetail,
@@ -13,7 +12,7 @@ import {
 type Ctx = { params: Promise<{ id: string }> };
 
 export async function GET(_req: Request, { params }: Ctx) {
-  const session = await requireRole(STOCK_MONITOR_ROLES);
+  const session = await requirePermission('stock_monitor');
   if (!session) return fail('Unauthorized', 401);
   const { id } = await params;
 
@@ -27,7 +26,7 @@ export async function GET(_req: Request, { params }: Ctx) {
 }
 
 export async function PATCH(req: Request, { params }: Ctx) {
-  const session = await requireRole(STOCK_MONITOR_ROLES);
+  const session = await requirePermission('stock_monitor');
   if (!session) return fail('Unauthorized', 401);
   const { id } = await params;
 

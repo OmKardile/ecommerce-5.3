@@ -2,12 +2,11 @@
 // for one SKU. Read-only. STAFF+ (ADR-010).
 
 import type { NextRequest } from 'next/server';
-import { fail, ok, requireRole } from '@/lib/api-helpers';
-import { STOCK_MONITOR_ROLES } from '@/lib/constants';
+import { fail, ok, requirePermission } from '@/lib/api-helpers';
 import { getSkuHistory, StockMonitorError } from '@/server/services/stock-monitor.service';
 
 export async function GET(req: NextRequest) {
-  const session = await requireRole(STOCK_MONITOR_ROLES);
+  const session = await requirePermission('stock_monitor');
   if (!session) return fail('Unauthorized', 401);
 
   const skuId = req.nextUrl.searchParams.get('skuId');

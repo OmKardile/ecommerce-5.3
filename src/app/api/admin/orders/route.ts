@@ -2,11 +2,11 @@
 
 import type { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
-import { fail, ok, requireAnyAdmin } from '@/lib/api-helpers';
+import { fail, ok, requirePermission } from '@/lib/api-helpers';
 import { getAdminOrdersList } from '@/server/services/admin.service';
 
 export async function GET(req: NextRequest) {
-  const session = await requireAnyAdmin();
+  const session = await requirePermission('orders');
   if (!session) return fail('Unauthorized', 401);
 
   const sp = req.nextUrl.searchParams;

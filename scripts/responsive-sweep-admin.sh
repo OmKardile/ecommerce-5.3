@@ -3,7 +3,7 @@
 set -u
 ROUTES=(
   "/admin" "/admin/orders" "/admin/returns" "/admin/products" "/admin/categories"
-  "/admin/brands" "/admin/inventory" "/admin/stock-monitor" "/admin/customers" "/admin/inquiries"
+  "/admin/brands" "/admin/inventory" "/admin/stock-monitor" "/admin/staff" "/admin/customers" "/admin/inquiries"
   "/admin/reviews" "/admin/reports" "/admin/banners" "/admin/blog" "/admin/coupons" "/admin/settings"
 )
 VIEWPORTS=("375 812" "768 1024")

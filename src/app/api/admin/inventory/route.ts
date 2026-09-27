@@ -1,10 +1,10 @@
 // GET /api/admin/inventory — dense SKU matrix for the inventory console.
 
 import { db } from '@/lib/db';
-import { fail, ok, requireAnyAdmin } from '@/lib/api-helpers';
+import { fail, ok, requirePermission } from '@/lib/api-helpers';
 
 export async function GET() {
-  const session = await requireAnyAdmin();
+  const session = await requirePermission('inventory');
   if (!session) return fail('Unauthorized', 401);
 
   const rows = await db.inventory.findMany({

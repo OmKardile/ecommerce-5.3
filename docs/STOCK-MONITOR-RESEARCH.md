@@ -162,3 +162,7 @@ One design addition beyond the draft: count-session lines carry an `appliedAt`/`
 ## 10. Effort (actual: shipped in one round)
 
 Schema + push + seed touches · APIs · wall + lookup UI · count sessions + request/decide loop · QA + polish all landed in Task 21 (2026-09-27). The v2 candidates (BinLocation, StockSnapshot rollups, camera scanning, WhatsApp alerts) remain parked in the parking lot (compact.md).
+
+---
+
+**Addendum (Task 23, D-12)**: the fixed roles referenced in §7/§9 (`INVENTORY_MANAGER`, `ADMIN`, …) were removed after this doc was written. Decision endpoints now require the **`inventory` permission scope** and observation/reporting the **`stock_monitor` scope** — granted per-staff by the owner via the `/admin/staff` wizard. Gates re-read the user row per request; see `technical-documentation.md` §RBAC.

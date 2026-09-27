@@ -23,7 +23,8 @@ model User {
   email        String?   @unique
   passwordHash String?
   fullName     String?
-  role         String    @default("CUSTOMER") // CUSTOMER | SUPER_ADMIN | ADMIN | INVENTORY_MANAGER | ORDER_MANAGER | CONTENT_MANAGER | STAFF
+  role         String    @default("CUSTOMER") // CUSTOMER | SUPER_ADMIN | STAFF (D-12: fixed manager roles removed; staff scope lives in `permissions`)
+  permissions  Json? // STAFF only: JSON array of PermissionScope keys, e.g. ["orders","inventory"] — SUPER_ADMIN is implicitly full
   isActive     Boolean   @default(true)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
