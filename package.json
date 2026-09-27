@@ -3,16 +3,16 @@
   "version": "0.2.1",
   "private": true,
   "scripts": {
-    "dev": "env -u DATABASE_URL next dev -p 3000 2>&1 | tee dev.log",
+    "dev": "sh scripts/with-env.sh next dev -p 3000 2>&1 | tee dev.log",
     "build": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
     "start": "NODE_ENV=production node .next/standalone/server.js",
     "lint": "eslint .",
-    "db:push": "env -u DATABASE_URL prisma db push --accept-data-loss",
-    "db:sync": "env -u DATABASE_URL prisma db push",
+    "db:push": "sh scripts/with-env.sh prisma db push --accept-data-loss",
+    "db:sync": "sh scripts/with-env.sh prisma db push",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset",
-    "db:seed": "env -u DATABASE_URL bun run prisma/seed.ts",
+    "db:seed": "sh scripts/with-env.sh bun run prisma/seed.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

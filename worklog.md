@@ -777,3 +777,22 @@ Stage Summary:
 - Repo is Render-ready: render.yaml + package-lock + db:sync + RENDER-STEPS.md — owner just connects the repo on Render, pastes the Neon URL (and NEXT_PUBLIC_APP_URL), and deploys. JWT_SECRET auto-generated & stable.
 - Files: prisma/schema.prisma, prisma/seed.ts, package.json, package-lock.json (new), render.yaml (new), deploy/RENDER-STEPS.md (new), .env.example, deploy/ENV-SETUP.md, Dockerfile, docs/RENDER-DEPLOYMENT.md, README.md, technical-documentation.md, compact.md, decisions.md, changelog.md, worklog.md (+ /tmp/devup.sh keeper rebuilt, sandbox-only).
 - Next-round candidates: owner deploys on Render and shares the URL (NEXT_PUBLIC_APP_URL then needs one cache-clear redeploy) · per-product image overrides (owner images pending) · stock-monitor v2 (parked) · staff-activity reports per scope · qa-clean.ts purge at go-live · wire prisma-erd-generator.
+
+---
+Task ID: 28
+Agent: Z.ai Code (lead)
+Task: Render deploy failed at build step `db:sync` with P1012 "Environment variable not found: DATABASE_URL" (user pasted full build log; commit 88f25fe on Render Node runtime, npm install + prisma generate OK).
+
+Work Log:
+- DIAGNOSIS (from the pasted log alone): my Task-27 fix for the sandbox's stale injected `DATABASE_URL=file:…` used `env -u DATABASE_URL` on every DB script. That strips the var in BOTH worlds — correct in the sandbox (where .env refills it), fatal on Render (no .env exists; the dashboard env was the ONLY source, and `env -u` erased it). Build log confirms: postinstall + npm install fine → `env -u DATABASE_URL prisma db push` → P1012 → build failed.
+- FIX — scripts/with-env.sh (new, POSIX sh, executable): if `.env` exists → `set -a; . ./.env; set +a` so its values OVERRIDE inherited env (sandbox: Neon beats the stale file: URL, for every var not just DATABASE_URL); if not → passthrough untouched (Render: dashboard env flows through). `exec "$@"` keeps signals/exit codes clean. One mental model for both hosts; documented as the canonical route for any new DB-touching script.
+- SCRIPTS: dev / db:push / db:sync / db:seed switched from `env -u DATABASE_URL …` to `sh scripts/with-env.sh …` (verified bun's script shell execs it like any binary; node_modules/.bin stays on PATH through the shim so `next`/`prisma`/`bun` resolve). `start` untouched (no DB access at boot; standalone server reads dashboard env).
+- TESTS (3 scenarios, real runs): (1) stale-env sim `DATABASE_URL=file:/tmp/bogus.db bun run db:sync` → shim overrode → "PostgreSQL database neondb … already in sync" (Neon reached). (2) plain `bun run db:sync` → exit 0. (3) Render sim from /tmp (no .env) → inherited `DATABASE_URL=postgresql://dashboard-string` passes through verbatim; absent-var case passes through without crash. Restarted the dev server through the keeper → the running chain is now `sh scripts/with-env.sh next dev -p 3000 …`; health {db:up} on Neon.
+- RENDER-STEPS.md: troubleshooting map gains the exact P1012 row — cause = DATABASE_URL not set on the service + the fix path (Environment → add Neon string → Manual Deploy → Deploy latest commit) — plus a "Precedence rule" section explaining the shim and instructing future scripts to route through it.
+- DOCS DUTY: decisions D-13 amended in place (env -u mechanism → shim mechanism, with the Task-28 amendment note) · changelog Task 28 · worklog (this entry).
+- VERIFIED: lint 0 · tsc 0 · dev server healthy on Neon via the shim; db:sync proven against Neon from the sandbox with both stale and clean envs.
+
+Stage Summary:
+- Root cause of the failed Render build was my sandbox-first `env -u` hack; replaced with a precedence shim that is correct in both worlds (`.env`-first when present, passthrough when not). The next Render deploy passes db:sync PROVIDED DATABASE_URL is set in the service's Environment (if the owner never added it, the same P1012 would return — RENDER-STEPS.md now leads with this row).
+- Files: scripts/with-env.sh (new, +x), package.json (4 scripts), deploy/RENDER-STEPS.md, decisions.md, changelog.md, worklog.md.
+- Next-round candidates: confirm the owner's Render env has DATABASE_URL (+NEXT_PUBLIC_APP_URL) and watch the redeploy go green · per-product image overrides · stock-monitor v2 (parked) · staff-activity reports · qa-clean.ts purge at go-live.

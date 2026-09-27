@@ -81,8 +81,17 @@ Two paths: **A. Blueprint (recommended, ~5 min)** or **B. Manual web service**.
 
 | Symptom | Cause → fix |
 |---|---|
-| Build fails at `db:sync` | Destructive schema change pending → run `npx prisma db push` from the Render Shell after review. |
+| Build fails at `db:sync` with **P1012 "Environment variable not found: DATABASE_URL"** | The env var is not set on the Render service (build ran the passthrough path because there is no `.env` on Render). Render → your service → **Environment** → add `DATABASE_URL` = Neon connection string → **Manual Deploy → Deploy latest commit**. (Task 28 made the script .env-first when a `.env` exists and passthrough otherwise — on Render only the dashboard value can supply it.) |
+| Build fails at `db:sync` (any other reason) | Destructive schema change pending → run `npx prisma db push` from the Render Shell after review. |
 | `P1001 can't reach database` | Wrong `DATABASE_URL` / Neon compute suspended → check the Neon Dashboard, keep `sslmode=require`. |
 | Login works but next request logs out | `JWT_SECRET` changed between deploys → it must stay stable (Blueprint `generateValue` keeps it). |
 | Pages show old domain in OG/canonicals | `NEXT_PUBLIC_APP_URL` is build-time → clear cache & redeploy after changing. |
 | `npm ci`/install version drift | package-lock.json is the source of truth — commit it whenever package.json changes. |
+
+### Precedence rule (one mental model, both worlds)
+
+`scripts/with-env.sh` (used by `dev`, `db:push`, `db:sync`, `db:seed`) loads
+`.env` **over** the inherited environment when a `.env` file exists (sandbox —
+its session injects a stale SQLite URL), and passes the inherited environment
+through untouched when it doesn't (Render — dashboard env only). If you ever
+add a new DB-touching script, route it through the shim.

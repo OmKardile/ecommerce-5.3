@@ -2,6 +2,14 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-27 — Task 28 (hotfix: Render build failure — env precedence shim)
+
+**Fix — "Environment variable not found: DATABASE_URL" (P1012) at Render's `db:sync` build step**
+- **Root cause (self-inflicted)**: Task 27 made every DB script run under `env -u DATABASE_URL` to defeat the sandbox's stale injected env var — but on Render there is no `.env` to refill it, so the shim erased the dashboard-provided URL and the build died. Sandbox-first thinking, Render-hostile result.
+- **Fix — `scripts/with-env.sh`**: POSIX shim used by `dev` / `db:push` / `db:sync` / `db:seed`. When `.env` exists (sandbox) it sources it with `set -a` so its values **override** the inherited environment; when it doesn't (Render) the inherited environment passes through untouched. Correct in both worlds by construction; `exec "$@"` preserves signals/exit codes.
+- **Verified with real runs, all three modes**: stale `file:` env → Neon reached via `.env` override; plain run → sync; no-`.env` directory → dashboard-style URL passes through verbatim (the exact Render scenario). Dev server restarted through the new path — health `{db:up}` on Neon. lint 0 · tsc 0.
+- **Runbook**: `deploy/RENDER-STEPS.md` troubleshooting map now leads with this exact P1012 row — if it recurs after this fix, `DATABASE_URL` simply isn't set on the Render service (Environment → add the Neon string → Manual Deploy). New "Precedence rule" section documents the shim as the mandatory route for future DB-touching scripts. decisions **D-13 amended** to replace the `env -u` mechanism with the shim.
+
 ## 2026-09-27 — Task 27 (database switch: Neon PostgreSQL everywhere + Render deploy kit)
 
 **Change — "stop using your sqlite db and switch to this" (owner's Neon instance) + ready-to-deploy Render setup**
