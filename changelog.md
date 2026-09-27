@@ -2,6 +2,16 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-27 — Task 26 (blueprint canvas: self-rendered ERD + live dbdocs wired in)
+
+**Enhancement — the owner published the schema with our tools; the blueprint now shows it off**
+- **Owner followed the Task 24 guide**: published the DBML as live docs at **[dbdocs.io/galat31868/patel](https://dbdocs.io/galat31868/patel)** and produced the ERD export. Their SVG attachment never reached the sandbox (`upload/` was empty and the dbdocs diagram renderer is client-private), so the blueprint now **renders the same ERD itself**.
+- **New `scripts/blueprint-erd.ts`** (`bun scripts/blueprint-erd.ts`): schema.dbml → dbml-renderer (DOT) → inject 8 domain clusters matching the blueprint's domain cards (tinted, rounded, colored, labeled with table counts) → graphviz `dot` → **`public/blueprint/schema-diagram.svg`** (38 tables, ~9036×4210pt, rankdir=TB). The renderer's invisible ordering edges are dropped (they forced a 17k-pt single-column tower); DBML `''` SQL escapes are patched in-memory for the renderer only. Re-run after any schema change — canvas + DBML stay in lockstep with `prisma/schema.prisma`.
+- **Zoomable canvas in Section 3**: "The full canvas — all 38 tables on one map" — a self-contained vanilla-JS viewer (no dependencies added): drag to pan, wheel/pinch zoom centered on cursor, double-click dive-in, ±/Fit width/Fit all buttons, **fullscreen mode** for live client demos, arrow-key panning, zoom % readout, domain-color legend chips, "Open raw SVG ↗" link, and a how-to-read note. Fit-width on load; hidden in print (print note explains the PNG-annex path).
+- **Tools section updated**: dbdocs entry now carries a brass **"LIVE — YOURS"** chip with the real URL and `dbdocs push` re-push note; dbdiagram marked "Already used for this project"; Prisma-ERD-generator entry flipped to **"Done — our own"** pointing at the shipped script; client-ready-pack callout mentions demoing the canvas live on a shared screen.
+- Also: help.md blueprint section rewritten (canvas + live docs link); footer bumped to v1.1.
+- Verified live (agent-browser): canvas renders fit-all at 1280 with all 8 domain columns; zoom 9%→17% + drag-pan + fit-width all confirmed interactive; tools chips render; mobile 375px **0px overflow**; SVG serves 200 (334 KB); lint 0 · tsc 0.
+
 ## 2026-09-27 — Task 25 (dark-mode surface fix: brand bands stop flipping to mint)
 
 **Fix — "goofy dark mode colours"**

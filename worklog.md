@@ -739,3 +739,21 @@ Stage Summary:
 - Dark mode is no longer goofy: brand surfaces (announcement bar, kit-builder band, CTA bands) stay deep pine at night via the new --brand token, while interactive elements keep the mint accent — one token pair, light mode untouched by construction.
 - Surfaces changed: globals.css, header.tsx, (store)/page.tsx, page-shell.tsx, parallax.tsx (BandDecor), blog-manager.tsx, returns-queue.tsx + changelog.md + worklog.md.
 - Next-round candidates unchanged: per-product image overrides (owner images pending) · stock-monitor v2 (parked) · staff-activity reports per scope (idea) · qa-clean.ts purge at go-live · wire prisma-erd-generator.
+
+---
+Task ID: 26
+Agent: Z.ai Code (lead)
+Task: User loved /blueprint/index.html, used the recommended tools (published dbdocs.io/galat31868/patel + exported the schema diagram) and asked to enhance the blueprint with them; attached SVG never landed (upload/ empty).
+
+Work Log:
+- RECOVERY ATTEMPT: upload/Untitled.svg absent; dbdocs.io is a Vue SPA with a private renderer — probed api.dbdocs.io (project meta fetched OK: projectId 96774, org 214946, isPublic) but viz endpoints need auth tokens; the rendered ERD itself is not downloadable. Decision: render the SAME diagram ourselves from the DBML we already ship.
+- PIPELINE: new scripts/blueprint-erd.ts — bun script that runs @softwaretechnik/dbml-renderer on public/blueprint/schema.dbml (in-memory '' → ' patch; renderer chokes on SQL escapes), parses the flat DOT (header defaults / node segments via /^\s*"(\w+)" \[id=/ + />];$/ terminator / edge lines), drops the style=invis ordering edges (they forced a 2802×17578pt single-column tower), regroups all 38 tables into 8 subgraph clusters mirroring the blueprint's domain cards (tint fills #E7EFEA-family, domain color borders/labels, table counts), compacts fonts (32→19, CELLPADDING 10→6) and shells out to graphviz dot -Tsvg. Iterated layouts: LR (1:4.7 strip), ratio=compress (overlaps), unflatten (no help) → settled rankdir=TB, ranksep 1.1 → 9036×4210pt (2.15:1), domains as left-to-right story columns.
+- BUG DECODING: rg reported 38 `[headercolor` matches while python/awk showed corrupted ` eadercolor` lines — another sandbox cache-flapping episode (Task 21 precedent); od + sync proved the file was never corrupted. No DBML fix needed.
+- BLUEPRINT PAGE: Section 3 gains "The full canvas — all 38 tables on one map" — dependency-free vanilla-JS pan/zoom viewer (pointer-drag pan, cursor-centered wheel zoom, dblclick dive, ± / Fit width / Fit all / Fullscreen w/ aria-pressed, arrow-key pan, zoom % readout, hint pill, clamp-to-canvas), fit-width on load, 8 domain legend chips, how-to-read note with regenerate command + live dbdocs link, raw-SVG open link, print: viewer hidden + explanatory note. Section 7: dbdocs entry gets brass "LIVE — YOURS" chip + https://dbdocs.io/galat31868/patel + dbdocs push note; dbdiagram marked already-used; Prisma-ERD-generator entry → "Done — our own" (scripts/blueprint-erd.ts); client-pack callout mentions live canvas demos. Footer → v1.1.
+- DOCS DUTY: help.md blueprint section rewritten (canvas usage + published docs link + dbdocs push) · changelog Task 26 · worklog (this entry).
+- VERIFIED (agent-browser): canvas fit-all at 1280 shows all 8 tinted domain columns; zoom 9%→17% with cursor-centered scaling, drag-pan, fit-width all interactive-verified; SVG serves 200 (334 KB); tools chips render; mobile 375px 0px overflow; lint 0 · tsc 0 · health {db:up}.
+
+Stage Summary:
+- The blueprint is no longer only a description — it now embeds the real 38-table ERD (regenerated from schema.dbml in one command) and celebrates the owner's published dbdocs site; owner + client can zoom the whole database live during a call or share the permanent docs link.
+- Files: new scripts/blueprint-erd.ts + public/blueprint/schema-diagram.svg; changed public/blueprint/index.html, help.md, changelog.md, worklog.md.
+- Next-round candidates unchanged: per-product image overrides (owner images pending) · stock-monitor v2 (parked) · staff-activity reports per scope · qa-clean.ts purge at go-live.

@@ -18,7 +18,9 @@ For the owner and staff. Everything is clickable in the admin console at **/admi
 ## System Blueprint (explaining the system to a client)
 
 - Owner sidebar → **System blueprint** (or open `/blueprint/index.html` directly): one printable page covering the database (all 38 tables, field by field), the backend flow, roles & the 15 staff scopes, the order lifecycle, and every route. **Print / Save PDF** at the top produces a client-ready document.
-- Want a zoomable picture of the database? Download `/blueprint/schema.dbml` and paste it into **dbdiagram.io** (free) — you get an interactive ER diagram you can export as PNG/PDF. More tools (dbdocs, Eraser, drawSQL, Mermaid) are compared at the bottom of the blueprint page.
+- **Schema canvas** (Section 3 of the blueprint): all 38 tables as one zoomable diagram grouped into the 8 domains — drag to pan, scroll to zoom, fullscreen for demos, raw SVG opens in a new tab. It is generated from `schema.dbml` by `bun scripts/blueprint-erd.ts`, so it never goes stale.
+- **Live database docs are published**: [dbdocs.io/galat31868/patel](https://dbdocs.io/galat31868/patel) — searchable tables/columns from the same DBML. Share this link with the client; re-push updates with `dbdocs push`. (A copy of the DBML also ships at `/blueprint/schema.dbml` for dbdiagram.io.)
+- More tools (Eraser, drawSQL, Mermaid) are compared at the bottom of the blueprint page.
 
 ## Where do I do X?
 

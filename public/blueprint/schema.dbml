@@ -184,7 +184,7 @@ Table stock_count_sessions [headercolor: #2E5E4E] {
   status varchar [not null, default: 'OPEN', note: 'OPEN | COUNTING | SUBMITTED | CLOSED | CANCELLED']
   scope_kind varchar [not null, note: 'CATEGORY | BRAND | ALL']
   scope_ref_id varchar
-  expected json [note: 'snapshot [{skuId, code, expectedQty}] so later edits don''t skew the count']
+  expected json [note: 'snapshot [{skuId, code, expectedQty}] so later edits do not skew the count']
   opened_by_id varchar
   closed_by_id varchar
   closed_at timestamp

@@ -171,15 +171,43 @@
   .callout{display:flex;gap:12px;background:var(--brass-soft);border:1px solid #E4D3B8;border-radius:12px;padding:14px 16px;font-size:13.5px;color:#5C421C;margin-top:18px}
   .callout b{color:#4A3413}
 
+  /* ── schema canvas viewer ─────────────── */
+  .canvas-wrap{margin-top:18px}
+  .canvas-frame{position:relative;background:var(--card);border:1.5px solid var(--pine);border-radius:14px;overflow:hidden;height:560px;cursor:grab;outline:none;touch-action:none}
+  .canvas-frame:active{cursor:grabbing}
+  .canvas-frame:focus-visible{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--brass)}
+  .cv-stage{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
+  .cv-stage img{display:block;user-select:none;-webkit-user-drag:none;pointer-events:none}
+  .cv-top{position:absolute;top:10px;left:10px;right:10px;display:flex;gap:8px;align-items:flex-start;pointer-events:none;flex-wrap:wrap}
+  .cv-tools{display:flex;gap:6px;pointer-events:auto;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:10px;padding:5px;backdrop-filter:blur(4px)}
+  .cv-btn{min-width:32px;height:32px;border:1px solid var(--line);background:#fff;color:var(--pine);border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;line-height:1;display:inline-flex;align-items:center;justify-content:center;padding:0 9px}
+  .cv-btn:hover{background:var(--pine-soft)}
+  .cv-btn.wide{font-size:12px;font-weight:600}
+  .cv-btn[aria-pressed="true"]{background:var(--pine);color:#fff;border-color:var(--pine)}
+  .cv-link{margin-left:auto;pointer-events:auto;font-size:12px;font-weight:700;color:var(--pine);background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:999px;padding:7px 13px;text-decoration:none;backdrop-filter:blur(4px)}
+  .cv-link:hover{border-color:var(--pine)}
+  .cv-hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(28,25,23,.8);color:#F7F6F1;font-size:11.5px;padding:5px 12px;border-radius:999px;pointer-events:none;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
+  .cv-zoom{position:absolute;bottom:10px;right:10px;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:8px;font-family:var(--mono);font-size:11px;color:var(--muted);padding:4px 8px;pointer-events:none}
+  .dlegend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .dlegend span{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 11px}
+  .dlegend i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:none}
+  .canvas-note{font-size:12.5px;color:var(--faint);margin-top:10px}
+  .canvas-note .k{font-size:11px}
+  .canvas-print-note{display:none}
+  .tool h3 .done{font-size:9.5px;font-weight:800;letter-spacing:.08em;background:var(--brass);color:#fff;border-radius:4px;padding:2px 7px;text-transform:uppercase}
+  .tool a{color:var(--brass);font-weight:600}
+
   @media print{
     .topnav,.printbtn{display:none}
     body{background:#fff;font-size:12px}
     section{padding:26px 0 0;page-break-inside:avoid}
     header.hero{padding:24px 0}
     details.er{page-break-inside:avoid}
-    details.er:not([open]){} 
+    details.er:not([open]){}
     a{color:inherit;text-decoration:none}
     h1,h2{color:#000}
+    .canvas-frame{display:none}
+    .canvas-print-note{display:block;font-size:12px;color:#444;margin-top:8px}
   }
 </style>
 </head>
@@ -405,6 +433,39 @@
         <span class="ent gray">adjustment_requests</span>
       </div>
       <p class="spine-cap">A <b>Product</b> is the brochure ("2MP Dome Camera"); a <b>Variant</b> is one combination of attributes (2MP · 3.6mm lens); a <b>SKU</b> is the warehouse item with a price and stock count. Orders snapshot SKU data at purchase time, so editing the catalog later never rewrites history.</p>
+    </div>
+
+    <h2 id="canvas" style="font-size:22px;margin-top:44px">The full canvas — all 38 tables on one map</h2>
+    <p class="sec-sub">The same schema that powers the live docs site (dbdocs.io/galat31868/patel), rendered as a single diagram and grouped into the 8 domains above — the colors match the cards. Drag to pan, scroll to zoom, double-click to dive in, or open the raw SVG full-size in a new tab.</p>
+
+    <div class="canvas-wrap">
+      <div class="canvas-frame" id="erdFrame" tabindex="0" role="application" aria-label="Interactive schema diagram. Toolbar buttons zoom; drag or arrow keys pan; scroll wheel zooms.">
+        <div class="cv-stage" id="erdStage"><img id="erdImg" src="schema-diagram.svg" alt="Entity-relationship diagram of all 38 database tables, grouped into 8 color-coded domain columns with relationship lines between tables" draggable="false" decoding="async" /></div>
+        <div class="cv-top">
+          <div class="cv-tools" role="group" aria-label="Diagram zoom controls">
+            <button class="cv-btn" id="cvZoomOut" type="button" aria-label="Zoom out">−</button>
+            <button class="cv-btn" id="cvZoomIn" type="button" aria-label="Zoom in">+</button>
+            <button class="cv-btn wide" id="cvFitW" type="button">Fit width</button>
+            <button class="cv-btn wide" id="cvFitAll" type="button">Fit all</button>
+            <button class="cv-btn wide" id="cvFull" type="button" aria-pressed="false">⛶ Fullscreen</button>
+          </div>
+          <a class="cv-link" href="schema-diagram.svg" target="_blank" rel="noopener">Open raw SVG ↗</a>
+        </div>
+        <div class="cv-hint" aria-hidden="true">Drag to pan · scroll to zoom · double-click to zoom in</div>
+        <div class="cv-zoom" id="cvZoomLabel" aria-hidden="true">100%</div>
+      </div>
+      <div class="dlegend" aria-hidden="false">
+        <span><i style="background:#1A3C34"></i>Identity &amp; Access</span>
+        <span><i style="background:#7A5C2E"></i>Catalog</span>
+        <span><i style="background:#2E5E4E"></i>Inventory &amp; Stock ops</span>
+        <span><i style="background:#4E5E2E"></i>Cart &amp; Wishlist</span>
+        <span><i style="background:#6B2E2E"></i>Orders &amp; Fulfillment</span>
+        <span><i style="background:#51355A"></i>Marketing &amp; Content</span>
+        <span><i style="background:#7A5C2E"></i>Kit Builder</span>
+        <span><i style="background:#37352F"></i>Platform</span>
+      </div>
+      <p class="canvas-note">How to read it: each box is a real table (header = table name, rows = columns with types); <b>(!)</b> marks required/unique columns; arrows run from a child table to the table it references. The canvas regenerates from <span class="k">public/blueprint/schema.dbml</span> with <span class="k">bun scripts/blueprint-erd.ts</span> — so it can never go stale. Prefer browsing table-by-table? Use the live docs: <a href="https://dbdocs.io/galat31868/patel" target="_blank" rel="noopener" style="color:var(--brass);font-weight:700">dbdocs.io/galat31868/patel ↗</a>.</p>
+      <p class="canvas-print-note">The zoomable canvas is interactive-only and is hidden in print. For a printed database annex, export the PNG from dbdiagram.io (see Online tools below) or open the raw SVG and print it as a poster page.</p>
     </div>
 
     <h2 style="font-size:22px;margin-top:44px">Every table, field by field</h2>
@@ -959,7 +1020,7 @@
     <div class="card">
       <div class="tool">
         <h3>dbdiagram.io <span class="rec">Recommended — database ERD</span> <span class="url">dbdiagram.io</span></h3>
-        <p>Turns the schema file shipped with this blueprint into a clean, zoomable, interactive ER diagram. Best single tool for "make me and my client understand the whole DATABASE".</p>
+        <p>Turns the schema file shipped with this blueprint into a clean, zoomable, interactive ER diagram. Best single tool for "make me and my client understand the whole DATABASE". <b>Already used for this project</b> — the published dbdocs site below was born from this exact file.</p>
         <ol>
           <li>Download/copy <span class="k">/blueprint/schema.dbml</span> from this site (already written for dbdiagram — colors and relationships included).</li>
           <li>Go to dbdiagram.io → <b>New Diagram</b> → delete the sample → paste → the 38-table ERD renders instantly.</li>
@@ -967,8 +1028,8 @@
         </ol>
       </div>
       <div class="tool">
-        <h3>dbdocs.io <span class="rec">Shareable DB docs site</span> <span class="url">dbdocs.io</span></h3>
-        <p>From the makers of dbdiagram. The same DBML file becomes a searchable documentation website with a table-of-contents — good for sharing a permanent link with the client instead of screenshots.</p>
+        <h3>dbdocs.io <span class="rec">Shareable DB docs site</span> <span class="done">Live — yours</span> <span class="url">dbdocs.io/galat31868/patel</span></h3>
+        <p>The Patel Networks documentation site is <b>already published</b>: <a href="https://dbdocs.io/galat31868/patel" target="_blank" rel="noopener">dbdocs.io/galat31868/patel ↗</a>. It carries every table, column and relationship — searchable, with a table of contents and the built-in schema diagram (the same picture as the canvas above). Share that single link with the client; re-push an updated DBML any time with <span class="k">dbdocs push</span> and the link stays the same.</p>
       </div>
       <div class="tool">
         <h3>Eraser.io <span class="rec">Architecture + ERD as code</span> <span class="url">eraser.io</span></h3>
@@ -1006,8 +1067,8 @@
         </details>
       </div>
       <div class="tool">
-        <h3>Prisma ERD Generator <span class="url">github.com/keonik/prisma-erd-generator</span></h3>
-        <p>A dev-dependency that renders the ERD straight from <span class="k">prisma/schema.prisma</span> into <span class="k">ERD.svg</span> every time the schema changes — the picture can never go stale. Ask me to wire it in and it takes one command.</p>
+        <h3>Prisma ERD Generator <span class="done">Done — our own</span> <span class="url">scripts/blueprint-erd.ts</span></h3>
+        <p>Solved without the dependency: this blueprint ships its own generator. <span class="k">bun scripts/blueprint-erd.ts</span> re-renders <span class="k">public/blueprint/schema-diagram.svg</span> (the Section 3 canvas) from <span class="k">schema.dbml</span> via dbml-renderer + graphviz, with the 8 domain clusters colored to match this page. Run it after any schema change and both the canvas and the DBML stay in lockstep with <span class="k">prisma/schema.prisma</span>.</p>
       </div>
       <div class="tool">
         <h3>DBeaver / TablePlus <span class="url">dbeaver.io · tableplus.com</span></h3>
@@ -1016,17 +1077,116 @@
     </div>
 
     <div class="callout">
-      🖨️ <span><b>Client-ready pack in 2 minutes:</b> hit <b>Print / Save PDF</b> at the top of this page for the full story (system + database + roles + orders + routes), then add the dbdiagram.io PNG of the 38-table ERD as the annex. That pair answers "database, backend, roles, routes" end-to-end.</span>
+      🖨️ <span><b>Client-ready pack in 2 minutes:</b> hit <b>Print / Save PDF</b> at the top of this page for the full story (system + database + roles + orders + routes), then add the dbdiagram.io PNG of the 38-table ERD as the annex — or simply open the <b>full canvas</b> in Section 3 on a shared screen and zoom live during the call. Pair it with the permanent docs link (<b>dbdocs.io/galat31868/patel</b>) and you have "database, backend, roles, routes" covered end-to-end.</span>
     </div>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    <span>Patel Networks / MegaTech — System Blueprint v1.0 · generated from the live codebase (38 models · 78 API files · 50 pages) · September 2026</span>
+    <span>Patel Networks / MegaTech — System Blueprint v1.1 · generated from the live codebase (38 models · 78 API files · 50 pages) · includes the regenerable 38-table schema canvas · September 2026</span>
     <a href="/" style="color:var(--brass);font-weight:700">← Back to storefront</a>
   </div>
 </footer>
+
+<script>
+/* Schema canvas viewer — self-contained pan/zoom, no dependencies. */
+(function () {
+  var frame = document.getElementById("erdFrame");
+  var stage = document.getElementById("erdStage");
+  var img = document.getElementById("erdImg");
+  var label = document.getElementById("cvZoomLabel");
+  if (!frame || !stage || !img) return;
+
+  var scale = 1, tx = 0, ty = 0;
+  var dragging = false, sx = 0, sy = 0, stx = 0, sty = 0, moved = false;
+
+  function apply() {
+    stage.style.transform = "translate(" + tx + "px," + ty + "px) scale(" + scale + ")";
+    if (label) label.textContent = Math.round(scale * 100) + "%";
+  }
+  function clamp() {
+    var fw = frame.clientWidth, fh = frame.clientHeight;
+    var w = img.naturalWidth * scale, h = img.naturalHeight * scale;
+    if (w <= fw) tx = (fw - w) / 2; else tx = Math.min(0, Math.max(fw - w, tx));
+    if (h <= fh) ty = (fh - h) / 2; else ty = Math.min(0, Math.max(fh - h, ty));
+  }
+  function zoomAt(cx, cy, factor) {
+    var next = Math.min(4, Math.max(0.03, scale * factor));
+    tx = cx - (cx - tx) * (next / scale);
+    ty = cy - (cy - ty) * (next / scale);
+    scale = next;
+    clamp(); apply();
+  }
+  function fitWidth() {
+    scale = frame.clientWidth / img.naturalWidth;
+    tx = 0; ty = 0; clamp(); apply();
+  }
+  function fitAll() {
+    scale = Math.min(frame.clientWidth / img.naturalWidth, frame.clientHeight / img.naturalHeight);
+    tx = (frame.clientWidth - img.naturalWidth * scale) / 2;
+    ty = (frame.clientHeight - img.naturalHeight * scale) / 2;
+    clamp(); apply();
+  }
+  function center() { return { x: frame.clientWidth / 2, y: frame.clientHeight / 2 }; }
+
+  img.addEventListener("load", fitWidth);
+  window.addEventListener("resize", function () { clamp(); apply(); });
+
+  frame.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    var r = frame.getBoundingClientRect();
+    zoomAt(e.clientX - r.left, e.clientY - r.top, e.deltaY < 0 ? 1.15 : 1 / 1.15);
+  }, { passive: false });
+
+  frame.addEventListener("pointerdown", function (e) {
+    if (e.target.closest(".cv-tools") || e.target.closest(".cv-link")) return;
+    dragging = true; moved = false;
+    sx = e.clientX; sy = e.clientY; stx = tx; sty = ty;
+    frame.setPointerCapture(e.pointerId);
+  });
+  frame.addEventListener("pointermove", function (e) {
+    if (!dragging) return;
+    var dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
+    tx = stx + dx; ty = sty + dy; clamp(); apply();
+  });
+  frame.addEventListener("pointerup", function () { dragging = false; });
+  frame.addEventListener("pointercancel", function () { dragging = false; });
+
+  frame.addEventListener("dblclick", function (e) {
+    if (e.target.closest(".cv-tools") || e.target.closest(".cv-link")) return;
+    var r = frame.getBoundingClientRect();
+    zoomAt(e.clientX - r.left, e.clientY - r.top, 1.6);
+  });
+
+  frame.addEventListener("keydown", function (e) {
+    var step = 70;
+    var map = { ArrowLeft: [step, 0], ArrowRight: [-step, 0], ArrowUp: [0, step], ArrowDown: [0, -step] };
+    if (!map[e.key]) return;
+    e.preventDefault();
+    tx += map[e.key][0]; ty += map[e.key][1]; clamp(); apply();
+  });
+
+  document.getElementById("cvZoomIn").addEventListener("click", function () { var c = center(); zoomAt(c.x, c.y, 1.25); });
+  document.getElementById("cvZoomOut").addEventListener("click", function () { var c = center(); zoomAt(c.x, c.y, 1 / 1.25); });
+  document.getElementById("cvFitW").addEventListener("click", fitWidth);
+  document.getElementById("cvFitAll").addEventListener("click", fitAll);
+
+  var fullBtn = document.getElementById("cvFull");
+  fullBtn.addEventListener("click", function () {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (frame.requestFullscreen) frame.requestFullscreen();
+  });
+  document.addEventListener("fullscreenchange", function () {
+    var on = !!document.fullscreenElement;
+    fullBtn.setAttribute("aria-pressed", on ? "true" : "false");
+    setTimeout(fitWidth, 60);
+  });
+
+  if (img.complete && img.naturalWidth) fitWidth();
+})();
+</script>
 
 </body>
 </html>
