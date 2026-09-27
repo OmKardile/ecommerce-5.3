@@ -131,16 +131,16 @@ export function CtaBand({
 }) {
   return (
     <Reveal>
-      <div className="rounded-lg bg-primary px-6 py-10 text-primary-foreground sm:px-10 lg:px-12 lg:py-12">
+      <div className="rounded-lg bg-brand px-6 py-10 text-brand-foreground sm:px-10 lg:px-12 lg:py-12">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="max-w-xl">
             <h2 className="font-display text-2xl leading-snug tracking-tight lg:text-[1.7rem]">{title}</h2>
-            <p className="mt-3 text-[14px] leading-relaxed text-primary-foreground/80">{body}</p>
+            <p className="mt-3 text-[14px] leading-relaxed text-brand-foreground/80">{body}</p>
           </div>
           <div className="flex shrink-0 flex-wrap items-center gap-4">
             <Link
               href={href}
-              className="group inline-flex items-center gap-2 rounded-full bg-primary-foreground px-6 py-2.5 text-sm font-medium text-primary transition-colors duration-200 hover:bg-background"
+              className="group inline-flex items-center gap-2 rounded-full bg-brand-foreground px-6 py-2.5 text-sm font-medium text-brand transition-colors duration-200 hover:bg-background"
             >
               {ctaLabel}
               <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden />
@@ -148,7 +148,7 @@ export function CtaBand({
             {secondaryHref && secondaryLabel ? (
               <Link
                 href={secondaryHref}
-                className="link-underline text-sm font-medium text-primary-foreground/90 hover:text-primary-foreground"
+                className="link-underline text-sm font-medium text-brand-foreground/90 hover:text-brand-foreground"
               >
                 {secondaryLabel}
               </Link>

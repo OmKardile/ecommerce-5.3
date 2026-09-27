@@ -2,6 +2,16 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-27 — Task 25 (dark-mode surface fix: brand bands stop flipping to mint)
+
+**Fix — "goofy dark mode colours"**
+- **Root cause**: Task 20 made dark `--primary` a bright mint (`#7fc4ab`, correct for buttons/chips/selected states), but every component that used `bg-primary` as a large *surface* — the announcement bar, the home kit-builder band (plus its step cells and decor rings), and the content-page CTA band — inherited that mint, turning full-width brand sections into eye-searing bright slabs with near-black text at night.
+- **Fix, token-driven (not hardcoded)**: new `--brand` / `--brand-foreground` token pair exposed to Tailwind as `bg-brand` / `text-brand-foreground`. Light values equal the light primary (deep pine `#1a3c34` + cream `#f7f6f1`) so **light mode is pixel-identical**; dark values keep the deep pine surface (`#142a24`, one step above the `#0e1513` page background) with mist text (`#e6ebe7`), so bands read as elevated brand panels instead of mint billboards. Rule recorded in CSS comments: interactive elements keep `--primary`; large surfaces must never flip to mint.
+- **Surfaces migrated**: storefront announcement bar (header), kit-builder band + step grid + `BandDecor` rings (home page / parallax), `CtaBand` panel, pill button and secondary link (content page-shell). Buttons, badges, pagination chips, variant chips, WhatsApp FAB and all small interactive elements intentionally stay mint.
+- **Leftover light-theme badges given dark variants**: blog console Published/Draft chips and returns-queue REQUESTED/APPROVED borders (were pastel-on-dark).
+- **Incident worth remembering**: after editing `globals.css`, Turbopack served a **stale CSS chunk** — utilities (`bg-brand` → `var(--brand)`) regenerated but the `:root`/`.dark` definitions were missing, so everything rendered transparent. A plain server restart didn't clear it; `rm -rf .next` + restart did. If tokens resolve empty after a palette edit, nuke the cache first.
+- Verified live (agent-browser, dark): home kit band = deep pine panel with cream text; announcement bar pine; CtaBand + admin login card elegant; owner dashboard / orders / staff / blog consoles clean; product listing + PDP + kit-builder + cart clean; light mode unchanged; 375px overflow **0px**; lint 0 · tsc 0 · health {db:up}.
+
 ## 2026-09-27 — Task 24 (System Blueprint: visual docs for owner & client)
 
 **Feature — a shareable "how the whole system works" page + ready-to-paste schema**

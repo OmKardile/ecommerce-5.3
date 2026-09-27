@@ -199,7 +199,7 @@ export function BlogManager() {
                       <p className="truncate font-mono text-[11px] text-muted-foreground">/blog/{r.slug}</p>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={r.status === 'PUBLISHED' ? 'bg-green-100 text-green-900 border-green-200 text-[11px]' : 'bg-stone-200/70 text-stone-800 border-stone-300 text-[11px]'}>
+                      <Badge variant="outline" className={r.status === 'PUBLISHED' ? 'bg-green-100 text-green-900 border-green-200 dark:bg-green-950/60 dark:text-green-300 dark:border-green-900 text-[11px]' : 'bg-stone-200/70 text-stone-800 border-stone-300 dark:bg-stone-800/50 dark:text-stone-300 dark:border-stone-700 text-[11px]'}>
                         {r.status === 'PUBLISHED' ? 'Published' : 'Draft'}
                       </Badge>
                     </TableCell>

@@ -67,8 +67,8 @@ const ACTION_LABELS: Record<string, string> = {
 };
 
 const STATUS_BADGE: Record<string, string> = {
-  REQUESTED: 'border-amber-600/40 text-amber-700',
-  APPROVED: 'border-sky-700/40 text-sky-800',
+  REQUESTED: 'border-amber-600/40 text-amber-700 dark:border-amber-500/40 dark:text-amber-300',
+  APPROVED: 'border-sky-700/40 text-sky-800 dark:border-sky-500/40 dark:text-sky-300',
   RESTOCKED: 'border-primary/40 text-primary',
   REFUNDED: 'border-foreground/30 text-foreground',
   REJECTED: 'border-destructive/40 text-destructive',

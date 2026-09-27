@@ -150,15 +150,15 @@ export default async function HomePage() {
       </section>
 
       {/* ---------- kit builder band ---------- */}
-      <section className="relative overflow-hidden bg-primary text-primary-foreground">
+      <section className="relative overflow-hidden bg-brand text-brand-foreground">
         <BandDecor />
         <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-14 sm:px-6 lg:grid-cols-12 lg:py-16">
           <div className="lg:col-span-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-foreground/60">Kit Builder</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-foreground/60">Kit Builder</p>
             <h2 className="mt-3 font-display text-3xl leading-tight tracking-tight sm:text-4xl">
               A complete CCTV kit, assembled in five considered steps.
             </h2>
-            <p className="mt-4 max-w-sm text-sm leading-relaxed text-primary-foreground/75">
+            <p className="mt-4 max-w-sm text-sm leading-relaxed text-brand-foreground/75">
               No compatibility guessing. Pick a recorder, add cameras within its channel count, choose storage with a
               retention estimate, then let us pair the power supply and cable. The 5% bundle discount applies itself.
             </p>
@@ -168,12 +168,12 @@ export default async function HomePage() {
               </Link>
             </Button>
           </div>
-          <div className="grid gap-px overflow-hidden rounded-lg border border-primary-foreground/15 bg-primary-foreground/10 sm:grid-cols-2 lg:col-span-8 lg:grid-cols-5">
+          <div className="grid gap-px overflow-hidden rounded-lg border border-brand-foreground/15 bg-brand-foreground/10 sm:grid-cols-2 lg:col-span-8 lg:grid-cols-5">
             {KIT_STEPS.map((s) => (
-              <div key={s.n} className="bg-primary p-5">
-                <p className="font-display text-2xl text-primary-foreground/40">{s.n}</p>
+              <div key={s.n} className="bg-brand p-5">
+                <p className="font-display text-2xl text-brand-foreground/40">{s.n}</p>
                 <p className="mt-3 text-sm font-semibold">{s.title}</p>
-                <p className="mt-1.5 text-[12.5px] leading-relaxed text-primary-foreground/70">{s.body}</p>
+                <p className="mt-1.5 text-[12.5px] leading-relaxed text-brand-foreground/70">{s.body}</p>
               </div>
             ))}
           </div>

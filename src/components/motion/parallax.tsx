@@ -168,13 +168,13 @@ export function BandDecor() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
       <Drift distance={64}>
-        <div className="absolute -right-40 top-1/2 h-[30rem] w-[30rem] -translate-y-1/2 rounded-full border border-primary-foreground/[0.07] sm:-right-32 sm:h-[36rem] sm:w-[36rem]" />
+        <div className="absolute -right-40 top-1/2 h-[30rem] w-[30rem] -translate-y-1/2 rounded-full border border-brand-foreground/[0.07] sm:-right-32 sm:h-[36rem] sm:w-[36rem]" />
       </Drift>
       <Drift distance={-44}>
-        <div className="absolute -right-24 top-1/2 h-[20rem] w-[20rem] -translate-y-1/2 rounded-full border border-primary-foreground/[0.09] sm:h-[24rem] sm:w-[24rem]" />
+        <div className="absolute -right-24 top-1/2 h-[20rem] w-[20rem] -translate-y-1/2 rounded-full border border-brand-foreground/[0.09] sm:h-[24rem] sm:w-[24rem]" />
       </Drift>
       <Drift distance={30}>
-        <div className="absolute -left-32 -bottom-24 h-80 w-80 rounded-full border border-primary-foreground/[0.05]" />
+        <div className="absolute -left-32 -bottom-24 h-80 w-80 rounded-full border border-brand-foreground/[0.05]" />
         <div className="absolute -left-24 -bottom-16 h-64 w-64 rounded-full bg-accent/[0.08] blur-3xl" />
       </Drift>
     </div>

@@ -721,3 +721,21 @@ Stage Summary:
 - Recommended combo recorded on-page: this blueprint (Print→PDF) for the story, dbdiagram.io PNG for the zoomable database annex; prisma-erd-generator offered as a wire-in candidate so the ERD regenerates with every schema change.
 - Files: new public/blueprint/index.html + public/blueprint/schema.dbml; changed src/components/admin/admin-shell.tsx (owner-only link), changelog.md, help.md, worklog.md.
 - Next-round candidates unchanged: per-product image overrides (owner images pending) · stock-monitor v2 (parked) · staff-activity reports per scope (idea) · qa-clean.ts purge at go-live · wire prisma-erd-generator (one command, keeps ERD in repo).
+
+---
+Task ID: 25
+Agent: Z.ai Code (lead)
+Task: User reported "fix that goofy dark mode colours" — diagnose and fix the dark-mode color problems left after the Task 20 trust-pine palette.
+
+Work Log:
+- DIAGNOSIS (browser-first): opened storefront + admin in dark via agent-browser and screenshotted every key surface. Found the real culprit — Task 20 set dark `--primary` to bright mint `#7fc4ab` (right for buttons/chips), but components using `bg-primary` as a large SURFACE flipped with it: the announcement bar (header.tsx) and the home kit-builder band (page.tsx, incl. step cells + `BandDecor` rings) rendered as giant bright-mint slabs with near-black text; `CtaBand` (page-shell.tsx) had the same problem plus a near-black pill button. Audited the whole repo for hardcoded light colors (`bg-stone-/bg-amber-/text-white` etc.) — nearly all already had dark: variants from Task 20; two stragglers found (blog-manager Published/Draft chips, returns-queue REQUESTED/APPROVED badges).
+- FIX (token-driven, per the Task 20 "token contract" documented in the codebase): new `--brand` / `--brand-foreground` pair in globals.css (`:root`: #1a3c34/#f7f6f1 = identical to light primary → zero light-mode change; `.dark`: #142a24/#e6ebe7 = deep pine one step above the #0e1513 bg → bands read as elevated brand panels). Exposed via `@theme inline` as `--color-brand`/`--color-brand-foreground`. Migrated ONLY the surface-scale usages: header announcement bar, kit-builder band/label/body/grid/cells, CtaBand panel + pill button + secondary link, BandDecor rings. Buttons, badges, pagination/variant chips, WhatsApp FAB, selected states deliberately keep mint (interactive = accent). Rule recorded as a CSS comment: "large surfaces must never flip to mint".
+- LEFTOVER BADGES: blog-manager chips and returns-queue badges given proper dark: variants matching the status-badge.tsx conventions.
+- INCIDENT: after the globals.css edit the dev server served a STALE Turbopack CSS chunk — utilities (.bg-brand → var(--brand)) regenerated but the :root/.dark definitions were absent, so --brand resolved empty and surfaces went transparent. Plain restart did NOT clear it; `rm -rf .next` + keeper restart did. Recorded in changelog as a troubleshooting note.
+- VERIFIED (agent-browser, dark): home kit band = deep pine panel + cream text + subtle rings; announcement bar pine; CtaBand (about) + admin login card elegant; owner dashboard/orders/staff/blog consoles clean; products listing, PDP, kit-builder, cart clean; blog "Published" chips now deep-green/mint; light mode pixel-identical (brand == primary in :root by construction); 375px overflow 0; lint 0 · tsc 0 · health {db:up}; dev.log clean.
+- DOCS DUTY: changelog Task 25 entry (incl. the stale-CSS-cache incident note) · worklog (this entry). No other md affected (no schema/API/route changes).
+
+Stage Summary:
+- Dark mode is no longer goofy: brand surfaces (announcement bar, kit-builder band, CTA bands) stay deep pine at night via the new --brand token, while interactive elements keep the mint accent — one token pair, light mode untouched by construction.
+- Surfaces changed: globals.css, header.tsx, (store)/page.tsx, page-shell.tsx, parallax.tsx (BandDecor), blog-manager.tsx, returns-queue.tsx + changelog.md + worklog.md.
+- Next-round candidates unchanged: per-product image overrides (owner images pending) · stock-monitor v2 (parked) · staff-activity reports per scope (idea) · qa-clean.ts purge at go-live · wire prisma-erd-generator.

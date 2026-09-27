@@ -173,7 +173,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
       {/* announcement bar */}
-      <div className="bg-primary text-primary-foreground">
+      <div className="bg-brand text-brand-foreground">
         <div className="mx-auto flex h-9 max-w-7xl items-center justify-between px-4 text-[11px] tracking-wide sm:px-6">
           <p className="truncate">Same-day dispatch on orders confirmed before 4:00 PM IST (Mon–Sat) · Pan-India delivery</p>
           <a href="tel:+919876543210" className="hidden items-center gap-1.5 sm:flex hover:underline">
