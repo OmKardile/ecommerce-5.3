@@ -52,11 +52,12 @@ Admin (`/admin`, own chrome, role-scoped):
 - Orders fulfillment console (FSM transition buttons, serial number capture, AWB booking, carrier-scan simulator, CSV export)
 - Returns & DOA (full RMA: approve → courier inward → QC → refund → restock) · Trade Desk (B2B inquiry FSM `NEW → CONTACTED → CLOSED`) · Reviews moderation (approve / un-publish / delete — nothing publishes unapproved)
 - Products (list/new/edit with variants, SKUs, images, specs), categories, brands
-- Inventory console (SKU matrix, adjust with reason codes, movement ledger, CSV export/import)
+- Inventory console (SKU matrix, adjust with reason codes, movement ledger, CSV export/import) + **Requests & counts** tab (approve staff stock corrections, apply count variances)
+- **Stock Monitor** (STAFF-facing): state-tile stock wall with kiosk mode, human-phrased movement history, discrepancy reports, cycle-count sessions — employees observe and propose, managers dispose (ADR-10)
 - Customers (CRM, LTV, B2B badge, wa.me links), coupons, banners, blog editor
 - Reports (sales 30-day chart, tax summary, GSTR-1 schedule with CSV export, top products/customers, inventory valuation), settings (COD rules, fees, cutoff, announcement)
 
-APIs: 67 route handlers under `/api/**` — auth, account, cart, catalog, coupon, shipping, orders, payments, webhooks, admin surface, health. See [API.md](./API.md).
+APIs: 75 route files under `/api/**` — auth, account, cart, catalog, coupon, shipping, orders, payments, webhooks, admin surface, health. See [API.md](./API.md).
 
 ## Tech stack
 

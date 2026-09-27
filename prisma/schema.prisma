@@ -23,7 +23,7 @@ model User {
   email        String?   @unique
   passwordHash String?
   fullName     String?
-  role         String    @default("CUSTOMER") // CUSTOMER | SUPER_ADMIN | ADMIN | INVENTORY_MANAGER | ORDER_MANAGER | CONTENT_MANAGER
+  role         String    @default("CUSTOMER") // CUSTOMER | SUPER_ADMIN | ADMIN | INVENTORY_MANAGER | ORDER_MANAGER | CONTENT_MANAGER | STAFF
   isActive     Boolean   @default(true)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -35,6 +35,7 @@ model User {
   orders   Order[]
   reviews  Review[]
   auditLogs AuditLog[]
+  countSessionsOpened StockCountSession[] @relation("CountSessionsOpened")
 
   @@index([role])
   @@map("users")
@@ -214,6 +215,8 @@ model Sku {
   bundleItems BundleItem[]
   movements   InventoryMovement[]
   stockAlerts StockAlert[]
+  stockCountLines      StockCountLine[]       @relation("StockCountLines")
+  adjustmentRequests   StockAdjustmentRequest[] @relation("StockAdjustmentRequests")
 
   @@map("skus")
 }
@@ -249,6 +252,76 @@ model InventoryMovement {
   @@index([skuId, createdAt])
   @@index([reason])
   @@map("inventory_movements")
+}
+
+// ============================================================
+// 3b. STOCK MONITOR — employee observe-and-report layer
+// (ADR-010 · docs/STOCK-MONITOR-RESEARCH.md). Never bypasses
+// Inventory/InventoryMovement — approvals create real movements.
+// ============================================================
+
+// A cycle-count session over a slice of the catalog. `expected`
+// snapshots scope so later catalog edits don't skew the count.
+model StockCountSession {
+  id          String    @id @default(cuid())
+  title       String // "Monsoon shelf check — cameras"
+  status      String    @default("OPEN") // OPEN | COUNTING | SUBMITTED | CLOSED | CANCELLED
+  scopeKind   String // CATEGORY | BRAND | ALL
+  scopeRefId  String?
+  expected    Json? // [{ skuId, code, expectedQty }] snapshot
+  openedById  String?
+  openedByIdx User?     @relation("CountSessionsOpened", fields: [openedById], references: [id])
+  closedById  String?
+  closedAt    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  lines StockCountLine[]
+
+  @@index([status, createdAt])
+  @@map("stock_count_sessions")
+}
+
+// One SKU inside a count session: expected vs actually counted.
+model StockCountLine {
+  id               String            @id @default(cuid())
+  sessionId        String
+  session          StockCountSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  skuId            String
+  sku              Sku               @relation("StockCountLines", fields: [skuId], references: [id], onDelete: Cascade)
+  expectedQty      Int
+  countedQty       Int? // null until counted
+  variance         Int? // countedQty − expectedQty (derived on write)
+  countedById      String?
+  countedAt        DateTime?
+  note             String?
+  appliedAt        DateTime? // set when a manager converts the variance into a movement
+  appliedMovementId String?
+
+  @@unique([sessionId, skuId])
+  @@index([skuId])
+  @@map("stock_count_lines")
+}
+
+// Employee-proposed correction; manager approves → real InventoryMovement.
+model StockAdjustmentRequest {
+  id            String    @id @default(cuid())
+  skuId         String
+  sku           Sku       @relation("StockAdjustmentRequests", fields: [skuId], references: [id], onDelete: Cascade)
+  delta         Int // proposed signed change (0 for WRONG_LOCATION acknowledgements)
+  reason        String // DAMAGED | MISSING | FOUND | WRONG_LOCATION | OTHER
+  note          String?
+  status        String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  requestedById String?
+  decidedById   String?
+  decidedAt     DateTime?
+  // filled on approval: the InventoryMovement that executed the delta
+  movementId    String?
+  createdAt     DateTime  @default(now())
+
+  @@index([status, createdAt])
+  @@index([skuId])
+  @@map("stock_adjustment_requests")
 }
 
 // ============================================================

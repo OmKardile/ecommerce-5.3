@@ -4,6 +4,14 @@ Older records: conflict resolutions **C1..C12** and **ADR-020/021** live in [`do
 
 ---
 
+## D-10 · 2026-09-27 · Stock monitor: staff observe-and-report, two-man-rule corrections
+
+**Context**: Task 17's research draft (`docs/STOCK-MONITOR-RESEARCH.md`) parked the stock-monitor build pending owner answers to §9. The owner green-lit the build ("okay remember we talked about stock management panel"); since no per-question answers came back, the draft's recommended options were adopted as recorded defaults (§9 of the research doc now logs each decision + rationale).
+
+**Decision**: (1) **Persona** — new `STAFF` role with wall + history + count + proposals only; `ADMIN_ROLES` is unchanged so every existing admin API remains closed to STAFF, and the panel layout fences STAFF sessions to `/admin/stock-monitor*` via an `x-pathname` header the proxy now injects (server-side redirect, not just nav hiding). (2) **Corrections are propose→approve** — employees never mutate stock; approvals (and count-variance applies) write through the SAME transactional `Inventory`+`InventoryMovement` ledger as the inventory console, with the request/line marked applied and audited. WRONG_LOCATION is a delta-0 acknowledgement (flag report, no movement). (3) **Count sessions snapshot expected quantities at open** (scope JSON) so later catalog edits can't skew an in-flight count; scope caps at 500 SKUs. (4) **Kiosk wall mode** ships in v1 (cheap, scenario #4 from research); WhatsApp OUT/LOW alerts and phone-camera barcode scanning stay parked (owner notification rules + hardware scope, not needed for the observe-and-report loop). (5) On-demand counting only — no cadence scheduler.
+
+**Rejected**: reusing `INVENTORY_MANAGER` for juniors (no way to grant view-only); letting the monitor write stock directly (breaks the audit model); a separate bin-location/trend-rollup schema in v1 (v2 candidates, research doc §6).
+
 ## D-9 · 2026-09-27 · Dark mode is a manual toggle and a token-only theme
 
 **Context**: Request was "clean trust themed dark mode (on switch)". Two failure modes to avoid: an off-brand dark palette (the stock `.dark` block was warm-brown, not pine), and scattered `dark:` patches as the only mechanism.

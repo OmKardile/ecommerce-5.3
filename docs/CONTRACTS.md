@@ -42,6 +42,7 @@
 
 ## Server conventions
 - ALL mutations via API route handlers (NO server actions). Zod-validate every input. Money math server-side only.
+- Stock monitor (ADR-10): STAFF+ read endpoints (`STOCK_MONITOR_ROLES`), decision endpoints (`INVENTORY_DECISION_ROLES`); every stock change — approvals and count-variance applies — writes a real `InventoryMovement` (MANUAL_ADJUSTMENT, referenceId = request/session) inside one transaction; proposals carry reason-validated deltas (DAMAGED/MISSING < 0, FOUND > 0, WRONG_LOCATION = 0); count sessions snapshot expected stock at open and each line applies at most once (`appliedAt`). STAFF console surface fenced server-side to `/admin/stock-monitor*`.
 - Inventory-critical ops inside prisma.$transaction with { maxWait: 15000, timeout: 30000 }.
 - Availability check: currentStock - reservedStock >= qty else 409 INSUFFICIENT_STOCK.
 - Order create: reserve stock (reservedStock++ + movement ORDER_RESERVED) for every item; prepaid -> PENDING_PAYMENT then PAID on capture; COD -> COD_PENDING (respect COD ceiling Rs 15,000 paise = 1500000, per-product isCodAllowed, zone codAvailable).

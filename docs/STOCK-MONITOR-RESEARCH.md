@@ -1,8 +1,9 @@
-# Stock Monitor — Employee Panel · Research & Design (DRAFT, NOT IMPLEMENTED)
+# Stock Monitor — Employee Panel · Research & Design (IMPLEMENTED, Task 21)
 
-> Status: **research only** — awaiting owner confirmation before any schema push or code.
-> Owner request: *"stock monitor employee panel or whatever u call it; make that page panel everything related to it, schema and all ready, don't implement it right now, just research and keep in some md file."*
-> This document is the single source for that future build. Nothing here is wired into `prisma/schema.prisma` or the app yet.
+> Status: **implemented & shipped** (2026-09-27) — see D-10 in `decisions.md` and the Task 21 changelog entry.
+> Owner request: *"stock monitor employee panel or whatever u call it; make that page panel everything related to it, schema and all ready, don't implement it right now, just research and keep in some md file."* — then, later: *"okay remember we talked about stock management panel"* (green light).
+> This document is the design record of that build. Everything in §5–§8 below is now live code; §9 records the decisions taken where the owner didn't answer individually.
+> Live surface: `/admin/stock-monitor` (wall + count) · Inventory console "Requests & counts" tab (manager side) · `staff@patelnetworks.in / counter@2026` seeded.
 
 ---
 
@@ -49,12 +50,12 @@ Decision when confirmed: **Option A**. Employee identity: existing admin email+p
 5. **Movement ticker**: last N movements shop-wide with human phrasing ("−2 CP-PLUS-IR-BULLET · ORDER so-24xxxx").
 6. **Explicitly NOT in v1**: direct stock mutation from this panel (that stays in Inventory console), purchase-order management, supplier fields, barcode scanner hardware support (phone camera later).
 
-## 6. Schema draft (Prisma — DO NOT PUSH)
+## 6. Schema (as shipped — final, in `prisma/schema.prisma`)
 
 ```prisma
 // ============================================================
-//  STOCK MONITOR (DRAFT — awaiting confirmation, see
-//  docs/STOCK-MONITOR-RESEARCH.md · not yet in schema.prisma)
+//  STOCK MONITOR (shipped in Task 21 — see schema.prisma
+//  §3b for the authoritative version)
 // ============================================================
 
 // A scheduled/started counting session over a slice of the catalog.
@@ -121,19 +122,23 @@ Backlinks required on existing models when implemented: `User` gains `countSessi
 
 Optional v2 (not drafted in detail): `BinLocation` (rack/shelf code on SKU) for walk-order sorting; `StockSnapshot` daily rollup for trend sparklines.
 
-## 7. API surface draft
+## 7. API surface (as shipped)
 
 | Method & path | Role | Purpose |
 |---|---|---|
-| `GET /api/admin/stock-monitor/wall?q=&category=&brand=` | STAFF+ | tiles projection: product, per-SKU available, state |
-| `GET /api/admin/stock-monitor/sku/:id/history` | STAFF+ | last 30 movements, human-phrased |
-| `POST /api/admin/stock-monitor/count-sessions` | STAFF+ | open session (scope snapshot) |
+| `GET /api/admin/stock-monitor/wall?q=&categoryId=&brandId=` | STAFF+ | tiles projection: product, per-SKU available, state (+ categories/brands for filters) |
+| `GET /api/admin/stock-monitor/history?skuId=&take=` | STAFF+ | last 30 movements, human-phrased |
+| `POST /api/admin/stock-monitor/count-sessions` | STAFF+ | open session (scope snapshot, ≤500 SKUs, empty scope → 422) |
+| `GET /api/admin/stock-monitor/count-sessions` | STAFF+ | list recent sessions with variance counters |
+| `GET /api/admin/stock-monitor/count-sessions/:id` | STAFF+ | session detail (lines: expected vs counted vs applied) |
 | `PATCH /api/admin/stock-monitor/count-sessions/:id` | STAFF+ | submit counted quantities (bulk lines) |
-| `POST /api/admin/stock-monitor/adjustment-requests` | STAFF+ | propose correction |
-| `GET /api/admin/stock-monitor/requests?status=PENDING` | INVENTORY_MANAGER+ | manager queue |
-| `POST /api/admin/stock-monitor/requests/:id/decide` | INVENTORY_MANAGER+ | approve (creates InventoryMovement + audit) / reject |
+| `POST /api/admin/stock-monitor/count-sessions/:id/close` | decision roles | close a reviewed session |
+| `POST /api/admin/stock-monitor/count-lines/apply` | decision roles | one-click variance → real MANUAL_ADJUSTMENT movement |
+| `POST /api/admin/stock-monitor/adjustment-requests` | STAFF+ | propose correction (reason-validated delta) |
+| `GET /api/admin/stock-monitor/adjustment-requests?status=` | decision roles | manager queue |
+| `POST /api/admin/stock-monitor/adjustment-requests/:id/decide` | decision roles | approve (creates InventoryMovement + audit when delta ≠ 0) / reject |
 
-All mutation endpoints: Zod DTOs, `recordAudit` (`STOCK_COUNT_*`, `STOCK_REQUEST_*`), rate limits consistent with the rest of the console.
+"Decision roles" = `INVENTORY_DECISION_ROLES` (SUPER_ADMIN / ADMIN / INVENTORY_MANAGER — same gate as the inventory console). All mutation endpoints: Zod DTOs, `recordAudit` (`STOCK_COUNT_*`, `STOCK_REQUEST_*`).
 
 ## 8. UI plan
 
@@ -142,14 +147,18 @@ All mutation endpoints: Zod DTOs, `recordAudit` (`STOCK_COUNT_*`, `STOCK_REQUEST
 - Count page: numeric steppers identical to cart qty pattern (`.press` active scale, tabular-nums).
 - Manager's variance queue lives as a new tab in the existing Inventory console — no new module.
 
-## 9. Open questions for the owner
+## 9. Open questions for the owner — RESOLVED (defaults adopted, D-10)
 
-1. Is the persona right — counter/warehouse staff with view+report only, or do they also adjust directly?
-2. Wall display: shop TV/tablet always-on page (needs a kiosk-friendly "no chrome" mode) — wanted?
-3. Count sessions: per week cadence, or on-demand only?
-4. Should OUT/LOW tiles also trigger WhatsApp to the owner (notification service already has the plumbing)?
-5. Barcode scanning via phone camera in v2?
+The owner approved the build without per-question answers; the research draft's recommended options were adopted and recorded:
 
-## 10. Effort estimate (when approved)
+1. **Persona**: view+report only — `STAFF` role added; ADMIN_ROLES untouched (existing APIs stay 401 for STAFF, verified). *(Option A, as recommended.)*
+2. **Wall display**: kiosk "Wall mode" SHIPPED in v1 — chrome-less full-screen board, Esc/exit button, auto-refresh continues (needs no extra plumbing).
+3. **Count cadence**: on-demand only (no scheduler); sessions snapshot expected stock at open.
+4. **WhatsApp on OUT/LOW**: NOT in v1 — plumbing exists in the notification service, but alert routing/consent needs owner input; parked.
+5. **Barcode camera scanning**: v2, unchanged.
 
-Schema + push + seed touches: ~0.5 round · APIs: ~0.5 · wall + lookup UI: ~1 · count sessions + request/decide loop: ~1 · QA + polish: ~0.5. Total ≈ 3–4 rounds with the usual gates.
+One design addition beyond the draft: count-session lines carry an `appliedAt`/`appliedMovementId` marker so a manager applies each variance exactly once (one-click "Apply" in the Inventory console); approvals with delta 0 (WRONG_LOCATION) acknowledge without a movement.
+
+## 10. Effort (actual: shipped in one round)
+
+Schema + push + seed touches · APIs · wall + lookup UI · count sessions + request/decide loop · QA + polish all landed in Task 21 (2026-09-27). The v2 candidates (BinLocation, StockSnapshot rollups, camera scanning, WhatsApp alerts) remain parked in the parking lot (compact.md).

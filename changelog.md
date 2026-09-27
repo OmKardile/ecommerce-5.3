@@ -2,6 +2,19 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-27 — Task 21 (stock monitor: employee observe-and-report panel, ADR-010)
+
+**Feature — Stock Monitor (`/admin/stock-monitor`)**
+- New `STAFF` role (counter/floor staff): observe + report only. Logged in via the normal admin login; the panel layout fences STAFF sessions to `/admin/stock-monitor*` (pathname header from the proxy, redirect otherwise) and the sidebar nav filters to a single entry. Every existing admin API stays closed to STAFF (`ADMIN_ROLES` unchanged) — verified 401s.
+- **Stock wall**: state-coloured tiles grouped by category → brand, per-SKU available chips (current − reserved), totals strip (in stock / low / out), search (name/model/SKU/barcode), category+brand filters, 60 s auto-refresh + manual refresh, and a **kiosk "Wall mode"** (chrome-less full-screen board for the shop TV, Esc to exit).
+- **SKU dialog**: availability grid (available/physical/reserved), human-phrased movement ledger ("−3 manual adjustment", "+6 received into stock"), and a discrepancy report form — reasons `DAMAGED | MISSING | FOUND | WRONG_LOCATION | OTHER` with reason-validated signed deltas (schema-enforced; WRONG_LOCATION is a note-only flag, delta 0).
+- **Count sessions**: open a cycle count scoped to category/brand/all (expected quantities snapshot at open, ≤500 SKUs), steppers identical to the cart qty pattern, bulk submit → `SUBMITTED` with mismatch count. Empty-scope sessions are rejected server-side.
+- **Manager side** (Inventory console → new "Requests & counts" tab): approve/reject discrepancy requests (approve with delta ≠ 0 writes a real `MANUAL_ADJUSTMENT` movement atomically; delta 0 acknowledges), review submitted count sheets, one-click **Apply** per variance line (also creates the real movement, marks the line applied), close sessions.
+- **Schema**: +3 models — `StockCountSession` (scope snapshot JSON), `StockCountLine` (expected vs counted, variance, applied marker), `StockAdjustmentRequest` (propose→decide, `movementId` backfill). Counts as the stock-monitor layer over `Inventory`/`InventoryMovement` — never a parallel ledger. 38 models total, 75 API route files, 49 pages.
+- **APIs** (8 route files, all role-gated): wall projection, SKU history, count-sessions open/list/detail/submit, close, variance apply, requests propose/list, decide. `STOCK_MONITOR_ROLES` = all admins + STAFF; decision endpoints = `INVENTORY_DECISION_ROLES` (matches the inventory console gate). All mutations audited (`STOCK_COUNT_*`, `STOCK_REQUEST_*`).
+- **Seed**: `staff@patelnetworks.in / counter@2026` (Counter Staff, STAFF) added to `prisma/seed.ts` and inserted into the live DB.
+- Verified end-to-end: API round-trip (STAFF proposes −1 → superadmin approves → stock 14→13 with phrased ledger; count submit 80→82 → manager applies → stock 82) AND the same loop through the browser UI (report → queue badge → approve → variance apply → wall updated); STAFF fence redirects (`/admin/orders`, `/admin/products` → `/admin/stock-monitor`); admin sweep stays 0px overflow at 375/768/1280 with the new route; dark mode adapts via the Task 20 token contract; lint 0 · tsc 0.
+
 ## 2026-09-27 — Task 20 (trust-pine dark mode on toggle)
 
 **Feature — dark mode (manual switch)**

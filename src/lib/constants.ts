@@ -21,6 +21,7 @@ export const ROLES = {
   INVENTORY_MANAGER: 'INVENTORY_MANAGER',
   ORDER_MANAGER: 'ORDER_MANAGER',
   CONTENT_MANAGER: 'CONTENT_MANAGER',
+  STAFF: 'STAFF',
   CUSTOMER: 'CUSTOMER',
 } as const;
 export type Role = (typeof ROLES)[keyof typeof ROLES];
@@ -31,6 +32,18 @@ export const ADMIN_ROLES: Role[] = [
   ROLES.INVENTORY_MANAGER,
   ROLES.ORDER_MANAGER,
   ROLES.CONTENT_MANAGER,
+];
+
+// Stock Monitor persona (ADR-010): counter/floor staff observe and report —
+// they get the monitor endpoints ONLY, never the general admin surface.
+export const STOCK_MONITOR_ROLES: Role[] = [...ADMIN_ROLES, ROLES.STAFF];
+
+// Roles allowed to decide adjustment requests / apply count variances
+// (mirrors the inventory console's mutation gate).
+export const INVENTORY_DECISION_ROLES: Role[] = [
+  ROLES.SUPER_ADMIN,
+  ROLES.ADMIN,
+  ROLES.INVENTORY_MANAGER,
 ];
 
 export const ORDER_STATUSES = [

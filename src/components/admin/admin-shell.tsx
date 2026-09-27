@@ -25,6 +25,7 @@ import {
   TicketPercent,
   Users,
   Warehouse,
+  Radar,
   Menu,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -32,7 +33,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
-import { ROLES, STORE } from '@/lib/constants';
+import { ROLES, STOCK_MONITOR_ROLES, STORE, type Role } from '@/lib/constants';
 import { api } from '@/components/admin/api';
 
 export interface AdminShellSession {
@@ -48,6 +49,8 @@ interface NavItem {
   icon: LucideIcon;
   exact?: boolean;
   badgeKey?: 'pendingReturns' | 'newInquiries' | 'pendingReviews';
+  /** Roles that see this entry; omitted = managers only (never STAFF). */
+  roles?: Role[];
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -58,6 +61,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/categories', label: 'Categories', icon: Shapes },
   { href: '/admin/brands', label: 'Brands', icon: Boxes },
   { href: '/admin/inventory', label: 'Inventory', icon: Warehouse },
+  { href: '/admin/stock-monitor', label: 'Stock Monitor', icon: Radar, roles: STOCK_MONITOR_ROLES },
   { href: '/admin/customers', label: 'Customers', icon: Users },
   { href: '/admin/inquiries', label: 'Trade Desk', icon: MessageSquareQuote, badgeKey: 'newInquiries' },
   { href: '/admin/reviews', label: 'Reviews', icon: Star, badgeKey: 'pendingReviews' },
@@ -93,7 +97,7 @@ function SidebarNav({ session, badges, onNavigate }: { session: AdminShellSessio
       </div>
 
       <nav aria-label="Admin sections" className="flex-1 overflow-y-auto thin-scrollbar px-3 py-4 space-y-0.5">
-        {NAV_ITEMS.map((item) => {
+        {NAV_ITEMS.filter((item) => (item.roles ? item.roles.includes(session.role as Role) : session.role !== ROLES.STAFF)).map((item) => {
           const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
           const Icon = item.icon;
           return (

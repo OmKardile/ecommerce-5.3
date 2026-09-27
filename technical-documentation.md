@@ -23,7 +23,7 @@ src/
     admin/
       login/          ← standalone login (outside panel chrome)
       (panel)/        ← 15 console pages, server-layout gated + role badges
-    api/              ← 67 route handlers (all mutations; Zod-validated DTOs)
+    api/              ← 75 route files (all mutations; Zod-validated DTOs)
   components/
     storefront/       ← product cards, gallery, variant selector, cart, reviews…
     admin/            ← client islands per console module + shared shell
@@ -34,7 +34,7 @@ src/
   |                      that talks to Prisma besides thin API reads
   lib/                ← session, api-helpers (ok/fail/requireRole), validators,
   |                      money, phone, pincodes, rate-limit, constants
-prisma/schema.prisma  ← 35 models · prisma/seed.ts + seed-images.json (real images only)
+prisma/schema.prisma  ← 38 models · prisma/seed.ts + seed-images.json (real images only)
 scripts/              ← qa-fixtures.ts / qa-clean.ts / checkdb.ts / rma-e2e.sh
   |                    / responsive-sweep.sh + responsive-sweep-admin.sh
 ```
@@ -62,7 +62,7 @@ scripts/              ← qa-fixtures.ts / qa-clean.ts / checkdb.ts / rma-e2e.sh
 | Admin | email+password (scrypt N=16384,r=8,p=1); JWT cookie `pn_admin_session`; role bootstrap via `ADMIN_EMAIL/PASSWORD` | Login 8 / 10 min / email |
 | Cookies | httpOnly, `sameSite=lax`, `secure` in prod | Role isolation: admin login clears customer cookie and vice versa |
 
-RBAC roles: `SUPER_ADMIN, ADMIN, INVENTORY_MANAGER, ORDER_MANAGER, CONTENT_MANAGER` — enforced per-route via `requireRole([...])` (products/categories/brands/settings: admin+; inventory mutations: +INVENTORY_MANAGER; orders/shipments/returns/serials: +ORDER_MANAGER; content (banners/posts/coupons): +CONTENT_MANAGER).
+RBAC roles: `SUPER_ADMIN, ADMIN, INVENTORY_MANAGER, ORDER_MANAGER, CONTENT_MANAGER, STAFF` — enforced per-route via `requireRole([...])` (products/categories/brands/settings: admin+; inventory mutations: +INVENTORY_MANAGER; orders/shipments/returns/serials: +ORDER_MANAGER; content (banners/posts/coupons): +CONTENT_MANAGER; stock-monitor endpoints: +STAFF via `STOCK_MONITOR_ROLES`, decision endpoints via `INVENTORY_DECISION_ROLES`). STAFF sessions are additionally fenced to `/admin/stock-monitor*` server-side (proxy injects `x-pathname`; panel layout redirects).
 
 ## Integrations (dual-mode)
 

@@ -78,6 +78,7 @@ All stock mutations run inside `prisma.$transaction(..., { maxWait: 15000, timeo
 | Order -> SHIPPED (from PACKED) | `currentStock -= qty` and `reservedStock -= qty` | `ORDER_DISPATCHED` |
 | Order -> CANCELLED (pre-dispatch) | `reservedStock -= min(qty, reserved)` | `ORDER_CANCELLED_RESTOCK` |
 | Admin adjust / CSV import | `currentStock += delta` (guard: never negative, never below reserved) | `PURCHASE_RECEIPT`, `MANUAL_ADJUSTMENT`, `DAMAGED_WRITE_OFF`, `RETURN_RESTOCK` |
+| Stock-monitor request approved / count variance applied (`stock-monitor.service.ts`) | same transactional ledger as manual adjust; request/line marked decided+`movementId`/`appliedAt` | `MANUAL_ADJUSTMENT` (referenceId = requestId / sessionId) |
 
 Note (from `inventory.service.ts`): SQLite's interactive-transaction write lock serializes writers in the sandbox; on PostgreSQL the same code path runs with row-level locking semantics. No `SELECT ... FOR UPDATE` is used explicitly, so the availability check + update pattern relies on the transaction boundary; serializing single-node traffic (the target topology) keeps this safe.
 

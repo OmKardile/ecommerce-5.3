@@ -20,7 +20,11 @@ export async function proxy(req: NextRequest) {
     if (!session || session.kind !== 'admin') {
       return NextResponse.redirect(new URL(`/admin/login?next=${encodeURIComponent(pathname + search)}`, req.url));
     }
-    return NextResponse.next();
+    // Pass the pathname down so server layouts can apply role-based page guards
+    // (e.g. STAFF console access is limited to /admin/stock-monitor, ADR-010).
+    const headers = new Headers(req.headers);
+    headers.set('x-pathname', pathname);
+    return NextResponse.next({ request: { headers } });
   }
 
   if (pathname.startsWith('/account')) {

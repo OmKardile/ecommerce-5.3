@@ -291,3 +291,61 @@ export const settingsSchema = z.object({
 export type CheckoutInput = z.infer<typeof checkoutSchema>;
 export type ProductQueryInput = z.infer<typeof productQuerySchema>;
 export type AddressInput = z.infer<typeof addressSchema>;
+
+// ---------- admin: stock monitor (ADR-010) ----------
+export const DISCREPANCY_REASONS = ['DAMAGED', 'MISSING', 'FOUND', 'WRONG_LOCATION', 'OTHER'] as const;
+
+export const stockCountSessionCreateSchema = z
+  .object({
+    title: z.string().trim().min(3).max(120),
+    scopeKind: z.enum(['CATEGORY', 'BRAND', 'ALL']),
+    scopeRefId: z.string().trim().min(1).optional(),
+  })
+  .superRefine((v, ctx) => {
+    if (v.scopeKind !== 'ALL' && !v.scopeRefId) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['scopeRefId'], message: 'scopeRefId is required for CATEGORY/BRAND scopes' });
+    }
+  });
+
+export const stockCountSubmitSchema = z.object({
+  lines: z
+    .array(
+      z.object({
+        lineId: z.string().min(1),
+        countedQty: z.number().int().min(0, 'Counted quantity cannot be negative').max(100000),
+        note: z.string().trim().max(300).optional(),
+      }),
+    )
+    .min(1, 'At least one counted line is required')
+    .max(500),
+});
+
+export const stockAdjustmentRequestSchema = z
+  .object({
+    skuId: z.string().min(1),
+    delta: z.number().int().min(-10000).max(10000),
+    reason: z.enum(DISCREPANCY_REASONS),
+    note: z.string().trim().max(300).optional(),
+  })
+  .superRefine((v, ctx) => {
+    if ((v.reason === 'DAMAGED' || v.reason === 'MISSING') && v.delta >= 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['delta'], message: `${v.reason} requires a negative delta (stock leaving)` });
+    }
+    if (v.reason === 'FOUND' && v.delta <= 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['delta'], message: 'FOUND requires a positive delta (stock reappearing)' });
+    }
+    if (v.reason === 'WRONG_LOCATION' && v.delta !== 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['delta'], message: 'WRONG_LOCATION is a flag report — delta must be 0' });
+    }
+    if (v.reason === 'OTHER' && v.delta === 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['delta'], message: 'Delta cannot be zero' });
+    }
+  });
+
+export const stockRequestDecisionSchema = z.object({
+  decision: z.enum(['APPROVED', 'REJECTED']),
+});
+
+export const countLineApplySchema = z.object({
+  lineId: z.string().min(1),
+});

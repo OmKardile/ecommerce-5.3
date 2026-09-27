@@ -100,7 +100,18 @@ async function main() {
       passwordHash: hashPassword('fulfill@2026'),
     },
   });
+  // counter staff — Stock Monitor persona (ADR-010): observe & report only
+  await prisma.user.create({
+    data: {
+      phone: '+919899000004',
+      email: 'staff@patelnetworks.in',
+      fullName: 'Counter Staff',
+      role: 'STAFF',
+      passwordHash: hashPassword('counter@2026'),
+    },
+  });
   console.log('👤 Admin:', admin.email);
+  console.log('👤 Staff (stock monitor): staff@patelnetworks.in / counter@2026');
 
   const customer = await prisma.user.create({
     data: {

@@ -50,8 +50,16 @@ For the owner and staff. Everything is clickable in the admin console at **/admi
 | The scrolling/parallax effects bother someone | All motion honours the OS "reduce motion" setting (Windows: Animation effects · macOS/iOS: Reduce Motion · Android: Remove animations) — effects stop and content stays fully readable |
 | A page overflows sideways on a phone | Run `bash scripts/responsive-sweep.sh` (storefront) or `-admin.sh` (console) to find the offending route; Card/TabsList/PageShell are already hardened — look for new wide tables or bare text inside flex rows |
 
+## Stock Monitor (counter staff)
+
+- Counter/floor staff sign in at **/admin/login** like everyone else — they land on the **Stock Monitor** automatically and see only that panel (the sidebar has one entry; typing another console URL bounces them back).
+- The **Stock wall** shows what is actually on the shelf (available = physical − reserved). Search by name, model number, SKU code or scan the barcode into the search box. Green "In stock", amber "Low", red "Out".
+- Click a tile to see recent movements in plain words and **Report a discrepancy** (Damaged / Missing / Found / Wrong location / Other). Reports go to the manager queue — nothing changes stock directly from this panel.
+- **Count sessions**: open one per category or brand (expected quantities snapshot at open), walk the shelf with the +/− steppers, submit. Mismatches are flagged to the manager, who applies corrections from Inventory → "Requests & counts".
+- **Wall mode** (button on the wall tab) turns the board into a chrome-less full-screen display for the shop TV; press Esc or "Exit wall mode" to come back. The wall refreshes itself every minute.
+
 ## Security notes for staff
 
-- Never share the superadmin login; ask the owner to create per-person admin users with the right **role** (orders vs inventory vs content) so audit trails name the right person.
+- Never share the superadmin login; ask the owner to create per-person admin users with the right **role** (orders vs inventory vs content vs `STAFF` counter access) so audit trails name the right person. Sandbox demo: `staff@patelnetworks.in / counter@2026` sees the Stock Monitor only.
 - The carrier tracking webhook needs `SHIPPING_WEBHOOK_TOKEN` set in production — the server warns loudly until it is.
 - Log out on shared machines (button in the sidebar footer).
