@@ -4,6 +4,14 @@ Older records: conflict resolutions **C1..C12** and **ADR-020/021** live in [`do
 
 ---
 
+## D-15 · 2026-09-27 · Volumetric seed is deterministic, batched, and covers every table
+
+**Context**: Owner asked to "seed a lot of data in neon db in every table" — the client-facing Render deploy was showing empty dashboards/reports because the seed covered only catalog + users (~20 of 38 tables had rows).
+
+**Decision**: seed.ts gains a volumetric phase driven by `mulberry32(20260927)` — a fixed PRNG seed makes every reseed rebuild the **identical** dataset (stable screenshots, comparable QA runs). Coverage target is every table: 51 buyers/106 addresses, 182 orders across all 13 statuses & 6 months, payments + gateway events, shipments + tracking events, returns, coupon redemptions, reviews, carts, wishlists, stock alerts, B2B inquiries, OTP trail, audit log, and the full stock-monitor lifecycle (count sessions → applied variances → real movements). All writes are batched `createMany`/`createManyAndReturn` (~50 round trips, not ~3,600 per-row inserts). Invariants kept: money integer paise; GST back-computed from GST-inclusive line prices (CGST/SGST Gujarat, IGST otherwise); order numbers match the app's `PN-YYYY-NNNNNN` format; orders never decrement Inventory (demo low/OOS states survive); unique constraints guarded in-memory. Idempotent via the existing clean-phase — rerunning `bun run db:seed` on Neon is safe.
+
+**Rejected**: `Math.random` data (unreproducible across reseeds — breaks before/after screenshots); per-row `create()` loops (minutes of network latency to Neon vs ~1 min batched); SQL dumps for seeding (provider-fragile, bypasses Prisma typing and the hashPassword/settings service hooks); auto-decrementing inventory to mirror orders (would erase the deliberate low/out-of-stock demo states).
+
 ## D-14 · 2026-09-27 · Standalone start pins HOSTNAME=0.0.0.0 (Render's HOSTNAME trap)
 
 **Context**: The Render deploy served 502 despite a green build: Render injects `HOSTNAME` (the service hostname) into the environment, and Next's standalone server binds to `process.env.HOSTNAME` — an unreachable interface. The owner's dashboard start command (`HOSTNAME=0.0.0.0 PORT=$PORT NODE_ENV=production bun .next/standalone/server.js`) fixed it live; the repo's `npm run start` did not yet carry the fix, so a Blueprint re-apply or fresh deploy would regress.

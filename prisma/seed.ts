@@ -31,6 +31,131 @@ function img(key: string, fallback?: string): string | undefined {
   return fallback;
 }
 
+// =============================================================================
+// VOLUMETRIC SEED TOOLKIT (Task 30) — deterministic fake-history generators.
+// Every generator is driven by mulberry32(20260927) so re-seeds rebuild the
+// exact same dataset (comparable screenshots, stable dashboards).
+// =============================================================================
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const rnd = mulberry32(20260927);
+const pick = <T>(arr: T[]): T => arr[Math.floor(rnd() * arr.length)];
+const randInt = (min: number, max: number): number => min + Math.floor(rnd() * (max - min + 1));
+/** Date `minDays`..`maxDays` ago at a random business hour (never in the future). */
+function daysAgo(minDays: number, maxDays: number): Date {
+  const d = new Date(Date.now() - (minDays + rnd() * (maxDays - minDays)) * 86400000);
+  d.setHours(randInt(9, 21), randInt(0, 59), randInt(0, 59), 0);
+  if (d.getTime() > Date.now()) d.setTime(Date.now() - 3600000);
+  return d;
+}
+const addHours = (d: Date, h: number): Date => new Date(d.getTime() + h * 3600000);
+const addDays = (d: Date, n: number): Date => new Date(d.getTime() + n * 86400000);
+/** GSTIN: 24 (Gujarat) + PAN(5 letters, 4 digits, 1 letter) + 1 + Z + checksum */
+function genGstin(i: number): string {
+  const L = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const letters = () => L[randInt(0, 23)] + L[randInt(0, 23)] + L[randInt(0, 23)] + L[randInt(0, 23)] + L[randInt(0, 23)];
+  return `24${letters()}${1000 + i}${L[randInt(0, 23)]}1Z${randInt(0, 9)}`;
+}
+
+const FIRST_NAMES = ['Rajesh', 'Amit', 'Priya', 'Nilesh', 'Meera', 'Jignesh', 'Kinjal', 'Hardik', 'Bhavna', 'Paresh', 'Dhruv', 'Krina', 'Mayur', 'Nisha', 'Sandeep', 'Falgun', 'Tejas', 'Hetal', 'Vishal', 'Payal', 'Mehul', 'Shreya', 'Bhargav', 'Dhwani', 'Chirag', 'Foram', 'Kaushal', 'Mital', 'Nirav', 'Pooja'];
+const LAST_NAMES = ['Patel', 'Shah', 'Desai', 'Mehta', 'Trivedi', 'Joshi', 'Chauhan', 'Parmar', 'Modi', 'Bhatt', 'Rana', 'Solanki', 'Kapadia', 'Sanghvi', 'Amin'];
+const COMPANIES = ['Shreeji Electricals', 'Krishna Security Systems', 'Sardar Traders', 'Surat CCTV Hub', 'Navkar Enterprises', 'Golden Gate Computers', 'Om Sai Networks', 'Riddhi Siddhi Solutions', 'Vyapaar Technologies', 'Diamond City Security', 'Sahjanand Trading Co.', 'Jalaram Enterprises', 'Shakti Surveillance', 'Kuber Systems', 'Annapurna Cables'];
+// [city, state] — Surat/Assured Gujarat weighted (home turf)
+const CITIES: [string, string][] = [
+  ['Surat', 'Gujarat'], ['Surat', 'Gujarat'], ['Surat', 'Gujarat'], ['Surat', 'Gujarat'], ['Surat', 'Gujarat'],
+  ['Ahmedabad', 'Gujarat'], ['Ahmedabad', 'Gujarat'], ['Vadodara', 'Gujarat'], ['Rajkot', 'Gujarat'],
+  ['Bhavnagar', 'Gujarat'], ['Bharuch', 'Gujarat'], ['Vapi', 'Gujarat'],
+  ['Mumbai', 'Maharashtra'], ['Pune', 'Maharashtra'], ['Nashik', 'Maharashtra'],
+  ['Delhi', 'Delhi'], ['Jaipur', 'Rajasthan'], ['Indore', 'Madhya Pradesh'],
+];
+const STREETS = ['Shop 14, Ring Road Market', 'B-402, Silver Business Point, VIP Circle', 'Plot 27, GIDC Pandesara', '3rd Floor, Millennium Mall, Adajan', '22, Udhna Udyog Nagar, Udhna', 'A-9, Lajamni Complex, Mota Varachha', '501, Iscon Emporio, Vesu', '15, Bhatar Road, Opp. Big Bazaar', 'Survey 218, Dumas Road, Piplod', 'Warehouse 4, Sachin GIDC'];
+const LANDMARKS = ['Near Omega Hospital', 'Opp. Rajhans Multiplex', 'Behind VR Surat', 'Airport Circle', 'Near Star Bazaar', 'Opp. Maharashtra Store'];
+const PINCODES = ['395009', '395010', '394210', '395006', '395002', '380015', '390019', '360005', '400001', '411001', '110001', '302001', '452001', '396215'];
+const COURIERS = ['Delhivery Surface', 'XpressBees', 'DTDC Express', 'BlueDart Surface', 'Ecom Express'];
+const TRANSIT_HUBS = ['Ahmedabad Hub', 'Vadodara Hub', 'Mumbai Hub', 'Surat Hub'];
+const REVIEW_POOL: [number, string, string][] = [
+  [5, 'Solid night vision', 'Installed six units around a warehouse — IR stays clean to about 20m and the housing has survived two monsoons without fogging.'],
+  [5, 'Genuine product, fast dispatch', 'Sealed box with brand warranty card. Invoice had correct HSN and my GSTIN — input credit went through in GSTR-2B without issues.'],
+  [4, 'Good value for the price', 'Image quality is sharper than expected for this tier. Docking one star because the mounting bracket feels light for windy terraces.'],
+  [5, 'Clean mobile viewing', 'Configured remote view in ten minutes. Playback search on the Purple drive is quick even with four cameras writing 24/7.'],
+  [4, 'Recommended for shops', 'Covered our showroom counter and godown entrance. Colors look accurate in daylight; night mode is usable up to the promised range.'],
+  [5, 'Repeat purchase', 'This is my third order from Patel Networks — packaging is always proper and the serial numbers match the warranty cards.'],
+  [3, 'Does the job', 'Works as specified. Firmware UI feels dated but once configured you never need to touch it again.'],
+  [5, 'Excellent for retrofit', 'Reused the existing coax runs — no rewiring needed. Picture on the 5MP-lite channel is more than enough for identification.'],
+  [4, 'Sturdy build', 'Metal housing, proper grommets, and the pigtail connectors felt tight. Survived a full Gujarat summer on a west-facing wall.'],
+  [5, 'Support knows their stuff', 'Called with a PoE budget question before ordering — they actually did the math for my camera count instead of pushing a bigger switch.'],
+];
+const B2B_MESSAGES = [
+  'Need quotation for 32 dome cameras + 2 NVRs with installation support at our textile unit in Pandesara. Monthly repeat orders possible.',
+  'We are an AMC contractor in Surat. Looking for dealer pricing on HD analog cameras and 3+1 cable — volume around 200 cameras per quarter.',
+  'Please share bulk price list for Cat6 boxes and RJ45 kits. We do structured cabling for new offices across South Gujarat.',
+  'Interested in 4MP ColorVu stock for a mall project (48 units). Need GST invoice with our company name and staged delivery.',
+  'Do you offer demo units for NVR + 8 camera setup before we finalize the society annual maintenance contract?',
+  'Require surveillance HDDs (2TB) on a monthly basis for our rental DVR fleet. What payment terms do you offer for B2B accounts?',
+];
+const AUDIT_ACTIONS: [string, string, string][] = [
+  ['order.status_changed', 'Order', 'moved order forward'],
+  ['order.viewed', 'Order', 'opened order in admin console'],
+  ['product.updated', 'Product', 'updated product details'],
+  ['product.price_changed', 'Product', 'revised selling price'],
+  ['inventory.manual_adjustment', 'Sku', 'manual stock correction'],
+  ['coupon.created', 'Coupon', 'created discount coupon'],
+  ['settings.updated', 'Setting', 'updated store settings'],
+  ['staff.login', 'Session', 'signed into admin console'],
+  ['return.status_changed', 'OrderReturn', 'processed return'],
+];
+const NOTE_POOL = ['Gatekeeper to confirm before dispatch', 'Customer asked for delivery after 5 PM', 'Install site — call before reaching', 'B2B counter sale picked from store', 'Leave with security if closed'];
+
+// Order status lifecycle used to synthesize OrderStatusHistory rows.
+const STATUS_FLOW = ['PENDING_PAYMENT', 'PAID', 'CONFIRMED', 'PROCESSING', 'PACKED', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED', 'RETURN_REQUESTED', 'RETURNED', 'REFUNDED'];
+
+interface OrderBlueprint {
+  orderNumber: string;
+  userId: string;
+  status: string;
+  paymentMethod: 'RAZORPAY' | 'COD';
+  isB2B: boolean;
+  gstin: string | null;
+  companyName: string | null;
+  subtotal: number;
+  discountAmount: number;
+  couponCode: string | null;
+  bundleDiscount: number;
+  bundleName: string | null;
+  shippingAmount: number;
+  codFee: number;
+  gstAmount: number;
+  cgstAmount: number;
+  sgstAmount: number;
+  igstAmount: number;
+  totalAmount: number;
+  deliveryName: string;
+  deliveryPhone: string;
+  deliveryLine1: string;
+  deliveryLine2: string | null;
+  deliveryCity: string;
+  deliveryState: string;
+  deliveryPincode: string;
+  customerNote: string | null;
+  createdAt: Date;
+  estimatedDeliveryAt: Date;
+  items: { skuId: string; productName: string; variantName: string; skuCode: string; hsnCode: string; quantity: number; unitPrice: number; taxRate: number; taxAmount: number; totalPrice: number; serial: boolean }[];
+  couponId: string | null;
+  couponDiscount: number;
+  paymentStatus: string;
+  paymentEvents: string[];
+  shipment: null | { status: string; courier: string; awb: string; dispatchedAt: Date; deliveredAt: Date | null };
+  returnInfo: null | { reason: string; status: string; isRma: boolean; refundAmount: number; inward: boolean };
+}
+
 async function main() {
   console.log('🌱 Seeding Patel Networks catalog…');
 
@@ -90,7 +215,7 @@ async function main() {
     },
   });
   // staff accounts (scoped personas)
-  await prisma.user.create({
+  const staffWarehouse = await prisma.user.create({
     data: {
       phone: '+919899000002',
       email: 'inventory@patelnetworks.in',
@@ -100,7 +225,7 @@ async function main() {
       passwordHash: hashPassword('warehouse@2026'),
     },
   });
-  await prisma.user.create({
+  const staffFulfillment = await prisma.user.create({
     data: {
       phone: '+919899000003',
       email: 'orders@patelnetworks.in',
@@ -110,7 +235,7 @@ async function main() {
       passwordHash: hashPassword('fulfill@2026'),
     },
   });
-  await prisma.user.create({
+  const staffContent = await prisma.user.create({
     data: {
       phone: '+919899000005',
       email: 'content@patelnetworks.in',
@@ -121,7 +246,7 @@ async function main() {
     },
   });
   // counter staff — Stock Monitor persona (ADR-010): observe & report only
-  await prisma.user.create({
+  const staffCounter = await prisma.user.create({
     data: {
       phone: '+919899000004',
       email: 'staff@patelnetworks.in',
@@ -750,11 +875,574 @@ async function main() {
     ],
   });
 
-  // ---------------- settings ----------------
+  // ===================================================================
+  // VOLUMETRIC SEED (Task 30) — realistic operating history for EVERY
+  // table: 50 buyers, ~180 orders across all statuses & 6 months,
+  // payments + gateway events, shipments + tracking events, returns,
+  // coupon redemptions, reviews, carts, wishlists, stock alerts, B2B
+  // inquiries, OTPs, audit trail and full stock-monitor lifecycle.
+  // Deterministic (mulberry32) → identical dataset on every re-seed.
+  // ===================================================================
+  console.log('🏭 Volumetric seed: generating operating history…');
+
+  // ---- 0. reload catalog as generator input -------------------------
+  const skuRows = await prisma.sku.findMany({
+    select: {
+      id: true, code: true, sellingPrice: true, mrp: true,
+      inventory: { select: { currentStock: true } },
+      variant: {
+        select: {
+          name: true,
+          product: { select: { id: true, name: true, slug: true, category: { select: { hsnCode: true, gstRate: true } } } },
+        },
+      },
+    },
+  });
+  const salableSkus = skuRows.filter((s) => s.variant && (s.inventory?.currentStock ?? 0) > 0);
+  const productMetaList = (() => {
+    const m = new Map<string, { id: string; name: string; slug: string; hsn: string; gstRate: number; minPrice: number }>();
+    for (const s of skuRows) {
+      if (!s.variant) continue;
+      const p = s.variant.product;
+      const cur = m.get(p.id);
+      if (cur) cur.minPrice = Math.min(cur.minPrice, s.sellingPrice);
+      else m.set(p.id, { id: p.id, name: p.name, slug: p.slug, hsn: p.category.hsnCode, gstRate: p.category.gstRate, minPrice: s.sellingPrice });
+    }
+    return [...m.values()];
+  })();
+  const couponRows = await prisma.coupon.findMany();
+
+  // ---- 1. buyers: 50 customers w/ profiles & 1–3 addresses ----------
+  const CUSTOMER_COUNT = 50;
+  const custUsers = await prisma.user.createManyAndReturn({
+    data: Array.from({ length: CUSTOMER_COUNT }, (_, i) => {
+      const at = daysAgo(4, 200);
+      return { phone: `+91${9876500000 + (i + 1) * 137}`, fullName: `${pick(FIRST_NAMES)} ${pick(LAST_NAMES)}`, role: 'CUSTOMER', createdAt: at, updatedAt: at };
+    }),
+  });
+  const custProfiles = await prisma.customer.createManyAndReturn({
+    data: custUsers.map((u, i) => {
+      const b2b = rnd() < 0.6;
+      return { userId: u.id, fullName: u.fullName!, companyName: b2b ? pick(COMPANIES) : null, gstin: b2b ? genGstin(i) : null, isB2BVerified: b2b, createdAt: u.createdAt, updatedAt: u.createdAt };
+    }),
+  });
+  const addrRows: { customerId: string; recipientName: string; phone: string; addressLine1: string; addressLine2: string | null; city: string; state: string; pincode: string; isDefault: boolean; type: string; createdAt: Date; updatedAt: Date }[] = [];
+  custProfiles.forEach((c, idx) => {
+    const n = randInt(1, 3);
+    for (let j = 0; j < n; j++) {
+      const [city, state] = pick(CITIES);
+      addrRows.push({ customerId: c.id, recipientName: c.fullName, phone: custUsers[idx].phone, addressLine1: pick(STREETS), addressLine2: rnd() < 0.5 ? pick(LANDMARKS) : null, city, state, pincode: pick(PINCODES), isDefault: j === 0, type: pick(['HOME', 'WORK', 'WAREHOUSE']), createdAt: custUsers[idx].createdAt, updatedAt: custUsers[idx].createdAt });
+    }
+  });
+  const addresses = await prisma.address.createManyAndReturn({ data: addrRows });
+  const addrByCustomer = new Map<string, typeof addresses>();
+  for (const a of addresses) {
+    const list = addrByCustomer.get(a.customerId) ?? [];
+    list.push(a);
+    addrByCustomer.set(a.customerId, list);
+  }
+  const rajeshProfile = await prisma.customer.findUniqueOrThrow({ where: { userId: customer.id }, include: { addresses: true } });
+  const buyers = [
+    ...custProfiles.map((c, idx) => ({ userId: c.userId, name: c.fullName, phone: custUsers[idx].phone, isB2B: c.isB2BVerified, gstin: c.gstin, companyName: c.companyName, addrs: addrByCustomer.get(c.id) ?? [] })),
+    { userId: customer.id, name: rajeshProfile.fullName, phone: customer.phone, isB2B: rajeshProfile.isB2BVerified, gstin: rajeshProfile.gstin, companyName: rajeshProfile.companyName, addrs: rajeshProfile.addresses },
+  ];
+  console.log('🧍 Buyers:', buyers.length, '· addresses:', addresses.length);
+
+  // ---- 2. order blueprints ------------------------------------------
+  const STATUS_PLAN: [string, number][] = [
+    ['DELIVERED', 110], ['OUT_FOR_DELIVERY', 8], ['SHIPPED', 12], ['PACKED', 6], ['PROCESSING', 8],
+    ['CONFIRMED', 6], ['PAID', 6], ['COD_PENDING', 6], ['PENDING_PAYMENT', 4], ['CANCELLED', 8],
+    ['RETURN_REQUESTED', 2], ['RETURNED', 4], ['REFUNDED', 2],
+  ];
+  const statusBag: string[] = [];
+  for (const [s, n] of STATUS_PLAN) for (let i = 0; i < n; i++) statusBag.push(s);
+  for (let i = statusBag.length - 1; i > 0; i--) {
+    const j = Math.floor(rnd() * (i + 1));
+    [statusBag[i], statusBag[j]] = [statusBag[j], statusBag[i]];
+  }
+
+  const RETURN_REASONS = ['DOA — dead on arrival', 'Damaged in transit', 'Wrong variant ordered', 'Not powering after install', 'Customer changed requirement'];
+  const CANCEL_REASONS = ['Payment not received in time', 'Out of stock at confirmation', 'Customer changed requirement', 'Duplicate order'];
+
+  function pickSkus(maxItems: number): OrderBlueprint['items'] {
+    const items: OrderBlueprint['items'] = [];
+    const used = new Set<string>();
+    const n = randInt(1, maxItems);
+    for (let i = 0; i < n; i++) {
+      const s = pick(salableSkus);
+      if (used.has(s.code)) continue;
+      used.add(s.code);
+      const v = s.variant!;
+      const rate = v.product.category.gstRate;
+      const isCable = /CBL|C6|DRUM/.test(s.code);
+      const isConnector = /AXP|MTC/.test(s.code);
+      const qty = isCable ? randInt(1, 6) : isConnector ? randInt(1, 10) : randInt(1, 4);
+      const lineTotal = s.sellingPrice * qty;
+      items.push({
+        skuId: s.id, productName: v.product.name, variantName: v.name, skuCode: s.code, hsnCode: v.product.category.hsnCode,
+        quantity: qty, unitPrice: s.sellingPrice, taxRate: rate,
+        taxAmount: Math.round((lineTotal * rate) / (100 + rate)), totalPrice: lineTotal,
+        serial: s.sellingPrice >= 300000,
+      });
+    }
+    return items;
+  }
+
+  const blueprints: OrderBlueprint[] = statusBag.map((status, idx) => {
+    const buyer = pick(buyers);
+    const addr = pick(buyer.addrs.length ? buyer.addrs : buyers[buyers.length - 1].addrs);
+    const paymentMethod: 'RAZORPAY' | 'COD' = rnd() < 0.3 ? 'COD' : 'RAZORPAY';
+    const isReturn = ['RETURN_REQUESTED', 'RETURNED', 'REFUNDED'].includes(status);
+    const minAge = status === 'DELIVERED' ? 8 : isReturn ? 25 : 0;
+    const createdAt = daysAgo(minAge, 180);
+    const items = pickSkus(randInt(1, 4));
+    const subtotal = items.reduce((t, it) => t + it.totalPrice, 0);
+    const gstAmount = items.reduce((t, it) => t + it.taxAmount, 0);
+
+    let couponCode: string | null = null;
+    let couponId: string | null = null;
+    let discountAmount = 0;
+    if (rnd() < 0.16) {
+      const eligible = couponRows.filter((c) => c.isActive && (!c.minOrderValue || subtotal >= c.minOrderValue));
+      if (eligible.length) {
+        const c = pick(eligible);
+        couponCode = c.code;
+        couponId = c.id;
+        discountAmount = c.type === 'PERCENT' ? Math.min(Math.round((subtotal * c.value) / 100), c.maxDiscountValue ?? Number.MAX_SAFE_INTEGER) : c.value;
+      }
+    }
+    let bundleDiscount = 0;
+    let bundleName: string | null = null;
+    if (items.length >= 3 && rnd() < 0.1) {
+      bundleDiscount = Math.round(subtotal * 0.05);
+      bundleName = 'Custom CCTV Kit';
+    }
+    const shippingAmount = subtotal >= 500000 ? 0 : 14900;
+    const codFee = paymentMethod === 'COD' ? 4900 : 0;
+    const totalAmount = subtotal - discountAmount - bundleDiscount + shippingAmount + codFee;
+    const guj = addr.state === 'Gujarat';
+    const cgstAmount = guj ? Math.floor(gstAmount / 2) : 0;
+    const sgstAmount = guj ? gstAmount - cgstAmount : 0;
+    const igstAmount = guj ? 0 : gstAmount;
+
+    // status history is synthesized in a second pass below (historyMap)
+    const flowEnd = status === 'CANCELLED' ? randInt(2, 5) : STATUS_FLOW.indexOf(status);
+
+    // payment
+    let paymentStatus = 'SUCCESS';
+    let paymentEvents: string[];
+    if (status === 'PENDING_PAYMENT') { paymentStatus = 'INITIATED'; paymentEvents = ['payment.order_created']; }
+    else if (status === 'COD_PENDING') { paymentStatus = 'INITIATED'; paymentEvents = ['cod.order_placed']; }
+    else if (status === 'CANCELLED') { paymentStatus = paymentMethod === 'COD' || flowEnd < 1 ? 'INITIATED' : 'FAILED'; paymentEvents = paymentStatus === 'FAILED' ? ['payment.failed'] : ['payment.order_created']; }
+    else if (status === 'REFUNDED') { paymentStatus = 'REFUNDED'; paymentEvents = ['payment.captured', 'refund.processed']; }
+    else paymentEvents = paymentMethod === 'COD' ? ['cod.collect_on_delivery'] : ['payment.authorized', 'payment.captured'];
+
+    // shipment (everything that reached SHIPPED+)
+    let shipment: OrderBlueprint['shipment'] = null;
+    if (STATUS_FLOW.indexOf(status) >= 5) {
+      const dispatchedAt = addHours(createdAt, randInt(20, 40));
+      const deliveredAt = ['SHIPPED', 'OUT_FOR_DELIVERY'].includes(status) ? null : addHours(dispatchedAt, randInt(48, 120));
+      shipment = {
+        status: status === 'SHIPPED' ? 'IN_TRANSIT' : status === 'OUT_FOR_DELIVERY' ? 'OUT_FOR_DELIVERY' : 'DELIVERED',
+        courier: pick(COURIERS), awb: `AWB${1200000000 + idx}`, dispatchedAt,
+        deliveredAt: deliveredAt && deliveredAt.getTime() > Date.now() ? new Date(Date.now() - 3600000) : deliveredAt,
+      };
+    }
+
+    // returns
+    let returnInfo: OrderBlueprint['returnInfo'] = null;
+    if (status === 'RETURN_REQUESTED') returnInfo = { reason: pick(RETURN_REASONS), status: 'REQUESTED', isRma: false, refundAmount: 0, inward: false };
+    else if (status === 'RETURNED') returnInfo = { reason: pick(RETURN_REASONS), status: 'RESTOCKED', isRma: true, refundAmount: 0, inward: true };
+    else if (status === 'REFUNDED') returnInfo = { reason: pick(RETURN_REASONS), status: 'REFUNDED', isRma: true, refundAmount: totalAmount, inward: true };
+
+    return {
+      orderNumber: `PN-2026-${String(300000 + idx).padStart(6, '0')}`,
+      userId: buyer.userId, status, paymentMethod,
+      isB2B: buyer.isB2B, gstin: buyer.gstin, companyName: buyer.companyName,
+      subtotal, discountAmount, couponCode, shippingAmount, codFee, gstAmount, cgstAmount, sgstAmount, igstAmount, totalAmount,
+      deliveryName: addr.recipientName ?? buyer.name, deliveryPhone: addr.phone, deliveryLine1: addr.addressLine1,
+      deliveryLine2: addr.addressLine2, deliveryCity: addr.city, deliveryState: addr.state, deliveryPincode: addr.pincode,
+      customerNote: rnd() < 0.12 ? pick(NOTE_POOL) : null,
+      createdAt, estimatedDeliveryAt: addDays(createdAt, randInt(3, 7)),
+      items, couponId, couponDiscount: discountAmount, bundleDiscount, bundleName,
+      paymentStatus, paymentEvents, shipment, returnInfo,
+    };
+  });
+  // Second pass: synthesize OrderStatusHistory chains per blueprint.
+  const historyMap = new Map<OrderBlueprint, { status: string; comment: string; changedBy: string; at: Date }[]>();
+  for (const o of blueprints) {
+    const flowEnd = o.status === 'CANCELLED' ? randInt(2, 5) : STATUS_FLOW.indexOf(o.status);
+    const hh: { status: string; comment: string; changedBy: string; at: Date }[] = [];
+    let t = o.createdAt;
+    for (let step = 0; step <= flowEnd; step++) {
+      const st = step === 1 && o.paymentMethod === 'COD' ? 'COD_PENDING' : STATUS_FLOW[step];
+      t = addHours(t, randInt(2, 20));
+      if (t.getTime() > Date.now()) t = new Date(Date.now() - 60000);
+      hh.push({ status: st, comment: st === 'PENDING_PAYMENT' ? 'Order placed' : st === 'PAID' ? 'Razorpay payment captured' : st === 'COD_PENDING' ? 'Awaiting cash on delivery' : st === 'DELIVERED' ? 'Delivered & signed' : pick(['Routed to fulfillment', 'Picked & packed', 'Manifested with courier', 'Invoiced']), changedBy: step === 0 ? 'customer' : step <= 4 ? admin.id : 'system', at: t });
+    }
+    if (o.status === 'CANCELLED') {
+      t = addHours(t, randInt(2, 12));
+      hh.push({ status: 'CANCELLED', comment: pick(CANCEL_REASONS), changedBy: admin.id, at: t });
+    }
+    historyMap.set(o, hh);
+  }
+
+  // ---- 3. persist orders (batched createManyAndReturn) ---------------
+  const orderRows: { id: string; orderNumber: string }[] = [];
+  for (let i = 0; i < blueprints.length; i += 40) {
+    const rets = await prisma.order.createManyAndReturn({
+      data: blueprints.slice(i, i + 40).map((o) => ({
+        orderNumber: o.orderNumber, userId: o.userId, status: o.status, paymentMethod: o.paymentMethod,
+        isB2B: o.isB2B, gstin: o.gstin, companyName: o.companyName,
+        subtotal: o.subtotal, discountAmount: o.discountAmount, bundleDiscount: o.bundleDiscount, bundleName: o.bundleName,
+        couponCode: o.couponCode, shippingAmount: o.shippingAmount, codFee: o.codFee,
+        gstAmount: o.gstAmount, cgstAmount: o.cgstAmount, sgstAmount: o.sgstAmount, igstAmount: o.igstAmount, totalAmount: o.totalAmount,
+        deliveryName: o.deliveryName, deliveryPhone: o.deliveryPhone, deliveryLine1: o.deliveryLine1, deliveryLine2: o.deliveryLine2,
+        deliveryCity: o.deliveryCity, deliveryState: o.deliveryState, deliveryPincode: o.deliveryPincode,
+        customerNote: o.customerNote, estimatedDeliveryAt: o.estimatedDeliveryAt, createdAt: o.createdAt, updatedAt: o.createdAt,
+      })),
+    });
+    orderRows.push(...rets.map((r) => ({ id: r.id, orderNumber: r.orderNumber })));
+  }
+  const orderIdByNumber = new Map(orderRows.map((r) => [r.orderNumber, r.id]));
+  console.log('🧾 Orders:', orderRows.length);
+
+  // ---- 4. order items + status history -------------------------------
+  const orderItemData = blueprints.flatMap((o) => {
+    const orderId = orderIdByNumber.get(o.orderNumber)!;
+    return o.items.map((it) => ({
+      orderId, skuId: it.skuId, productName: it.productName, variantName: it.variantName, skuCode: it.skuCode, hsnCode: it.hsnCode,
+      quantity: it.quantity, unitPrice: it.unitPrice, taxRate: it.taxRate, taxAmount: it.taxAmount, totalPrice: it.totalPrice,
+      serialNumbers: it.serial ? JSON.stringify([`SN${randInt(100000000000, 999999999999)}`]) : null, isCodAllowed: true,
+    }));
+  });
+  for (let i = 0; i < orderItemData.length; i += 80) await prisma.orderItem.createMany({ data: orderItemData.slice(i, i + 80) });
+  const historyData = blueprints.flatMap((o) => historyMap.get(o)!.map((h) => ({ orderId: orderIdByNumber.get(o.orderNumber)!, status: h.status, comment: h.comment, changedBy: h.changedBy, createdAt: h.at })));
+  for (let i = 0; i < historyData.length; i += 100) await prisma.orderStatusHistory.createMany({ data: historyData.slice(i, i + 100) });
+  console.log('📋 Order items:', orderItemData.length, '· history rows:', historyData.length);
+
+  // ---- 5. payments + payment events ----------------------------------
+  const paymentRows: { id: string; orderId: string }[] = [];
+  for (let i = 0; i < blueprints.length; i += 60) {
+    const rets = await prisma.payment.createManyAndReturn({
+      data: blueprints.slice(i, i + 60).map((o, k) => ({
+        orderId: orderIdByNumber.get(o.orderNumber)!,
+        gateway: o.paymentMethod === 'COD' ? 'COD' : 'RAZORPAY',
+        gatewayOrderId: `order_SEED${String(i + k).padStart(4, '0')}`,
+        gatewayPaymentId: ['SUCCESS', 'REFUNDED'].includes(o.paymentStatus) ? `pay_SEED${String(i + k).padStart(4, '0')}` : null,
+        amount: o.totalAmount, currency: 'INR', method: o.paymentMethod === 'COD' ? 'COD' : 'ONLINE',
+        status: o.paymentStatus, createdAt: addHours(o.createdAt, 0.05), updatedAt: addHours(o.createdAt, 0.3),
+      })),
+    });
+    paymentRows.push(...rets.map((r) => ({ id: r.id, orderId: r.orderId })));
+  }
+  const payIdByOrder = new Map(paymentRows.map((p) => [p.orderId, p.id]));
+  const peData = blueprints.flatMap((o, idx) => {
+    const paymentId = payIdByOrder.get(orderIdByNumber.get(o.orderNumber)!)!;
+    return o.paymentEvents.map((eventType, k) => ({
+      paymentId, eventId: `evt_seed_pe_${idx}_${k}`, eventType,
+      payload: JSON.stringify({ orderNumber: o.orderNumber, amount: o.totalAmount, gateway: o.paymentMethod === 'COD' ? 'COD' : 'razorpay', seed: true }),
+      createdAt: addHours(o.createdAt, 0.1 + k * 0.2),
+    }));
+  });
+  for (let i = 0; i < peData.length; i += 100) await prisma.paymentEvent.createMany({ data: peData.slice(i, i + 100) });
+  console.log('💳 Payments:', paymentRows.length, '· payment events:', peData.length);
+
+  // ---- 6. shipments + tracking events --------------------------------
+  const shipped = blueprints.filter((o) => o.shipment);
+  const shipmentRows: { id: string; orderId: string; status: string; awb: string }[] = [];
+  for (let i = 0; i < shipped.length; i += 60) {
+    const rets = await prisma.shipment.createManyAndReturn({
+      data: shipped.slice(i, i + 60).map((o) => ({
+        orderId: orderIdByNumber.get(o.orderNumber)!, provider: 'SHIPROCKET', courierName: o.shipment!.courier,
+        providerShipmentId: `SHRSEED${String(100000 + i + shipped.indexOf(o)).padStart(7, '0')}`,
+        awb: o.shipment!.awb, trackingUrl: `https://shiprocket.co/tracking/${o.shipment!.awb}`,
+        status: o.shipment!.status, estimatedDeliveryAt: o.estimatedDeliveryAt,
+        dispatchedAt: o.shipment!.dispatchedAt, deliveredAt: o.shipment!.deliveredAt,
+        createdAt: o.shipment!.dispatchedAt, updatedAt: o.shipment!.deliveredAt ?? o.shipment!.dispatchedAt,
+      })),
+    });
+    shipmentRows.push(...rets.map((r) => ({ id: r.id, orderId: r.orderId, status: r.status, awb: r.awb! })));
+  }
+  const seData = shipped.flatMap((o, idx) => {
+    const sh = shipmentRows.find((r) => r.awb === o.shipment!.awb)!;
+    const chain: [string, string, number][] = [['MANIFESTED', 'Surat, Gujarat', 0], ['PICKED_UP', 'Surat, Gujarat', 6], ['IN_TRANSIT', pick(TRANSIT_HUBS), 24]];
+    if (['OUT_FOR_DELIVERY', 'DELIVERED'].includes(sh.status)) chain.push(['OUT_FOR_DELIVERY', `${o.deliveryCity}, ${o.deliveryState}`, 48]);
+    if (sh.status === 'DELIVERED') chain.push(['DELIVERED', `${o.deliveryCity}, ${o.deliveryState}`, 66]);
+    return chain.map(([st, loc, h], k) => ({
+      shipmentId: sh.id, eventId: `evt_seed_se_${idx}_${k}`, status: st, location: loc,
+      occurredAt: addHours(o.shipment!.dispatchedAt, h),
+      payload: JSON.stringify({ awb: sh.awb, seed: true }), createdAt: addHours(o.shipment!.dispatchedAt, h),
+    }));
+  });
+  for (let i = 0; i < seData.length; i += 100) await prisma.shipmentEvent.createMany({ data: seData.slice(i, i + 100) });
+  console.log('🚚 Shipments:', shipmentRows.length, '· tracking events:', seData.length);
+
+  // ---- 7. returns + coupon redemptions -------------------------------
+  const returned = blueprints.filter((o) => o.returnInfo);
+  const returnRets = await prisma.orderReturn.createManyAndReturn({
+    data: returned.map((o) => ({
+      orderId: orderIdByNumber.get(o.orderNumber)!, reason: o.returnInfo!.reason, status: o.returnInfo!.status,
+      isRma: o.returnInfo!.isRma, refundAmount: o.returnInfo!.refundAmount,
+      inwardCourier: o.returnInfo!.inward ? pick(COURIERS) : null,
+      inwardTracking: o.returnInfo!.inward ? `RT${randInt(100000000, 999999999)}` : null,
+      inwardNote: o.returnInfo!.inward ? pick(['Carton opened — unit powers on, scratches on housing', 'Seal intact, DOA confirmed on bench', 'Customer-packed, accessories complete']) : null,
+      inwardAt: o.returnInfo!.inward ? addDays(o.createdAt, 14) : null,
+      createdAt: addDays(o.createdAt, 9), updatedAt: addDays(o.createdAt, 15),
+    })),
+  });
+  const redemptionData = blueprints.filter((o) => o.couponId).map((o) => ({
+    couponId: o.couponId!, orderId: orderIdByNumber.get(o.orderNumber)!, discountAmount: o.couponDiscount, createdAt: o.createdAt,
+  }));
+  await prisma.couponRedemption.createMany({ data: redemptionData });
+  for (const c of couponRows) {
+    await prisma.coupon.update({ where: { id: c.id }, data: { usedCount: redemptionData.filter((r) => r.couponId === c.id).length } });
+  }
+  console.log('↩️ Returns:', returnRets.length, '· coupon redemptions:', redemptionData.length);
+
+  // ---- 8. reviews ------------------------------------------------------
+  const reviewSeen = new Set<string>();
+  const reviewData: { productId: string; userId: string; rating: number; title: string; comment: string; isApproved: boolean; isVerified: boolean; createdAt: Date }[] = [];
+  for (const p of productMetaList) {
+    const n = randInt(3, 6);
+    let made = 0;
+    let guard = 0;
+    while (made < n && guard++ < 24) {
+      const u = pick(custUsers);
+      const key = `${p.id}:${u.id}`;
+      if (reviewSeen.has(key)) continue;
+      reviewSeen.add(key);
+      const [rating, title, comment] = pick(REVIEW_POOL);
+      reviewData.push({ productId: p.id, userId: u.id, rating, title, comment, isApproved: rnd() < 0.92, isVerified: rnd() < 0.8, createdAt: daysAgo(2, 130) });
+      made++;
+    }
+  }
+  for (let i = 0; i < reviewData.length; i += 60) await prisma.review.createMany({ data: reviewData.slice(i, i + 60) });
+  console.log('⭐ Reviews:', reviewData.length);
+
+  // ---- 9. carts, wishlists, stock alerts ------------------------------
+  const carts = await prisma.cart.createManyAndReturn({
+    data: [...custUsers.slice(0, 10).map((u) => ({ userId: u.id })), ...[1, 2, 3].map((n) => ({ guestToken: `guest_seed_${n}` }))],
+  });
+  const cartItemData = carts.flatMap((c) => {
+    const used = new Set<string>();
+    const rows: { cartId: string; skuId: string; quantity: number; createdAt: Date }[] = [];
+    for (let i = 0, n = randInt(1, 3); i < n; i++) {
+      const s = pick(salableSkus);
+      if (used.has(s.code)) continue;
+      used.add(s.code);
+      rows.push({ cartId: c.id, skuId: s.id, quantity: randInt(1, 3), createdAt: daysAgo(0, 6) });
+    }
+    return rows;
+  });
+  await prisma.cartItem.createMany({ data: cartItemData });
+  const wishlists = await prisma.wishlist.createManyAndReturn({ data: custUsers.slice(10, 24).map((u) => ({ userId: u.id })) });
+  const wliData = wishlists.flatMap((w) => {
+    const used = new Set<string>();
+    const rows: { wishlistId: string; productId: string; priceAtAddPaise: number; createdAt: Date }[] = [];
+    for (let i = 0, n = randInt(1, 4); i < n; i++) {
+      const p = pick(productMetaList);
+      if (used.has(p.id)) continue;
+      used.add(p.id);
+      rows.push({ wishlistId: w.id, productId: p.id, priceAtAddPaise: p.minPrice, createdAt: daysAgo(1, 60) });
+    }
+    return rows;
+  });
+  await prisma.wishlistItem.createMany({ data: wliData });
+  const oosSkus = skuRows.filter((s) => (s.inventory?.currentStock ?? 1) <= 4);
+  const alertSeen = new Set<string>();
+  const alertData: { skuId: string; phone: string; status: string; notifiedAt: Date | null; createdAt: Date }[] = [];
+  for (const s of oosSkus) {
+    for (let k = 0; k < 3; k++) {
+      const u = pick(custUsers);
+      const key = `${s.id}:${u.phone}`;
+      if (alertSeen.has(key)) continue;
+      alertSeen.add(key);
+      alertData.push({ skuId: s.id, phone: u.phone, status: 'PENDING', notifiedAt: null, createdAt: daysAgo(1, 25) });
+    }
+  }
+  await prisma.stockAlert.createMany({ data: alertData });
+  console.log('🛒 Carts:', carts.length, '· cart items:', cartItemData.length, '· wishlists:', wishlists.length, '· wishlist items:', wliData.length, '· stock alerts:', alertData.length);
+
+  // ---- 10. B2B inquiries + OTP trail ----------------------------------
+  await prisma.b2BInquiry.createMany({
+    data: Array.from({ length: 14 }, (_, i) => {
+      const status = i < 5 ? 'NEW' : i < 10 ? 'CONTACTED' : 'CLOSED';
+      const createdAt = daysAgo(1, 90);
+      const handledAt = status === 'NEW' ? null : addHours(createdAt, randInt(4, 40));
+      return {
+        name: `${pick(FIRST_NAMES)} ${pick(LAST_NAMES)}`, phone: `+91${9812345000 + i * 211}`,
+        email: i % 3 === 0 ? `buyer${i}@example.in` : null, companyName: i % 2 === 0 ? pick(COMPANIES) : null,
+        gstin: i % 2 === 0 ? genGstin(200 + i) : null, message: pick(B2B_MESSAGES),
+        productId: i % 3 === 0 ? pick(productMetaList).id : null, status,
+        note: status === 'NEW' ? null : pick(['Quoted dealer price — awaiting PO', 'Sample unit handed over at counter', 'Closed — went with local vendor', 'Follow up next month for AMC']),
+        handledAt, createdAt, updatedAt: handledAt ?? createdAt,
+      };
+    }),
+  });
+  await prisma.otpVerification.createMany({
+    data: Array.from({ length: 12 }, (_, i) => {
+      const createdAt = daysAgo(0, 45);
+      const verified = i % 3 !== 2;
+      return { phone: i < 8 ? pick(custUsers).phone : `+9198111${String(10000 + i).slice(-5)}`, codeHash: `seedotp_${i}_hash`, expiresAt: addHours(createdAt, 0.167), isVerified: verified, attempts: verified ? 1 : randInt(0, 3), createdAt };
+    }),
+  });
+  console.log('🤝 B2B inquiries: 14 · OTP trail: 12');
+
+  // ---- 11. stock-monitor lifecycle (ADR-010) --------------------------
+  const hdInv = await prisma.inventory.findMany({
+    where: { sku: { variant: { product: { categoryId: subHd.id } } } },
+    include: { sku: { select: { code: true } } },
+  });
+  const sessClosedAt = daysAgo(20, 26);
+  const sessClosed = await prisma.stockCountSession.create({
+    data: {
+      title: 'Q2 FY26 shelf audit — HD analog cameras', status: 'CLOSED', scopeKind: 'CATEGORY', scopeRefId: subHd.id,
+      expected: JSON.stringify(hdInv.slice(0, 8).map((x) => ({ skuId: x.skuId, code: x.sku.code, expectedQty: x.currentStock }))),
+      openedById: staffWarehouse.id, closedById: admin.id, closedAt: addDays(sessClosedAt, 2), createdAt: sessClosedAt,
+    },
+  });
+  const closedLineRets = await prisma.stockCountLine.createManyAndReturn({
+    data: hdInv.slice(0, 8).map((x) => {
+      const drift = rnd() < 0.35 ? randInt(-3, 2) : 0;
+      return {
+        sessionId: sessClosed.id, skuId: x.skuId, expectedQty: x.currentStock, countedQty: x.currentStock + drift, variance: drift,
+        countedById: staffCounter.id, countedAt: addHours(sessClosedAt, 20),
+        note: drift !== 0 ? pick(['Two units at repair bench', 'Found sealed units in showcase', 'Mis-shelved under bullet rack', 'Demo unit on shopfloor']) : null,
+        appliedAt: addDays(sessClosedAt, 2),
+      };
+    }),
+  });
+  for (const line of closedLineRets.filter((l) => (l.variance ?? 0) !== 0)) {
+    const mv = await prisma.inventoryMovement.create({
+      data: { skuId: line.skuId, quantity: line.variance!, reason: line.variance! < 0 ? 'DAMAGED_WRITE_OFF' : 'RETURN_RESTOCK', referenceId: line.id, notes: `Applied from count session ${sessClosed.title}`, createdById: admin.id },
+    });
+    await prisma.stockCountLine.update({ where: { id: line.id }, data: { appliedMovementId: mv.id } });
+  }
+  const hikInv = await prisma.inventory.findMany({
+    where: { sku: { variant: { product: { brandId: brands['hikvision'] } } }, currentStock: { gt: 0 } },
+    include: { sku: { select: { code: true } } },
+  });
+  const sessCountingAt = daysAgo(2, 4);
+  const sessCounting = await prisma.stockCountSession.create({
+    data: {
+      title: 'Weekly spot check — Hikvision shelves', status: 'COUNTING', scopeKind: 'BRAND', scopeRefId: brands['hikvision'],
+      expected: JSON.stringify(hikInv.slice(0, 6).map((x) => ({ skuId: x.skuId, code: x.sku.code, expectedQty: x.currentStock }))),
+      openedById: staffWarehouse.id, createdAt: sessCountingAt,
+    },
+  });
+  await prisma.stockCountLine.createMany({
+    data: hikInv.slice(0, 6).map((x, i) => {
+      const counted = i < 4 ? x.currentStock + (rnd() < 0.3 ? randInt(-1, 1) : 0) : null;
+      return {
+        sessionId: sessCounting.id, skuId: x.skuId, expectedQty: x.currentStock, countedQty: counted,
+        variance: counted === null ? null : counted - x.currentStock,
+        countedById: counted === null ? null : staffCounter.id, countedAt: counted === null ? null : addHours(sessCountingAt, 5 + i * 2),
+      };
+    }),
+  });
+  const sessOpenAt = daysAgo(0, 1);
+  const sessOpen = await prisma.stockCountSession.create({
+    data: {
+      title: 'Month-end full floor count', status: 'OPEN', scopeKind: 'ALL',
+      expected: JSON.stringify(salableSkus.slice(0, 10).map((s) => ({ skuId: s.id, code: s.code, expectedQty: s.inventory?.currentStock ?? 0 }))),
+      openedById: staffCounter.id, createdAt: sessOpenAt,
+    },
+  });
+  await prisma.stockCountLine.createMany({
+    data: salableSkus.slice(0, 10).map((s) => ({ sessionId: sessOpen.id, skuId: s.id, expectedQty: s.inventory?.currentStock ?? 0 })),
+  });
+
+  // adjustment requests: PENDING → APPROVED (with real movements) → REJECTED
+  const ADJ_SPECS: { code: string; delta: number; reason: string; note: string; status: string }[] = [
+    { code: 'CPP-D01-2MP-36', delta: -2, reason: 'DAMAGED', note: 'Two domes cracked in transit from Ahmedabad branch', status: 'PENDING' },
+    { code: 'CPP-CBL-90M', delta: -1, reason: 'MISSING', note: 'Box missing from rack B4 after festival rush', status: 'PENDING' },
+    { code: 'AXP-BNCD-10', delta: 4, reason: 'FOUND', note: 'Unopened packs recovered from old showcase', status: 'PENDING' },
+    { code: 'HIK-IP-4MP-4MM', delta: 0, reason: 'WRONG_LOCATION', note: 'Moved to IP rack — count unchanged', status: 'PENDING' },
+    { code: 'WDP-HDD-2TB', delta: -1, reason: 'DAMAGED', note: 'Failed SMART check on bench', status: 'APPROVED' },
+    { code: 'DL-C6-90M', delta: 2, reason: 'FOUND', note: 'Return-to-stock from cancelled order restock', status: 'APPROVED' },
+    { code: 'LAP-MON-22HD', delta: -1, reason: 'OTHER', note: 'Display unit converted to counter demo', status: 'APPROVED' },
+    { code: 'OPL-CONV-SM20', delta: 1, reason: 'FOUND', note: 'Extra unit found on RMA shelf', status: 'APPROVED' },
+    { code: 'CPP-DVR-8CH', delta: -1, reason: 'MISSING', note: 'Serial gap during dispatch staging', status: 'REJECTED' },
+    { code: 'MTC-RJ45-K20', delta: -2, reason: 'MISSING', note: 'Reported missing — recount found them', status: 'REJECTED' },
+  ];
+  for (const spec of ADJ_SPECS) {
+    const skuId = skuToId[spec.code];
+    if (!skuId) continue;
+    const req = await prisma.stockAdjustmentRequest.create({
+      data: {
+        skuId, delta: spec.delta, reason: spec.reason, note: spec.note, status: spec.status,
+        requestedById: staffCounter.id, createdAt: daysAgo(1, 30),
+        decidedById: spec.status === 'PENDING' ? null : admin.id,
+        decidedAt: spec.status === 'PENDING' ? null : addHours(daysAgo(1, 30), 30),
+      },
+    });
+    if (spec.status === 'APPROVED' && spec.delta !== 0) {
+      const mv = await prisma.inventoryMovement.create({
+        data: { skuId, quantity: spec.delta, reason: 'MANUAL_ADJUSTMENT', referenceId: req.id, notes: `Approved adjustment: ${spec.reason}`, createdById: admin.id },
+      });
+      await prisma.stockAdjustmentRequest.update({ where: { id: req.id }, data: { movementId: mv.id } });
+    }
+  }
+  // extra historical movements for the ledger
+  const extraMovements = Array.from({ length: 15 }, () => {
+    const s = pick(skuRows);
+    const kind = rnd();
+    if (kind < 0.4) return { skuId: s.id, quantity: randInt(10, 30), reason: 'PURCHASE_RECEIPT', referenceId: `PO-2026-${randInt(100, 999)}`, notes: 'Stock lot received from distributor', createdById: staffWarehouse.id, createdAt: daysAgo(5, 150) };
+    if (kind < 0.75) return { skuId: s.id, quantity: 1, reason: 'RETURN_RESTOCK', referenceId: pick(orderRows).orderNumber, notes: 'Customer return restocked after QC', createdById: staffWarehouse.id, createdAt: daysAgo(2, 90) };
+    return { skuId: s.id, quantity: -randInt(1, 2), reason: 'DAMAGED_WRITE_OFF', referenceId: null, notes: pick(['Water damage in storage', 'Failed QC on bench', 'Cracked housing — written off']), createdById: staffWarehouse.id, createdAt: daysAgo(2, 90) };
+  });
+  await prisma.inventoryMovement.createMany({ data: extraMovements });
+  console.log('📦 Stock monitor: 3 sessions, 10 adjustment requests,', extraMovements.length, 'ledger movements');
+
+  // ---- 12. audit trail -------------------------------------------------
+  const staffIds = [admin.id, staffWarehouse.id, staffFulfillment.id, staffContent.id];
+  const returnIds = returnRets.map((r) => r.id);
+  const auditData = Array.from({ length: 80 }, () => {
+    const [action, entity, blurb] = pick(AUDIT_ACTIONS);
+    let entityId: string | null = null;
+    if (entity === 'Order') entityId = pick(orderRows).id;
+    else if (entity === 'Product') entityId = pick(productMetaList).id;
+    else if (entity === 'Coupon') entityId = pick(couponRows).id;
+    else if (entity === 'OrderReturn' && returnIds.length) entityId = pick(returnIds);
+    else if (entity === 'Setting') entityId = 'announcement';
+    else if (entity === 'Session') entityId = null;
+    else if (entity === 'Inventory') entityId = pick(skuRows).id;
+    return {
+      userId: pick(staffIds), action, entity, entityId,
+      details: JSON.stringify({ note: blurb, seed: true }),
+      ip: `103.${randInt(1, 254)}.${randInt(1, 254)}.${randInt(1, 254)}`,
+      createdAt: daysAgo(0, 170),
+    };
+  });
+  for (let i = 0; i < auditData.length; i += 40) await prisma.auditLog.createMany({ data: auditData.slice(i, i + 40) });
+  console.log('🧾 Audit logs:', auditData.length);
+
+
   const { saveSettings } = await import('../src/server/services/settings.service');
   await saveSettings({
     announcement: 'Same-day dispatch on orders confirmed before 4:00 PM IST (Mon–Sat) · Pan-India delivery',
   });
+
+  // ---- 13. per-table verification --------------------------------------
+  const tableReport: [string, { count: () => Promise<number> }][] = [
+    ['users', prisma.user], ['otp_verifications', prisma.otpVerification], ['customers', prisma.customer],
+    ['addresses', prisma.address], ['categories', prisma.category], ['brands', prisma.brand],
+    ['products', prisma.product], ['product_images', prisma.productImage], ['product_variants', prisma.productVariant],
+    ['skus', prisma.sku], ['inventory', prisma.inventory], ['inventory_movements', prisma.inventoryMovement],
+    ['stock_count_sessions', prisma.stockCountSession], ['stock_count_lines', prisma.stockCountLine],
+    ['stock_adjustment_requests', prisma.stockAdjustmentRequest], ['bundles', prisma.bundle], ['bundle_items', prisma.bundleItem],
+    ['carts', prisma.cart], ['cart_items', prisma.cartItem], ['wishlists', prisma.wishlist], ['wishlist_items', prisma.wishlistItem],
+    ['orders', prisma.order], ['order_items', prisma.orderItem], ['order_status_history', prisma.orderStatusHistory],
+    ['payments', prisma.payment], ['payment_events', prisma.paymentEvent], ['shipments', prisma.shipment],
+    ['shipment_events', prisma.shipmentEvent], ['order_returns', prisma.orderReturn], ['coupons', prisma.coupon],
+    ['coupon_redemptions', prisma.couponRedemption], ['banners', prisma.banner], ['posts', prisma.post],
+    ['reviews', prisma.review], ['b2b_inquiries', prisma.b2BInquiry], ['stock_alerts', prisma.stockAlert],
+    ['audit_logs', prisma.auditLog], ['settings', prisma.setting],
+  ];
+  const counts: string[] = [];
+  for (const [name, model] of tableReport) counts.push(`${name}=${await model.count()}`);
+  console.log('📊 Per-table row counts:\n   ' + counts.join('\n   '));
 
   console.log('✅ Seed complete');
   console.log(`   Admin login: ${admin.email} / ${adminPass}`);

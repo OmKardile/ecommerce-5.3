@@ -34,7 +34,7 @@ Quality gates per round: `bun run lint` (0) · `bunx tsc --noEmit` (0) · `bash 
 
 ### Demo data
 
-`bun run scripts/qa-fixtures.ts` seeds 2 B2B inquiries, a wishlist price-drop demo, and 1 pending review so every console has something to show. **Purge before go-live:** `bun run scripts/qa-clean.ts`.
+`bun run db:seed` builds the catalog **and** six months of deterministic operating history — every one of the 38 tables has data (51 buyers, 182 orders across all statuses, payments/gateway events, shipments/tracking events, returns, reviews, carts, wishlists, B2B inquiries, audit trail, stock-monitor sessions) — see **D-15** in `decisions.md`. `bun run scripts/qa-fixtures.ts` adds a few extra console demos (B2B inquiries, wishlist price-drop, pending review). **Purge before go-live:** `bun run scripts/qa-clean.ts` + a fresh `db:seed`.
 
 ---
 
