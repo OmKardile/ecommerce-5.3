@@ -165,7 +165,7 @@ NODE_ENV="production"
 
 ### ADMIN_EMAIL
 
-**What it does**: Defines the environment's bootstrap superadmin. On the first `/admin/login` submit, **only while no user in the database matches this email**, the auth service upserts a `SUPER_ADMIN` ("Platform Superadmin") with `ADMIN_PASSWORD`. It also names the seeded admin when `prisma/seed.ts` runs.
+**What it does**: Defines the environment's bootstrap superadmin. On the first `/admin/login` submit, **only while no user in the database matches this email**, the auth service upserts a `SUPER_ADMIN` ("Store Owner") with `ADMIN_PASSWORD`. It also names the seeded admin when `prisma/seed.ts` runs.
 
 **Where used**: `src/server/services/auth.service.ts` (bootstrap in `adminLogin`), `prisma/seed.ts` (seed override).
 

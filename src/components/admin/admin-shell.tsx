@@ -33,7 +33,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
-import { ROLES, STOCK_MONITOR_ROLES, STORE, type Role } from '@/lib/constants';
+import { ROLES, ROLE_LABELS, STOCK_MONITOR_ROLES, STORE, type Role } from '@/lib/constants';
 import { api } from '@/components/admin/api';
 
 export interface AdminShellSession {
@@ -84,7 +84,7 @@ function roleBadgeClass(role: string): string {
 }
 
 function roleLabel(role: string): string {
-  return role.replace(/_/g, ' ');
+  return ROLE_LABELS[role as Role] ?? role.replace(/_/g, ' ');
 }
 
 function SidebarNav({ session, badges, onNavigate }: { session: AdminShellSession; badges?: { pendingReturns?: number; newInquiries?: number; pendingReviews?: number }; onNavigate?: () => void }) {

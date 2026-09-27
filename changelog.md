@@ -2,6 +2,14 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-27 — Task 22 (role display naming: Owner-first ladder, D-11)
+
+**Change — roles now read the way the shop thinks**
+- New `ROLE_LABELS` map (`src/lib/constants.ts`) is the single source of truth for human-facing role names: `SUPER_ADMIN → Owner`, `ADMIN → Manager`, `INVENTORY_MANAGER → Inventory Manager`, `ORDER_MANAGER → Orders Manager`, `CONTENT_MANAGER → Content Manager`, `STAFF → Floor Staff`, `CUSTOMER → Customer`. The admin shell's sidebar badge and "Signed in as" chip render from the map.
+- The seeded/bootstrapped owner account renamed "Platform Superadmin" → **"Store Owner"** (`prisma/seed.ts`, auth bootstrap, live DB row via one-off upsert). Credentials unchanged.
+- Permission audit (route-by-route over all handlers): **no admin API is Owner-exclusive today** — plain `ADMIN` walks the same surface; the Owner/Manager distinction is currently identity (env bootstrap) + labels. Owner-shaped vocabulary is now in place for any future Owner-only fence (settings, staff management).
+- Verified live: Owner session shows "Store Owner · Signed in as Owner" + OWNER badge; Floor Staff keeps its single-entry fence and a live wall (badge FLOOR STAFF); Inventory Manager renders "Signed in as Inventory Manager". Admin sweep stays 0px overflow at 375/768/1280; lint 0 · tsc 0. (Sandbox DB wiped at round start — restored via db:push + db:seed + qa-fixtures per runbook.)
+
 ## 2026-09-27 — Task 21 (stock monitor: employee observe-and-report panel, ADR-010)
 
 **Feature — Stock Monitor (`/admin/stock-monitor`)**

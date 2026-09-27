@@ -4,6 +4,14 @@ Older records: conflict resolutions **C1..C12** and **ADR-020/021** live in [`do
 
 ---
 
+## D-11 · 2026-09-27 · Role display naming: the owner reads "Owner", not "Super Admin"
+
+**Context**: Owner asked "so you have named superadmin as manager (basically store owner who has ALL the permissions)" — their mental model is Owner-first, but the UI rendered `SUPER_ADMIN` as "SUPER ADMIN" and the account as "Platform Superadmin", while the "Manager" word actually belonged to the scoped roles. A route-by-route permission audit (all 75 handlers) also confirmed no admin API is Owner-exclusive today — plain `ADMIN` walks the same surface — so hierarchy was carried by labels and identity (env bootstrap), not by permissions.
+
+**Decision**: **Display-layer rename only; DB role keys frozen** (zero migration). A single `ROLE_LABELS` map in `lib/constants.ts` is the source of truth for human-facing names: SUPER_ADMIN→**Owner**, ADMIN→**Manager**, INVENTORY_MANAGER→Inventory Manager, ORDER_MANAGER→Orders Manager, CONTENT_MANAGER→Content Manager, STAFF→**Floor Staff**, CUSTOMER→Customer. The admin shell (sidebar badge + "Signed in as" chip) renders from the map, and the seeded/bootstrapped owner account is named "Store Owner". Owner-shaped vocabulary now exists so any future Owner-exclusive surface (settings, staff management) can be fenced on top without another naming pass.
+
+**Rejected**: renaming the Prisma role strings (breaking churn across API gates, audits and seed for cosmetics); labelling plain ADMIN "Admin" (keeps the exact manager/owner confusion the owner flagged); per-component label strings instead of one map (drift risk).
+
 ## D-10 · 2026-09-27 · Stock monitor: staff observe-and-report, two-man-rule corrections
 
 **Context**: Task 17's research draft (`docs/STOCK-MONITOR-RESEARCH.md`) parked the stock-monitor build pending owner answers to §9. The owner green-lit the build ("okay remember we talked about stock management panel"); since no per-question answers came back, the draft's recommended options were adopted as recorded defaults (§9 of the research doc now logs each decision + rationale).

@@ -76,7 +76,7 @@ async function main() {
     data: {
       phone: '+919899000001',
       email: (process.env.ADMIN_EMAIL ?? 'superadmin@patelnetworks.in').toLowerCase(),
-      fullName: 'Platform Superadmin',
+      fullName: 'Store Owner',
       role: 'SUPER_ADMIN',
       passwordHash: hashPassword(adminPass),
     },

@@ -26,6 +26,20 @@ export const ROLES = {
 } as const;
 export type Role = (typeof ROLES)[keyof typeof ROLES];
 
+// Human-facing names for the role ladder (D-11) — the DB keys above are
+// frozen API surface; only this map decides what people read in the UI.
+// Ladder: Owner (store owner, every permission) → Manager (general) →
+// scoped managers → Floor Staff (stock-monitor persona) → Customer.
+export const ROLE_LABELS: Record<Role, string> = {
+  SUPER_ADMIN: 'Owner',
+  ADMIN: 'Manager',
+  INVENTORY_MANAGER: 'Inventory Manager',
+  ORDER_MANAGER: 'Orders Manager',
+  CONTENT_MANAGER: 'Content Manager',
+  STAFF: 'Floor Staff',
+  CUSTOMER: 'Customer',
+} as const;
+
 export const ADMIN_ROLES: Role[] = [
   ROLES.SUPER_ADMIN,
   ROLES.ADMIN,

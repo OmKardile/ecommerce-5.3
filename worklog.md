@@ -654,3 +654,23 @@ Stage Summary:
 - Docs duty: changelog Task 21 entry · decisions D-10 · compact (end of Task 21, counters 38/49/75, creds, parking lot v2) · technical-documentation (counts + RBAC row) · docs/README (admin map + counts) · docs/ARCHITECTURE (movement table row) · docs/CONTRACTS (stock-monitor contract) · help.md (staff how-to + credentials) · worklog.
 - Files: new src/server/services/stock-monitor.service.ts, src/components/admin/{stock-monitor,stock-requests-console,console-tabs}.tsx, src/app/admin/(panel)/stock-monitor/page.tsx, 8 API route files; changed schema/seed/constants/validators/proxy/(panel)layout/admin-shell/inventory page/sweep script + docs set.
 - Next-round candidates: per-product image overrides (owner images pending), stock-monitor v2 (BinLocation/rollups/camera scanning/WhatsApp alerts — parked in compact), qa-clean.ts purge at go-live, staggered category-card Reveal.
+
+---
+Task ID: 22
+Agent: Z.ai Code (lead)
+Task: User asked "so you have named superadmin as manager (basically store owner who has ALL the permissions)" — answer the permission-model question precisely and align role naming with the owner's Owner-first mental model.
+
+Work Log:
+- ANSWERED from code: role key SUPER_ADMIN rendered as "SUPER ADMIN" (badge + "Signed in as") with account name "Platform Superadmin"; "Manager" actually belongs to the scoped roles (INVENTORY/ORDER/CONTENT_MANAGER). Confirmed superadmin = store owner with ALL permissions — and via a route-by-route audit over all 75 handlers, that NO admin API is Owner-exclusive today (plain ADMIN passes every gate; hierarchy is identity/bootstrap + labels, not permissions).
+- PERMISSION AUDIT: grepped every ROLES.* use across src/app/api/admin; the only file naming SUPER_ADMIN without ROLES.ADMIN (stock-monitor close route) uses INVENTORY_DECISION_ROLES which includes ADMIN. Zero Owner-only routes.
+- RENAME (display-layer only, D-11): new ROLE_LABELS map in src/lib/constants.ts (SUPER_ADMIN→Owner, ADMIN→Manager, INVENTORY_MANAGER→Inventory Manager, ORDER_MANAGER→Orders Manager, CONTENT_MANAGER→Content Manager, STAFF→Floor Staff, CUSTOMER→Customer); admin-shell roleLabel() now reads the map (fallback to underscore-split for unknowns); DB role keys frozen — zero migration.
+- ACCOUNT NAME: "Platform Superadmin" → "Store Owner" in prisma/seed.ts + auth.service bootstrap; live DB row renamed (one-off updateMany via scripts/tmp-who.ts, removed after).
+- INCIDENT (recurring): sandbox DB found WIPED at round start (0 users/0 products; health still {db:up}) → restored via bun run db:push + db:seed + scripts/qa-fixtures.ts per runbook; fresh seed now writes "Store Owner". (First rename attempt legitimately renamed 0 rows because the table was empty.)
+- VERIFIED LIVE (agent-browser): Owner login → "Store Owner · Signed in as Owner" + OWNER badge; STAFF login → lands /admin/stock-monitor, "Counter Staff · Signed in as Floor Staff" + FLOOR STAFF badge, single-entry nav, wall data live (20 in stock / 2 low / 1 out, 23 SKUs — proves DB restore); Inventory Manager login (warehouse@2026) → "Warehouse Manager · Signed in as Inventory Manager" with full manager nav. Admin sweep rerun → 0px overflow at 375/768/1280. lint 0 · tsc 0 · health {db:up}.
+- DOCS DUTY: changelog Task 22 entry · decisions D-11 (display-layer rename; rejected: renaming Prisma role strings, labelling ADMIN "Admin", per-component strings) · compact → end of Task 22 (Scale line shows the display ladder; new role-ladder state bullet; parking lot unchanged) · technical-documentation RBAC row (+ ROLE_LABELS mapping + no-Owner-exclusive fact) · docs/ENVIRONMENT-VARIABLES-GUIDE bootstrap wording ("Store Owner") · help.md (Owner mention in login step; security note lists display names) · worklog.
+
+Stage Summary:
+- The system now speaks the owner's language: Owner · Manager · Inventory/Orders/Content Manager · Floor Staff — one ROLE_LABELS map, DB keys untouched, credentials unchanged.
+- Documented the honest nuance: plain ADMIN currently has the same API surface as Owner; if the owner wants Owner-only surfaces (settings, staff management), the vocabulary and fence pattern (STAFF-style) are ready to layer on.
+- Files: src/lib/constants.ts, src/components/admin/admin-shell.tsx, prisma/seed.ts, src/server/services/auth.service.ts + docs set (changelog/decisions/compact/technical/env-guide/help/worklog).
+- Next-round candidates unchanged: Owner-only fences (candidate, needs owner say-so) · per-product image overrides (images pending) · stock-monitor v2 (parked) · qa-clean.ts purge at go-live.

@@ -139,7 +139,7 @@ export async function adminLogin(email: string, password: string): Promise<{ use
       create: {
         email: envEmail,
         phone: `+9100000${Date.now() % 100000000}`,
-        fullName: 'Platform Superadmin',
+        fullName: 'Store Owner',
         role: 'SUPER_ADMIN',
         passwordHash: hashPassword(envPassword),
       },

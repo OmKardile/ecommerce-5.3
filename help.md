@@ -4,7 +4,7 @@ For the owner and staff. Everything is clickable in the admin console at **/admi
 
 ## First 5 minutes
 
-1. **Log in**: `/admin/login` → email + password. (Sandbox demo: `superadmin@patelnetworks.in / patel@admin2026`.)
+1. **Log in**: `/admin/login` → email + password. (Sandbox demo: `superadmin@patelnetworks.in / patel@admin2026` — the sidebar shows this account as **Owner**.)
 2. The **Dashboard** is your morning: pipeline cards (orders to verify, processing, shipped), alerts in red when action is waiting (open returns, new trade inquiries, reviews to moderate), low/out-of-stock lists, 30-day sales chart.
 3. Left sidebar shows live **count badges** on Returns, Trade Desk and Reviews when something needs you.
 
@@ -60,6 +60,6 @@ For the owner and staff. Everything is clickable in the admin console at **/admi
 
 ## Security notes for staff
 
-- Never share the superadmin login; ask the owner to create per-person admin users with the right **role** (orders vs inventory vs content vs `STAFF` counter access) so audit trails name the right person. Sandbox demo: `staff@patelnetworks.in / counter@2026` sees the Stock Monitor only.
+- Never share the Owner login; ask the owner to create per-person admin users with the right **role** (orders vs inventory vs content vs `STAFF` counter access) so audit trails name the right person. Roles display as **Owner · Manager · Inventory Manager · Orders Manager · Content Manager · Floor Staff**. Sandbox demo: `staff@patelnetworks.in / counter@2026` sees the Stock Monitor only.
 - The carrier tracking webhook needs `SHIPPING_WEBHOOK_TOKEN` set in production — the server warns loudly until it is.
 - Log out on shared machines (button in the sidebar footer).
