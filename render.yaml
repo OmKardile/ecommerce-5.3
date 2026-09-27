@@ -9,6 +9,12 @@
 #   Build:        npm install && npm run db:sync && npm run build
 #   Start:        npm run start
 #
+# ⚠️ START-COMMAND GOTCHA (verified live 2026-09): Render sets HOSTNAME to the
+# service hostname, and Next standalone binds to it → 502. `npm run start` now
+# pins HOSTNAME=0.0.0.0 PORT=${PORT:-3000} (Task 29). The dashboard variant
+#   HOSTNAME=0.0.0.0 PORT=$PORT NODE_ENV=production bun .next/standalone/server.js
+# is equivalent (bun ships in Render's Node image) — keep the two in sync.
+#
 # The database is EXTERNAL (Neon Postgres) — Render's ephemeral disk holds
 # nothing of value, so free-plan restarts/spin-downs lose no data.
 # =============================================================================

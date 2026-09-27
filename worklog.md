@@ -796,3 +796,20 @@ Stage Summary:
 - Root cause of the failed Render build was my sandbox-first `env -u` hack; replaced with a precedence shim that is correct in both worlds (`.env`-first when present, passthrough when not). The next Render deploy passes db:sync PROVIDED DATABASE_URL is set in the service's Environment (if the owner never added it, the same P1012 would return — RENDER-STEPS.md now leads with this row).
 - Files: scripts/with-env.sh (new, +x), package.json (4 scripts), deploy/RENDER-STEPS.md, decisions.md, changelog.md, worklog.md.
 - Next-round candidates: confirm the owner's Render env has DATABASE_URL (+NEXT_PUBLIC_APP_URL) and watch the redeploy go green · per-product image overrides · stock-monitor v2 (parked) · staff-activity reports · qa-clean.ts purge at go-live.
+
+---
+Task ID: 29
+Agent: Z.ai Code (lead)
+Task: User reported the Render deploy went LIVE (runtime Docker → Node, build `npm install && npm run db:sync && npm run build`, Neon DATABASE_URL set) after a dashboard Start-Command change to `HOSTNAME=0.0.0.0 PORT=$PORT NODE_ENV=production bun .next/standalone/server.js`; site at https://patelnetworks.onrender.com. Repo-side task: back-port that runtime fix so future deploys/Blueprint re-applies don't regress, then (mid-round addition) seed a lot of data into the Neon DB in every table (spun off as Task 30).
+
+Work Log:
+- RECON: git clean @ 22d29c1 (Task 28 shim already pushed — explains why the build went green once DATABASE_URL was added: on Render the shim passes dashboard env through). Verified `.env` is NOT tracked (only .env.example + docs) — Neon credential stays out of git. Probed the live site: `/api/health` → `{"ok":true,"data":{"status":"healthy","db":"up"}}`, homepage 200 — Neon serving production.
+- ROOT CAUSE (502): Render injects `HOSTNAME` (service hostname) into the env; Next standalone binds `process.env.HOSTNAME` → unreachable interface. The dashboard's bun start command pinned `HOSTNAME=0.0.0.0 PORT=$PORT` — that binding was the effective fix, not bun.
+- BACK-PORT: package.json `start` → `HOSTNAME=0.0.0.0 PORT=${PORT:-3000} NODE_ENV=production node .next/standalone/server.js` (node = portable default; bun verified present on Render's Node image but Docker/VPS path has no bun). render.yaml header documents the gotcha + the equivalent dashboard variant; startCommand stays `npm run start` so Blueprint re-apply is safe. Docker runner already pinned HOSTNAME=0.0.0.0 via ENV (Task 3-b) — all three deploy paths now agree.
+- DOCS: deploy/RENDER-STEPS.md LIVE banner + "build green but 502" row (leads troubleshooting map) + A.3 start-command explanation; docs/RENDER-DEPLOYMENT.md status banner (Node path is the live one); README live-URL line; decisions D-14 (bind decision; rejected: dashboard-only fix, bun in repo script, hardcoded PORT) + D-13 point-3 amendment marker; changelog Task 29.
+- VERIFIED: live site healthy + homepage 200; lint 0. (Sandbox dev server untouched — dev path unaffected by the start-script change.)
+
+Stage Summary:
+- The verified runtime configuration now lives in the repo: any fresh Render deploy, Blueprint re-apply, or restart produces the correct 0.0.0.0:$PORT binding — the 502 cannot regress from the repo side.
+- Files: package.json, render.yaml, deploy/RENDER-STEPS.md, docs/RENDER-DEPLOYMENT.md, README.md, decisions.md, changelog.md, worklog.md.
+- Next-round candidates: NEXT_PUBLIC_APP_URL cache-clear redeploy if OG/canonicals show a stale origin · per-product image overrides · stock-monitor v2 (parked) · qa-clean.ts purge at go-live.

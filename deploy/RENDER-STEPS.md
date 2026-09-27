@@ -1,5 +1,9 @@
 # Patel Networks / MegaTech — Render Deployment Runbook (Neon Postgres)
 
+> **STATUS (Task 29): this setup is LIVE at https://patelnetworks.onrender.com**
+> (Node runtime, Blueprint build commands, Neon Postgres). Free plan: the
+> service sleeps after ~15 idle minutes — first visit wakes it in ~50 s.
+
 The stack on Render is a **single Node web service** with an **external Neon
 Postgres** database. Nothing is stored on Render's disk, so free-plan
 restarts lose no data. `render.yaml` in the repo root encodes everything
@@ -33,7 +37,10 @@ Two paths: **A. Blueprint (recommended, ~5 min)** or **B. Manual web service**.
    `JWT_SECRET` is auto-generated and kept stable; `NODE_VERSION=22` is fixed.
 3. **Apply** → first build runs
    `npm install && npm run db:sync && npm run build`, then starts
-   `node .next/standalone/server.js` on Render's `PORT`.
+   `npm run start` — which pins `HOSTNAME=0.0.0.0 PORT=${PORT:-3000}` before
+   launching `node .next/standalone/server.js` (Task 29: Render injects its
+   own `HOSTNAME`; without the pin the server binds an unreachable interface
+   → 502).
 4. Verify: open `https://<service>.onrender.com/api/health` →
    `{"ok":true,"data":{"status":"healthy","db":"up",...}}`, then log into
    `/admin/login` with the owner credentials.
@@ -81,6 +88,7 @@ Two paths: **A. Blueprint (recommended, ~5 min)** or **B. Manual web service**.
 
 | Symptom | Cause → fix |
 |---|---|
+| **Build green but the site 502s** | Next standalone bound to Render's injected `HOSTNAME` (service hostname — unreachable). Fixed in-repo since Task 29: `npm run start` pins `HOSTNAME=0.0.0.0 PORT=${PORT:-3000}`. If the dashboard Start Command was customized, it must also carry `HOSTNAME=0.0.0.0 PORT=$PORT` (the verified variant `HOSTNAME=0.0.0.0 PORT=$PORT NODE_ENV=production bun .next/standalone/server.js` works — bun ships in Render's Node image). |
 | Build fails at `db:sync` with **P1012 "Environment variable not found: DATABASE_URL"** | The env var is not set on the Render service (build ran the passthrough path because there is no `.env` on Render). Render → your service → **Environment** → add `DATABASE_URL` = Neon connection string → **Manual Deploy → Deploy latest commit**. (Task 28 made the script .env-first when a `.env` exists and passthrough otherwise — on Render only the dashboard value can supply it.) |
 | Build fails at `db:sync` (any other reason) | Destructive schema change pending → run `npx prisma db push` from the Render Shell after review. |
 | `P1001 can't reach database` | Wrong `DATABASE_URL` / Neon compute suspended → check the Neon Dashboard, keep `sslmode=require`. |

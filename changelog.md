@@ -2,6 +2,14 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-27 — Task 29 (Render go-live: runtime fix back-ported — 0.0.0.0 bind)
+
+**Fix — the start-command change that killed the 502 now lives in the repo, not just the dashboard**
+- **Live**: https://patelnetworks.onrender.com is up (runtime switched Docker → Node; build `npm install && npm run db:sync && npm run build`). Re-verified this round from the sandbox: `/api/health` → `{"db":"up"}`, homepage 200.
+- **Root cause of the 502**: Render injects `HOSTNAME` (the service hostname) into the environment and Next's standalone server binds to it — an interface nothing can reach. The dashboard start command that fixed it pins `HOSTNAME=0.0.0.0 PORT=$PORT`. `npm run start` now carries the same fix in-repo: `HOSTNAME=0.0.0.0 PORT=${PORT:-3000} NODE_ENV=production node .next/standalone/server.js` — so `render.yaml`'s `startCommand: npm run start` and the dashboard's bun variant are equivalent (bun ships in Render's Node image and is verified working there; node stays the portable default). Decision **D-14**.
+- **Docs**: render.yaml header documents the gotcha + the verified bun variant; `deploy/RENDER-STEPS.md` gains a LIVE banner + a "build green but 502" troubleshooting row (now leads the map); `docs/RENDER-DEPLOYMENT.md` gains a status banner; README gains the live URL.
+- Residual note: the dashboard's Start Command is a per-service override — if the Blueprint is ever re-applied it switches back to `npm run start`, which now includes the binding, so no regression either way.
+
 ## 2026-09-27 — Task 28 (hotfix: Render build failure — env precedence shim)
 
 **Fix — "Environment variable not found: DATABASE_URL" (P1012) at Render's `db:sync` build step**

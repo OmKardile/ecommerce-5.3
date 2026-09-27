@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "sh scripts/with-env.sh next dev -p 3000 2>&1 | tee dev.log",
     "build": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
-    "start": "NODE_ENV=production node .next/standalone/server.js",
+    "start": "HOSTNAME=0.0.0.0 PORT=${PORT:-3000} NODE_ENV=production node .next/standalone/server.js",
     "lint": "eslint .",
     "db:push": "sh scripts/with-env.sh prisma db push --accept-data-loss",
     "db:sync": "sh scripts/with-env.sh prisma db push",

@@ -5,6 +5,8 @@ E-commerce + operations platform for **Patel Networks** (Surat, Gujarat): CCTV, 
 > Stack: **Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 · shadcn/ui · Prisma ORM · PostgreSQL (Neon — dev + prod) · bun**
 > 38 Prisma models · 50 pages · 78 API route handlers · 2 operator roles (Owner + scoped Staff) · money always integer paise
 > Appearance: editorial light theme (default) · **trust-pine dark mode** via the nav toggle (storefront header, mobile drawer, admin chrome)
+>
+> **Live on Render (Node runtime)**: <https://patelnetworks.onrender.com> — free plan sleeps after ~15 idle minutes; the first visit wakes it in ~50 s. Runbook: [`deploy/RENDER-STEPS.md`](deploy/RENDER-STEPS.md).
 
 ---
 

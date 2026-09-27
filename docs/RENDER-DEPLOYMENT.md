@@ -1,5 +1,11 @@
 # Patel Networks / MegaTech — Render Staging Deployment Guide
 
+> **STATUS (Task 29): LIVE** — the Node-runtime path is deployed at
+> **https://patelnetworks.onrender.com** (`/api/health` → `{db:"up"}` on the
+> shared Neon DB). Start-command gotcha learned live: Render sets `HOSTNAME`
+> to the service hostname, so the standalone server MUST pin
+> `HOSTNAME=0.0.0.0 PORT=$PORT` — `npm run start` now does this in-repo.
+
 > **Which Render path should I use?** Since Task 27 there are two supported
 > ways to run this repo on Render:
 > 1. **Node runtime + Blueprint (recommended — fastest)**: `render.yaml` +
