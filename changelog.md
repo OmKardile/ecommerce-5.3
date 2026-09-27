@@ -2,6 +2,23 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-27 — Task 18 (parallax + responsive hardening)
+
+**Feature — scroll parallax system**
+- New motion primitives (`src/components/motion/parallax.tsx`): `ParallaxImage` (overscale + drift, edge-reveal-proof, hover-scale option), `ScrollDrift` (deterministic global-scroll hero drift + legibility-floor fade), `Drift` (decorative multi-speed layers), plus precomposed `HeroDecor` / `BandDecor`. All transform-only and reduced-motion-safe (verified under emulation).
+- Applied: home hero (backdrop + copy lag/fade + SKU-card counter-drift), kit-builder band rings, promo-strip image, PageShell hero band on all 9 content pages, blog article covers. Functional surfaces (catalog, PDP, cart, checkout, account, admin panels) intentionally stay motion-quiet.
+
+**Responsive — whole-site audit + fixes (0 overflow now at 375/768/1280)**
+- New repeatable sweeps: `scripts/responsive-sweep.sh` + `responsive-sweep-admin.sh` (43 route×viewport combos; note `agent-browser set viewport` is the working syntax).
+- Fixed grid `min-width:auto` blowouts: ContentSection now `grid-cols-1` + `min-w-0` columns (fixed /shipping-policy 641px & /return-policy 404px at 375); `ui/card.tsx` base + `min-w-0` (fixed /admin dashboard 331px); `ui/tabs.tsx` TabsList now scrollable (`max-w-full overflow-x-auto`) (fixed /admin/returns 53px). Bare-text flex `<li>` runs wrapped in `<span>` (shipping-policy).
+- Dev-console hygiene: `html { position: relative }` silences framer-motion v12's useScroll static-container warning.
+
+## 2026-09-27 — Task 17 (functional + security audit, docs suite, UI/UX, stock-monitor research)
+
+- **Functional audit**: all 48 pages + 67 API handlers verified (role, auth, payload validation); admin modules exercised end-to-end.
+- **Security**: granular RBAC mapped per route; shipping webhook got a shared-secret token gate (`SHIPPING_WEBHOOK_TOKEN`).
+- **Docs suite created**: README, changelog, technical-documentation, business-documentation, decisions, help, compact + `docs/STOCK-MONITOR-RESEARCH.md` (schema draft + open questions; implementation parked pending owner confirmation).
+
 ## 2026-09-27 — Task 16 (commit 80c4449)
 
 **Feature — Reviews moderation console (`/admin/reviews`)**

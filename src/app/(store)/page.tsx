@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { mapProductCard } from "@/lib/serializers";
 import { ProductCard } from "@/components/storefront/product-card";
 import { RecentlyViewedRail } from "@/components/storefront/recently-viewed";
+import { ParallaxImage, ScrollDrift, BandDecor } from "@/components/motion/parallax";
 import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
@@ -71,36 +72,45 @@ export default async function HomePage() {
       <section className="relative overflow-hidden border-b border-border">
         {heroBannerUrl ? (
           <>
-            {/* full-bleed backdrop (HOME_HERO banner) + paper gradient for headline negative space */}
-            <img
-              src={heroBannerUrl}
-              alt=""
-              aria-hidden
-              className="absolute inset-0 h-full w-full object-cover"
-            />
+            {/* full-bleed backdrop (HOME_HERO banner) with scroll parallax + paper gradient for headline negative space */}
+            <ParallaxImage src={heroBannerUrl} eager scale={1.18} from="0%" to="-8%" />
             <div aria-hidden className="absolute inset-0 bg-background/60 lg:hidden" />
             <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-background from-0% via-background/55 via-38% to-transparent to-66%" />
             <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-background/55 from-0% to-transparent to-30%" />
           </>
         ) : null}
         <div className={`relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-6 ${heroBannerUrl ? "py-16 lg:py-28" : "py-12 lg:py-20"}`}>
-          <div className={heroBannerUrl ? "lg:col-span-7" : "lg:col-span-6 xl:col-span-5"}>{heroCopy}</div>
+          <ScrollDrift
+            className={heroBannerUrl ? "lg:col-span-7" : "lg:col-span-6 xl:col-span-5"}
+            lag={64}
+            range={560}
+            fadeTo={0.35}
+            fadeRange={460}
+          >
+            {heroCopy}
+          </ScrollDrift>
           {!heroBannerUrl && (
-            <div className="relative lg:col-span-6 xl:col-span-7">
+            <ScrollDrift className="relative lg:col-span-6 xl:col-span-7" lag={36} range={560}>
               <div className="relative ml-auto aspect-[4/3] w-full max-w-2xl overflow-hidden rounded-lg border border-border bg-muted lg:ml-12 xl:ml-auto">
                 <div className="flex h-full items-center justify-center text-sm text-muted-foreground">Surveillance imagery</div>
               </div>
-            </div>
+            </ScrollDrift>
           )}
         </div>
         {heroBannerUrl && (
-          <div className="absolute bottom-6 right-4 hidden w-60 rounded-lg border border-border/70 bg-card/85 p-4 shadow-sm backdrop-blur-sm md:block">
-            <p className="label-caps !text-[10px]">SKU-level inventory</p>
-            <p className="mt-1 text-[12.5px] leading-snug text-muted-foreground">
-              Every camera, recorder and drum of cable has its own tracked stock — the count you see is the count that
-              ships.
-            </p>
-          </div>
+          <ScrollDrift
+            className="absolute bottom-6 right-4 hidden w-60 md:block"
+            lag={-56}
+            range={560}
+          >
+            <div className="rounded-lg border border-border/70 bg-card/85 p-4 shadow-sm backdrop-blur-sm">
+              <p className="label-caps !text-[10px]">SKU-level inventory</p>
+              <p className="mt-1 text-[12.5px] leading-snug text-muted-foreground">
+                Every camera, recorder and drum of cable has its own tracked stock — the count you see is the count that
+                ships.
+              </p>
+            </div>
+          </ScrollDrift>
         )}
       </section>
 
@@ -140,8 +150,9 @@ export default async function HomePage() {
       </section>
 
       {/* ---------- kit builder band ---------- */}
-      <section className="bg-primary text-primary-foreground">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-14 sm:px-6 lg:grid-cols-12 lg:py-16">
+      <section className="relative overflow-hidden bg-primary text-primary-foreground">
+        <BandDecor />
+        <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-14 sm:px-6 lg:grid-cols-12 lg:py-16">
           <div className="lg:col-span-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-foreground/60">Kit Builder</p>
             <h2 className="mt-3 font-display text-3xl leading-tight tracking-tight sm:text-4xl">
@@ -201,10 +212,14 @@ export default async function HomePage() {
           >
             <div className="relative aspect-[16/7] sm:aspect-[64/11]">
               {stripBanner.imageUrl ? (
-                <img
+                <ParallaxImage
                   src={stripBanner.imageUrl}
-                  alt={stripBanner.title}
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                  alt=""
+                  offset={["start end", "end start"]}
+                  scale={1.15}
+                  from="-6%"
+                  to="6%"
+                  hoverScale={1.19}
                 />
               ) : (
                 <div className="h-full w-full bg-muted" />

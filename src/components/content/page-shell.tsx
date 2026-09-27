@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { Reveal } from "./reveal";
+import { HeroDecor } from "@/components/motion/parallax";
 
 // Shared editorial page chrome for content surfaces (about, contact, faq,
 // policies, blog). Hero band + two-column prose sections + CTA band.
@@ -40,8 +41,9 @@ export function PageShell({
 }) {
   return (
     <article className="flex-1">
-      <header className="border-b border-border bg-muted/40">
-        <div className={`${CONTAINER} py-12 lg:py-16`}>
+      <header className="relative overflow-hidden border-b border-border bg-muted/40">
+        <HeroDecor />
+        <div className={`${CONTAINER} relative py-12 lg:py-16`}>
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="max-w-3xl">
               <Eyebrow>{eyebrow}</Eyebrow>
@@ -91,8 +93,8 @@ export function ContentSection({
         aria-labelledby={id ? `${id}-heading` : undefined}
         className={`${first ? "" : "border-t border-border"} py-10 lg:py-14 ${className}`}
       >
-        <div className="grid gap-6 lg:grid-cols-12 lg:gap-10">
-          <div className="lg:col-span-4">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-10">
+          <div className="lg:col-span-4 min-w-0">
             {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
             <h2
               id={id ? `${id}-heading` : undefined}
@@ -101,7 +103,7 @@ export function ContentSection({
               {title}
             </h2>
           </div>
-          <div className="lg:col-span-8">{children}</div>
+          <div className="lg:col-span-8 min-w-0">{children}</div>
         </div>
       </section>
     </Reveal>

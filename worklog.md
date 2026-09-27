@@ -552,3 +552,35 @@ Stage Summary:
 - Stock monitor is fully designed and parked — implementation is a clean 3-4 round job once the owner confirms the 5 open questions.
 - Files: new README.md, changelog.md, technical-documentation.md, business-documentation.md, decisions.md, help.md, compact.md, docs/STOCK-MONITOR-RESEARCH.md; changed src/app/api/webhooks/shipping/route.ts, src/app/(store)/cart/page.tsx, src/app/(store)/layout.tsx, src/components/admin/admin-shell.tsx, src/server/services/catalog.service.ts, .env.example, .env (sandbox token), docs/{README,ENVIRONMENT,SECURITY,ENVIRONMENT-VARIABLES-GUIDE}.md.
 - Next-round candidates: implement stock monitor after owner answers (docs/STOCK-MONITOR-RESEARCH.md §9); per-product image overrides (owner images pending); go-live purge (qa-clean.ts); production checklist walkthrough on the real VPS.
+
+---
+Task ID: 18
+Agent: Z.ai Code (lead)
+Task: User request — (1) implement parallax effects across pages; (2) make sure the whole site is responsive.
+
+Work Log:
+- PARALLAX SYSTEM (src/components/motion/parallax.tsx, new): four reusable framer-motion primitives, all transform-only (compositor-driven), all honouring prefers-reduced-motion (verified live: scale retained, y=0, opacity=1 under reduced-motion emulation):
+  - ParallaxImage — backdrop/cover image drifting against scroll; overscale (1.15–1.18) mathematically guarantees no edge reveal; supports top-of-page (["start start","end start"]) and mid-page (["start end","end start"]) offsets + optional whileHover scale for interactive banners.
+  - ScrollDrift — global-scrollY layer for hero pieces; deterministic at load (no mount-time jump); hero copy lags 64px + fades to 0.35 (legibility floor), fallback product panel lags 36px, hero SKU inventory card counter-drifts −56px (layered depth).
+  - Drift — target-based decorative drift for rings/glows/dot-grids.
+  - HeroDecor (warm-paper content heroes) + BandDecor (deep-pine bands): precomposed multi-speed decorative layers.
+- APPLIED: home hero backdrop + copy drift + SKU card counter-drift; kit-builder band concentric rings (BandDecor); promo strip image parallax with hover zoom; PageShell header band (HeroDecor) → propagates to ALL 9 content pages (about, contact, faq, blog list, 4 policies); blog article covers (PostCover parallax prop, detail page only). Catalog/PDP/cart/checkout/account/admin data panels intentionally motion-quiet (functional surfaces stay calm — recorded as design contract in the primitives file header).
+- RESPONSIVE AUDIT: built repeatable sweep scripts (scripts/responsive-sweep.sh + -admin.sh) that open every route at 375/768/1280 and measure documentElement horizontal overflow. CRITICAL HARNESS FIX discovered: `agent-browser viewport` is not a command (correct: `agent-browser set viewport`) — the first sweep run silently ran at default width and was discarded.
+- RESULTS storefront: 23 routes × 3 viewports → 2 real defects found & fixed:
+  1. /shipping-policy (641px overflow) + /return-policy (404px): (a) ContentSection grid `lg:grid-cols-12` without base template → implicit auto track sized to a wide TABLE's min-content (grid min-width:auto blowout) → fixed with `grid grid-cols-1 min-w-0` columns in PageShell (site-wide immunity for all 9 content pages); (b) shipping-policy carrier lis `li.flex` with bare text+<strong> runs → every text run became a non-wrapping flex item (471px row) → wrapped in <span>.
+  2. Bare-text flex-li pattern audited site-wide (grep) — no other occurrences.
+- RESULTS admin (15 routes, authed session): 2 real defects found & fixed centrally in shadcn primitives:
+  1. /admin dashboard 331px: Card as grid item inherited a 638px table's min-content → added `min-w-0` to ui/card.tsx base (site-wide hardening).
+  2. /admin/returns 53px: TabsList w-fit unshrinkable → added `max-w-full overflow-x-auto no-scrollbar` to ui/tabs.tsx base (all segmented controls now scroll on mobile).
+- Customer account surfaces (5 routes × 2 viewports, OTP session): all clean.
+- Console noise fix: framer-motion v12 warns when the window-scroll container (<html>) is position:static for ANY useScroll({target}) → added `position: relative` to html in globals.css (measurement-neutral; verified warning gone).
+- INCIDENTS: DB was found EMPTY at round start (sandbox wipe) → restored via db:push + db:seed + qa-fixtures per runbook. Dev server silently died 4× (sandbox reap) → setsid restarts; sweeps re-run for clean numbers.
+- VERIFIED LIVE: hero img transform matrix moves 0→−31px at scroll 500 (copy +57px, opacity 0.35 clamp); 5 moving layers mid-home; about HeroDecor 3 layers; mobile menu Sheet + admin mobile Sheet open correctly; sticky PDP add-to-cart bar at 375; screenshots at 375/768/1440 confirm.
+
+Stage Summary:
+- The storefront now has a coherent, reduced-motion-safe parallax language concentrated on editorial surfaces, and the whole site (storefront + admin + account) measures ZERO horizontal overflow at 375/768/1280.
+- Two shadcn primitives (Card, TabsList) and PageShell are now structurally hardened against the classic grid min-content blowout — classes of bug, not just instances, are fixed.
+- New regression tools: scripts/responsive-sweep.sh + responsive-sweep-admin.sh (run after any layout work; requires `agent-browser set viewport` syntax).
+- Gates: lint 0, tsc 0, health {db:up}, console clean (0 errors, 0 warnings after html fix), overflow 0 across 43 route×viewport combos.
+- Files: new src/components/motion/parallax.tsx, scripts/responsive-sweep.sh, scripts/responsive-sweep-admin.sh; changed (store)/page.tsx, components/content/page-shell.tsx, components/content/blog-card.tsx, blog/[slug]/page.tsx, shipping-policy/page.tsx, components/ui/card.tsx, components/ui/tabs.tsx, app/globals.css.
+- Next-round candidates: stock-monitor implementation (blocked on owner answers, docs/STOCK-MONITOR-RESEARCH.md §9); per-product image overrides (owner images pending); go-live purge via scripts/qa-clean.ts; consider animating category-card entrance on home with staggered Reveal (kept out of this round to scope parallax strictly).

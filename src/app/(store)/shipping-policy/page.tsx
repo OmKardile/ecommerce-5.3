@@ -101,14 +101,18 @@ export default function ShippingPolicyPage() {
           <ul className="mt-5 space-y-2 text-[13px] leading-relaxed text-muted-foreground">
             <li className="flex gap-2">
               <Truck className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
-              Carriers: <strong className="font-medium text-foreground">Delhivery</strong> and the{" "}
-              <strong className="font-medium text-foreground">Shiprocket</strong> carrier network, with{" "}
-              <strong className="font-medium text-foreground">BlueDart</strong> for air consignments.
+              <span>
+                Carriers: <strong className="font-medium text-foreground">Delhivery</strong> and the{" "}
+                <strong className="font-medium text-foreground">Shiprocket</strong> carrier network, with{" "}
+                <strong className="font-medium text-foreground">BlueDart</strong> for air consignments.
+              </span>
             </li>
             <li className="flex gap-2">
               <Clock className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
-              &ldquo;Working days&rdquo; exclude Sundays and public holidays; remote-zone weather can extend the
-              window beyond our control.
+              <span>
+                &ldquo;Working days&rdquo; exclude Sundays and public holidays; remote-zone weather can extend the
+                window beyond our control.
+              </span>
             </li>
           </ul>
         </ContentSection>

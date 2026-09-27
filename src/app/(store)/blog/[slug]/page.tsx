@@ -72,7 +72,7 @@ export default async function BlogPostPage({ params }: Props) {
 
             {/* Cover */}
             <div className="mt-6">
-              <PostCover post={post} ratio="aspect-[2/1]" />
+              <PostCover post={post} ratio="aspect-[2/1]" parallax />
             </div>
 
             {/* Body */}

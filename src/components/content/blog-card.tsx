@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, CalendarDays } from "lucide-react";
 import { Reveal } from "./reveal";
+import { ParallaxImage } from "@/components/motion/parallax";
 
 // Shared blog pieces: cover (image or quiet typographic panel), tag chips,
 // meta row, and the standard card used by the index grid.
@@ -51,15 +52,22 @@ export function PostCover({
   post,
   ratio = "aspect-[4/3]",
   className = "",
+  parallax = false,
 }: {
   post: Pick<BlogPostLike, "title" | "coverImageUrl">;
   ratio?: string;
   className?: string;
+  /** Article-detail covers only: scroll parallax on the image (needs the ratio container to clip). */
+  parallax?: boolean;
 }) {
   if (post.coverImageUrl) {
     return (
-      <div className={`${ratio} overflow-hidden rounded-lg border border-border bg-muted ${className}`}>
-        <img src={post.coverImageUrl} alt={post.title} loading="lazy" className="h-full w-full object-cover" />
+      <div className={`relative ${ratio} overflow-hidden rounded-lg border border-border bg-muted ${className}`}>
+        {parallax ? (
+          <ParallaxImage src={post.coverImageUrl} alt={post.title} offset={["start end", "end start"]} scale={1.16} from="-6%" to="6%" />
+        ) : (
+          <img src={post.coverImageUrl} alt={post.title} loading="lazy" className="h-full w-full object-cover" />
+        )}
       </div>
     );
   }

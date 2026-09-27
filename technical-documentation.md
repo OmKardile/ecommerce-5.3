@@ -48,6 +48,7 @@ scripts/              ← qa-fixtures.ts / qa-clean.ts / checkdb.ts / rma-e2e.sh
 6. **No AI-generated images.** Seed images indexed in `prisma/seed-images.json`.
 7. **Audit**: state-changing admin actions call `recordAudit(action, entity, id, details, userId)` (self-heals stale sessions — see decisions.md D-3).
 8. Client islands use the app's plain `role="tablist"` button-group pattern (not Radix Tabs) for consistency.
+9. **Motion contract**: scroll effects live in `src/components/motion/parallax.tsx` — transform-only, reduced-motion-safe, and only on editorial surfaces (heroes, bands, covers). Catalog/PDP/cart/checkout/account/admin data panels stay motion-quiet. `ui/Card` carries `min-w-0` and `ui/TabsList` carries `max-w-full overflow-x-auto` as permanent anti-blowout hardening; PageShell grids always declare a base `grid-cols-1`. Responsive regressions are caught by `scripts/responsive-sweep.sh` + `responsive-sweep-admin.sh` (0px horizontal overflow required at 375/768/1280).
 
 ## Auth model
 

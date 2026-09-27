@@ -125,6 +125,9 @@
   }
   html {
     scroll-behavior: smooth;
+    /* framer-motion useScroll(target) measures offsets against the scroll
+       container (<html>) and warns in dev when it is position:static. */
+    position: relative;
   }
   ::selection {
     background: color-mix(in srgb, var(--primary) 18%, transparent);
