@@ -27,6 +27,8 @@ src/
   components/
     storefront/       ← product cards, gallery, variant selector, cart, reviews…
     admin/            ← client islands per console module + shared shell
+    motion/           ← parallax primitives (ParallaxImage, ScrollDrift, Drift,
+    |                    HeroDecor, BandDecor) — editorial surfaces only (D-7)
   server/services/    ← business logic (orders, inventory, shipping, payments,
   |                      notifications, catalog, reports, auth); the ONLY place
   |                      that talks to Prisma besides thin API reads
@@ -34,6 +36,7 @@ src/
   |                      money, phone, pincodes, rate-limit, constants
 prisma/schema.prisma  ← 35 models · prisma/seed.ts + seed-images.json (real images only)
 scripts/              ← qa-fixtures.ts / qa-clean.ts / checkdb.ts / rma-e2e.sh
+  |                    / responsive-sweep.sh + responsive-sweep-admin.sh
 ```
 
 **Request flow**: page/handler → service (auth context resolved first) → Prisma → `{ok,data}` envelope via `ok()`/`fail()`.
@@ -77,7 +80,9 @@ Each integration is **live when real credentials exist, deterministic simulation
 
 ## Verification gates (every round)
 
-`bun run lint` (0) · `bunx tsc --noEmit` (0) · `GET /api/health` → `db:up` · agent-browser E2E pass of changed flows · 0 console errors.
+`bun run lint` (0) · `bunx tsc --noEmit` (0) · `GET /api/health` → `db:up` · agent-browser E2E pass of changed flows · 0 console errors · `bash scripts/responsive-sweep.sh` + `-admin.sh` → 0px overflow @375/768/1280 (after any layout work).
+
+**Docs duty (standing user contract)**: every shipped change updates `changelog.md` plus any affected md (`compact.md`, `decisions.md`, `technical-documentation.md`, `help.md`, `docs/*`) **in the same round** — documentation never lags code.
 
 ## Deep-dive index
 

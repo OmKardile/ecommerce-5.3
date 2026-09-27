@@ -46,6 +46,8 @@ For the owner and staff. Everything is clickable in the admin console at **/admi
 | Empty catalog | `bun run db:seed` restores the full demo catalog |
 | Demo inquiries/reviews show up | Intentional QA fixtures — `bun run scripts/qa-clean.ts` before go-live |
 | WhatsApp links open a chat with wrong number | Numbers are normalized to 10 digits (leading `91`/`0` handled) — check the customer record itself |
+| The scrolling/parallax effects bother someone | All motion honours the OS "reduce motion" setting (Windows: Animation effects · macOS/iOS: Reduce Motion · Android: Remove animations) — effects stop and content stays fully readable |
+| A page overflows sideways on a phone | Run `bash scripts/responsive-sweep.sh` (storefront) or `-admin.sh` (console) to find the offending route; Card/TabsList/PageShell are already hardened — look for new wide tables or bare text inside flex rows |
 
 ## Security notes for staff
 

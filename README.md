@@ -18,6 +18,8 @@ bun run dev          # Next dev server on :3000
 
 Health check: `GET /api/health` → `{ok:true,data:{status:"healthy",db:"up"}}`
 
+Quality gates per round: `bun run lint` (0) · `bunx tsc --noEmit` (0) · `bash scripts/responsive-sweep.sh` + `bash scripts/responsive-sweep-admin.sh` (0px horizontal overflow at 375/768/1280) · **docs updated in the same round** (`changelog.md` + every affected md — documentation never lags code).
+
 ### Default credentials (sandbox only)
 
 | Who | Where | Credential |

@@ -4,6 +4,22 @@ Older records: conflict resolutions **C1..C12** and **ADR-020/021** live in [`do
 
 ---
 
+## D-8 · 2026-09-27 · Responsive hardening at the primitive level, verified by repeatable sweeps
+
+**Context**: The whole-site responsive audit found the *same class* of bug in several unrelated places: grid/flex items defaulting to `min-width:auto` sized themselves to a wide table's min-content and blew out horizontally at 375px (shipping-policy 641px, admin dashboard 331px, admin/returns 53px).
+
+**Decision**: Fix the class, not just the instances — `ui/card.tsx` base carries `min-w-0`, `ui/tabs.tsx` TabsList carries `max-w-full overflow-x-auto no-scrollbar`, PageShell grids always declare a base `grid-cols-1` with `min-w-0` columns, and bare text runs inside flex `<li>`s get wrapped in `<span>`. Regression safety is a script, not memory: `scripts/responsive-sweep.sh` + `responsive-sweep-admin.sh` measure `documentElement.scrollWidth` on every route × 375/768/1280 and must report 0px (harness note: the working agent-browser syntax is `set viewport`, not `viewport`).
+
+**Rejected**: per-page one-off patches (the same bug reappears on the next page); a global `* { min-width: 0 }` (masks real layout intent and breaks intentional overflow).
+
+## D-7 · 2026-09-27 · Parallax is transform-only, editorial-only, reduced-motion-safe
+
+**Context**: Request was "parallax all over pages". The naive versions are harmful: `background-attachment: fixed` breaks on iOS Safari; animating layout properties forces reflow jank; scroll-jacked libraries add weight; and data-dense surfaces (catalog, cart, admin tables) get slower and harder to scan.
+
+**Decision**: All scroll motion lives in `src/components/motion/parallax.tsx` and is (a) **transform-only** (`translate3d`/`scale` — compositor-driven, no reflow), (b) **overscaled** (backdrops render at 1.15–1.18 so drift never reveals edges), (c) **reduced-motion-safe** (every primitive drops translation/scale and keeps full opacity under `prefers-reduced-motion` — verified under emulation), and (d) **editorial-surfaces-only**: home hero, kit band, promo strip, the PageShell header band on all 9 content pages, and blog covers. Catalog/PDP/cart/checkout/account and all admin panels stay motion-quiet by contract (header comment in the primitives file + convention 9 in technical-documentation.md).
+
+**Rejected**: site-wide parallax including functional surfaces (usability/perf cost, no conversion benefit); `background-attachment: fixed` (iOS breakage); scroll-hijack libraries (Lenis/GSAP-class) — framer-motion `useScroll`/`useTransform` was already in the bundle.
+
 ## D-6 · 2026-09-27 · Shipping webhook auth = shared secret, not HMAC
 
 **Context**: `POST /api/webhooks/shipping` (carrier tracking events) accepted unauthenticated POSTs — anyone who guessed an AWB could push `DELIVERED`. Razorpay-style HMAC isn't available: Shiprocket/Delhivery webhooks don't sign bodies the way Razorpay does.

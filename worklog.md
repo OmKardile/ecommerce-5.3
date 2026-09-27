@@ -584,3 +584,26 @@ Stage Summary:
 - Gates: lint 0, tsc 0, health {db:up}, console clean (0 errors, 0 warnings after html fix), overflow 0 across 43 route×viewport combos.
 - Files: new src/components/motion/parallax.tsx, scripts/responsive-sweep.sh, scripts/responsive-sweep-admin.sh; changed (store)/page.tsx, components/content/page-shell.tsx, components/content/blog-card.tsx, blog/[slug]/page.tsx, shipping-policy/page.tsx, components/ui/card.tsx, components/ui/tabs.tsx, app/globals.css.
 - Next-round candidates: stock-monitor implementation (blocked on owner answers, docs/STOCK-MONITOR-RESEARCH.md §9); per-product image overrides (owner images pending); go-live purge via scripts/qa-clean.ts; consider animating category-card entrance on home with staggered Reveal (kept out of this round to scope parallax strictly).
+
+---
+Task ID: 19
+Agent: Z.ai Code (lead)
+Task: User request — "I hope documentations and all md files are updated/updating" — audit the entire md corpus against the shipped code (post-Task 18) and bring every file current; institutionalize the docs-updating duty so future rounds never lag.
+
+Work Log:
+- AUDIT: read all root md files (README, changelog, technical, business, decisions, help, compact) + docs/ index + ARCHITECTURE/CONTRACTS against the Task 18 state (f4a7fde). Found changelog.md and technical-documentation.md already Task-18-current (updated during that round). Stale spots: decisions.md (no ADRs for parallax/responsive), compact.md (header said "Task 17", no sweep scripts/motion contract in commands+conventions), README.md (no quality-gate line), help.md (no motion/mobile-overflow operator answers), docs/ARCHITECTURE.md + docs/CONTRACTS.md (Motion lines still pre-parallax), docs/README.md (stale counts "34 models"/"60+ handlers"; admin feature map missing Returns & DOA / Trade Desk / Reviews moderation).
+- Counters verified against code: 35 Prisma models, 67 API route handlers, 48 pages.
+- decisions.md += D-7 (parallax: transform-only, editorial-only, reduced-motion-safe; rejected background-attachment:fixed / scroll-hijack libs / site-wide motion) + D-8 (responsive hardening at shadcn-primitive level — Card min-w-0, TabsList scrollable, PageShell base grid-cols-1, span-wrapped flex text; repeatable sweep scripts; rejected per-page patches and global min-width:0).
+- compact.md → "end of Task 18": commands += responsive sweeps; conventions += #9 motion contract; state += motion/responsive bullet; QA posture += 0px overflow; parking lot += staggered category-card Reveal candidate.
+- technical-documentation.md: architecture map += components/motion/ (5 primitives); scripts line += responsive sweeps; verification gates += sweep gate AND the standing DOCS DUTY ("every shipped change updates changelog.md + affected mds in the same round — documentation never lags code").
+- README.md quick start += per-round quality-gates line (lint/tsc/sweeps/docs duty). help.md troubleshooting += reduced-motion operator answer + mobile-overflow sweep row.
+- docs/README.md: 34→35 models, 60+→67 handlers, admin map += Returns & DOA / Trade Desk / Reviews moderation lines, storefront map += presentation line (parallax, skip-link, sweeps).
+- docs/ARCHITECTURE.md + docs/CONTRACTS.md Motion lines rewritten to the Task-18 contract (parallax primitives file, motion-quiet data surfaces, sweep gate).
+- Verified current & intentionally untouched: changelog.md (already had full Task 18 entry), business-documentation.md (no factual drift — Task 18 was presentational), docs/ENVIRONMENT*/SECURITY (updated in Task 17 for the webhook token; Task 18 added no env/security surface).
+- Gates: dev.log clean (all 200s, zero errors), health 200 {db:up}, lint 0, tsc 0 (docs-only round; no source changes).
+
+Stage Summary:
+- Every md file now reflects the Task 18 motion + responsive reality, and the docs-updating obligation is written into the round gates (technical-documentation.md §Verification gates + README quality-gates line) instead of relying on memory.
+- Doc corpus shape: README (start) → technical/business (hubs) → docs/ (deep dives) → decisions/changelog/worklog (history) → compact (context) → help (operator).
+- Files changed: decisions.md, compact.md, technical-documentation.md, README.md, help.md, docs/README.md, docs/ARCHITECTURE.md, docs/CONTRACTS.md, worklog.md. Verified-current, untouched: changelog.md, business-documentation.md, docs/ENVIRONMENT*.md, docs/SECURITY.md.
+- Next: recurring cron webDevReview re-armed (15-min cadence); implementation candidates unchanged — stock monitor blocked on owner answers (docs/STOCK-MONITOR-RESEARCH.md §9), per-product images pending, qa-clean.ts at go-live.

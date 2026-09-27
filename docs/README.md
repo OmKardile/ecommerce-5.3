@@ -10,7 +10,7 @@ The implementation was built from scratch by a multi-agent team; the authoritati
 | --- | --- |
 | [README.md](./README.md) | This overview: identity, feature map, stack, quick start |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Modular-monolith layout, services, session design, order FSM, dual-mode integrations, design system |
-| [DATABASE.md](./DATABASE.md) | All 34 Prisma models, relationships, money-in-paise rationale, portability, seed, PostgreSQL switch |
+| [DATABASE.md](./DATABASE.md) | All 35 Prisma models, relationships, money-in-paise rationale, portability, seed, PostgreSQL switch |
 | [DEPLOYMENT.md](./DEPLOYMENT.md) | Client VPS self-hosting: Docker Compose, nginx, migrations, backups, logging, SSL |
 | [ENVIRONMENT.md](./ENVIRONMENT.md) | Every environment variable, required vs optional, simulation behavior |
 | [../deploy/ENV-SETUP.md](../deploy/ENV-SETUP.md) | `.env` setup runbook: fill-in order, credential sources, sim→live verification, rotation, troubleshooting |
@@ -44,17 +44,19 @@ Storefront (route group `(store)`):
 - Cart (server source of truth, guest cart with auto-merge at login), coupon box, checkout with OTP-gated login, saved addresses, B2B GSTIN toggle, Razorpay or COD
 - Order success, public order tracking (`/track`), account area: profile, orders, order detail, printable GST invoice, address book (max 10), wishlist
 - Content: about, contact (B2B inquiry with WhatsApp notify), FAQ (17 Q&As), shipping policy, return policy, privacy policy, terms, blog index and posts
+- Presentation: scroll-parallax motion on hero/bands/covers (reduced-motion-safe), skip-to-content link, responsive sweeps keep every route at 0px horizontal overflow @375/768/1280
 
 Admin (`/admin`, own chrome, role-scoped):
 
 - Dashboard (GMV, GST, order pipeline, payment split, low stock)
 - Orders fulfillment console (FSM transition buttons, serial number capture, AWB booking, carrier-scan simulator, CSV export)
+- Returns & DOA (full RMA: approve → courier inward → QC → refund → restock) · Trade Desk (B2B inquiry FSM `NEW → CONTACTED → CLOSED`) · Reviews moderation (approve / un-publish / delete — nothing publishes unapproved)
 - Products (list/new/edit with variants, SKUs, images, specs), categories, brands
 - Inventory console (SKU matrix, adjust with reason codes, movement ledger, CSV export/import)
 - Customers (CRM, LTV, B2B badge, wa.me links), coupons, banners, blog editor
 - Reports (sales 30-day chart, tax summary, GSTR-1 schedule with CSV export, top products/customers, inventory valuation), settings (COD rules, fees, cutoff, announcement)
 
-APIs: 60+ route handlers under `/api/**` — auth, account, cart, catalog, coupon, shipping, orders, payments, webhooks, admin surface, health. See [API.md](./API.md).
+APIs: 67 route handlers under `/api/**` — auth, account, cart, catalog, coupon, shipping, orders, payments, webhooks, admin surface, health. See [API.md](./API.md).
 
 ## Tech stack
 

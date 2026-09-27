@@ -123,7 +123,7 @@ Webhook receivers (`/api/webhooks/razorpay|shipping|whatsapp`) are the same in b
 - Fonts: Fraunces (`--font-display`, headlines/prices/big numbers via `font-display`) + Inter (body)
 - Palette: warm paper background `#FAF9F6`, ink foreground `#1C1917`, deep pine primary `#1A3C34` (paper-foreground `#F7F6F1`), muted brass accent `#B45309` used sparingly, hairline borders `#E6E1D6`, muted surfaces `#F1EEE7`; admin sidebar `#142A24`
 - Geometry: rounded-md (0.5rem base radius), soft shadows only, hairline dividers, 12-col grids with controlled asymmetry, small-caps tracking-widest section labels
-- Motion: subtle framer-motion fade+12-24px reveals (0.4-0.6s, once); 200-300ms hovers; no gradients/neon/glow/emoji anywhere
+- Motion: subtle framer-motion fade+12-24px reveals (0.4-0.6s, once); 200-300ms hovers; scroll parallax confined to `src/components/motion/parallax.tsx` primitives — transform-only, reduced-motion-safe, editorial surfaces only (catalog/PDP/cart/checkout/account/admin stay motion-quiet, decisions.md D-7); no gradients/neon/glow/emoji anywhere
 - Imagery: seed image bank (`prisma/seed-images.json`, optional external file — ADR-020) with graceful typographic placeholders when a product has no images; plain `<img>` with object-cover
 - Loading/empty/error states: skeletons from `src/components/ui/skeleton.tsx`, quiet editorial empty states, sonner toasts + inline errors
 
