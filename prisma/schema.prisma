@@ -1,7 +1,6 @@
 // Patel Networks / MegaTech — Unified commerce schema
-// PORTABILITY NOTE: This schema is 100% valid for BOTH SQLite (sandbox dev)
-// and PostgreSQL (client VPS production). To deploy on PostgreSQL:
-//   1. Change provider to "postgresql"  2. npx prisma db push  3. bun run prisma/seed.ts
+// PROVIDER: PostgreSQL (Neon). This schema is 100% portable to SQLite (sandbox
+// fallback) — to go back: change provider to "sqlite" + DATABASE_URL=file:./db/custom.db
 // Guarantees: no Prisma enums (string + Zod), no native arrays (Json), all money = integer paise.
 
 generator client {
@@ -9,7 +8,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

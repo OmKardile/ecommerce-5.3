@@ -4,6 +4,14 @@ Older records: conflict resolutions **C1..C12** and **ADR-020/021** live in [`do
 
 ---
 
+## D-13 · 2026-09-27 · Runtime DB is Neon PostgreSQL — repo provider flipped, scripts made env-proof
+
+**Context**: Owner provisioned a Neon Postgres instance and asked to drop SQLite ("stop using your sqlite db and switch to this") because the site is going to Render in a Node environment for client viewing. The schema was already 100% provider-portable (D-12's JSON-column choice included), so the flip touches configuration, not models.
+
+**Decision**: (1) `prisma/schema.prisma` is now `provider = "postgresql"` in-repo (the Dockerfile sed stays as a documented no-op safety net). (2) **Every DB-touching npm script runs under `env -u DATABASE_URL`** (dev/db:push/db:sync/db:seed) — the sandbox injects a stale `DATABASE_URL=file:…` into the process environment, and OS env beats `.env` files, so without this the app silently talks to the wrong DB. (3) `start` uses plain `node .next/standalone/server.js` (Render Node runtime has no bun). (4) New `db:sync` script (`prisma db push` **without** `--accept-data-loss`) is the Render build step — destructive schema changes fail the deploy loudly instead of eating data. (5) Seed clean-phase now also clears `otp_verifications` + the three stock-monitor tables — Postgres enforces FKs strictly and this keeps reseeds idempotent. (6) `package-lock.json` (lockfileVersion 3, 951 pkgs) committed so Render npm builds are reproducible. SQLite remains a documented fallback (flip provider + `file:` URL).
+
+**Rejected**: keeping SQLite in dev (the owner's deployment target shares the Neon DB; one source of truth removes the recurring sandbox-wipe class of bugs); pooled Neon endpoint now (single long-running server doesn't need it — documented for future scaling); Prisma migrations (repo strategy remains `db push`, unchanged).
+
 ## D-12 · 2026-09-27 · Role overhaul: Owner + dynamically-scoped Staff (fixed roles removed)
 
 **Context**: Owner's spec — the store owner has full permissions **including changing their own login and creating other superadmins**; the general `ADMIN` role is removed; **every other operator role becomes Staff whose scope the owner sets at account creation via a wizard** ("which functions u want this staff to have").

@@ -15,11 +15,11 @@
 #    linux-debian-openssl-3.0.x. A musl/alpine runner would crash at startup
 #    unless schema.prisma adds binaryTargets = ["linux-musl-openssl-3.0.x"].
 #    Debian -> Debian keeps every engine platform consistent.
-# 3. PROVIDER SWITCH: repo schema.prisma is provider="sqlite" (sandbox
-#    constraint, 100%-portable schema per worklog Task 0/1). The switch to
-#    "postgresql" happens INSIDE the image via sed below — the repo file is
-#    never modified. Override with --build-arg PRISMA_PROVIDER=... if ever
-#    needed. Portable schema guarantees: no Prisma enums, no native arrays,
+# 3. PROVIDER SWITCH (now a NO-OP SAFETY NET): since Task 27 the repo
+#    schema.prisma is provider="postgresql" natively (Neon + Render). The
+#    in-image sed below only matters if an old SQLite checkout is built by
+#    mistake — it still flips sqlite->postgresql and the grep still passes.
+#    Portable schema guarantees: no Prisma enums, no native arrays,
 #    money = integer paise.
 # 4. SECRETS: nothing secret is required at build time. The session secret
 #    (code reads JWT_SECRET — the deployment spec calls it AUTH_SECRET),

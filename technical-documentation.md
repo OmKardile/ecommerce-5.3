@@ -9,7 +9,7 @@ Single entry point for engineers. Deep dives live in `docs/`; this file stays th
 | Framework | Next.js 16 App Router, React 19 | All mutations via **route handlers** (no server actions) |
 | Language | TypeScript 5 (strict) | |
 | Styling | Tailwind CSS 4 + shadcn/ui (New York) | Editorial light theme (default) + trust-pine dark mode via `.dark` tokens (manual toggle — decisions.md D-9) |
-| DB | Prisma 6 · **SQLite in dev, PostgreSQL in prod** | Portable schema: no enums, no `String[]`, money = integer paise |
+| DB | Prisma 6 · **PostgreSQL (Neon) in dev + prod** | Portable schema: no enums, no `String[]`, money = integer paise. SQLite remains a documented fallback (flip provider + `file:` URL). |
 | Auth | Phone-OTP (customers) · email+password scrypt (admins) | JWT in httpOnly cookies, `secure` in prod |
 | Cache/state | Local memory caching, Zustand (client islands) | No Redis by design |
 | Runtime | bun | `bun run dev` on :3000 |
@@ -47,7 +47,7 @@ scripts/              ← qa-fixtures.ts / qa-clean.ts / checkdb.ts / rma-e2e.sh
 2. **`{ok, data}` envelope** on every API route; errors via `fail(msg, status, issues?)`.
 3. **All mutations are route handlers** with Zod schemas from `src/lib/validators.ts`.
 4. **Status FSMs live server-side** with forward-only ranks + audit records (orders, returns, inquiries, shipments).
-5. **SQLite contains** is CI for ASCII; **no `mode:'insensitive'`** (breaks on SQLite).
+5. **Case-insensitive search**: the runtime DB is PostgreSQL, so `mode:'insensitive'` is available; existing search code predates the switch (no contains-mode usage). If the SQLite fallback is ever restored, remember `mode:'insensitive'` breaks there — the schema portability guarantees (no enums/native arrays, integer paise) still stand.
 6. **No AI-generated images.** Seed images indexed in `prisma/seed-images.json`.
 7. **Audit**: state-changing admin actions call `recordAudit(action, entity, id, details, userId)` (self-heals stale sessions — see decisions.md D-3).
 8. Client islands use the app's plain `role="tablist"` button-group pattern (not Radix Tabs) for consistency.

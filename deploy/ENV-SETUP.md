@@ -20,7 +20,7 @@ cp .env.example .env      # then edit; .env is git-ignored (never commit it)
 | **Runtime read** (`process.env.*` in `src/`) | everything except `NEXT_PUBLIC_*` | Change → restart the app (`docker compose up -d app`). No rebuild. |
 | **Build-time inlined** (Next.js bundles client code with these baked in) | `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_SUPPORT_WHATSAPP` | On Docker builds they are also a build **arg** (see `docker-compose.yml` `args:` comment). Changing the origin → rebuild the image, otherwise client bundles keep the old value. |
 | **Compose `env_file`** | whole `.env` injected into `app` and `db` containers | The same file also feeds `${...}` interpolation and the `POSTGRES_*` trio consumed by the `postgres:16-alpine` image. |
-| **Dockerfile build args** | `NEXT_PUBLIC_APP_URL` (default `http://localhost:3000`), `PRISMA_PROVIDER` (default `postgresql`) | `PRISMA_PROVIDER` is how the image ships a postgres schema while the repo keeps SQLite — do not override unless you know why. |
+| **Dockerfile build args** | `NEXT_PUBLIC_APP_URL` (default `http://localhost:3000`), `PRISMA_PROVIDER` (default `postgresql`) | The repo schema is already `postgresql`; the in-image sed remains only as a no-op safety net for SQLite checkouts — do not override unless you know why. |
 | **Container entrypoint** | `RUN_MIGRATIONS` | `true` → schema sync at boot (`migrate deploy` if `prisma/migrations/` exists, else `db push --skip-generate`). |
 
 **Golden rule:** leave a variable **unset** rather than inventing a fake
@@ -38,9 +38,13 @@ The template defaults are sim-safe. Only two things normally need attention:
 cp .env.example .env
 ```
 
-1. **`DATABASE_URL`** — keep the SQLite line
-   `DATABASE_URL="file:./db/custom.db"`, then `bun run db:push` +
-   `bun prisma/seed.ts`.
+1. **`DATABASE_URL`** — sandbox keeps a local SQLite fallback in
+   `.env.example` (`DATABASE_URL="file:./db/custom.db"`), which additionally
+   requires flipping `provider = "sqlite"` in `prisma/schema.prisma`. The
+   default sandbox posture is the shared Neon Postgres string (repo provider
+   is PostgreSQL since Task 27): `cp .env.example .env` and paste the Neon
+   URL, then `bun run db:push` + `bun run db:seed` (skip seeding if the Neon
+   DB is already populated).
 2. **Nothing else is required to boot.** Sessions use the documented dev
    fallback secret; OTPs print to the server log; payments/shipping/WhatsApp
    run in simulation.

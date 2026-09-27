@@ -2,7 +2,7 @@
 
 E-commerce + operations platform for **Patel Networks** (Surat, Gujarat): CCTV, surveillance and networking hardware retail & B2B trade. Storefront brand: **MegaTech** (by Patel Networks); store-ops console: **Patel Networks Operations Console**.
 
-> Stack: **Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 · shadcn/ui · Prisma ORM · SQLite (dev) / PostgreSQL (prod) · bun**
+> Stack: **Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 · shadcn/ui · Prisma ORM · PostgreSQL (Neon — dev + prod) · bun**
 > 38 Prisma models · 50 pages · 78 API route handlers · 2 operator roles (Owner + scoped Staff) · money always integer paise
 > Appearance: editorial light theme (default) · **trust-pine dark mode** via the nav toggle (storefront header, mobile drawer, admin chrome)
 
@@ -12,7 +12,7 @@ E-commerce + operations platform for **Patel Networks** (Surat, Gujarat): CCTV, 
 
 ```bash
 bun install          # postinstall runs `prisma generate`
-bun run db:push      # apply schema to SQLite (db/custom.db)
+bun run db:push      # apply schema to PostgreSQL (Neon via .env DATABASE_URL)
 bun run db:seed      # full catalog + demo users (idempotent restore point)
 bun run dev          # Next dev server on :3000
 ```
@@ -49,7 +49,8 @@ Quality gates per round: `bun run lint` (0) · `bunx tsc --noEmit` (0) · `bash 
 | [`compact.md`](compact.md) | One-file compact context (stack, commands, conventions, state) |
 | [`worklog.md`](worklog.md) | Agent work journal (per-round, three-section handover) |
 | [`docs/ENVIRONMENT-VARIABLES-GUIDE.md`](docs/ENVIRONMENT-VARIABLES-GUIDE.md) | Every env var explained |
-| [`deploy/DEPLOY-STEPS.md`](deploy/DEPLOY-STEPS.md) | Terse VPS deploy runbook |
+| [`deploy/DEPLOY-STEPS.md`](deploy/DEPLOY-STEPS.md) | Terse VPS (Docker) deploy runbook |
+| [`deploy/RENDER-STEPS.md`](deploy/RENDER-STEPS.md) | Render + Neon deploy runbook (Blueprint or manual) |
 | [`docs/VPS-SETUP-GUIDE.md`](docs/VPS-SETUP-GUIDE.md) | Phased VPS setup (Docker, TLS, backups) |
 | [`docs/PHYSICAL-SERVER-SETUP-GUIDE.md`](docs/PHYSICAL-SERVER-SETUP-GUIDE.md) | Bare-metal in-shop server guide |
 | [`docs/RENDER-DEPLOYMENT.md`](docs/RENDER-DEPLOYMENT.md) | Staging preview on Render |

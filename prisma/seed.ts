@@ -35,6 +35,12 @@ async function main() {
   console.log('🌱 Seeding Patel Networks catalog…');
 
   // Clean in dependency order
+  // (Postgres enforces FKs strictly — stock-monitor + OTP tables must be
+  // cleared before their users/SKUs disappear. Keeps reseed idempotent.)
+  await prisma.otpVerification.deleteMany();
+  await prisma.stockCountLine.deleteMany();
+  await prisma.stockAdjustmentRequest.deleteMany();
+  await prisma.stockCountSession.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.shipmentEvent.deleteMany();
   await prisma.shipment.deleteMany();

@@ -1,0 +1,48 @@
+# =============================================================================
+# Patel Networks / MegaTech — Render Blueprint
+#
+# One-click deploy: Render Dashboard → New + → Blueprint → pick this repo.
+# Render reads this file and prompts for every `sync: false` value.
+#
+# Manual alternative (New + → Web Service): use exactly these commands.
+#   Runtime:      Node
+#   Build:        npm install && npm run db:sync && npm run build
+#   Start:        npm run start
+#
+# The database is EXTERNAL (Neon Postgres) — Render's ephemeral disk holds
+# nothing of value, so free-plan restarts/spin-downs lose no data.
+# =============================================================================
+
+services:
+  - type: web
+    name: patelnetworks
+    runtime: node
+    plan: free # spins down after ~15min idle; first visit wakes in ~50s. Use starter for client demos.
+    buildCommand: npm install && npm run db:sync && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    autoDeploy: true # every push to the tracked branch deploys
+    envVars:
+      # Neon Postgres connection string (Neon Dashboard → Connection Details).
+      # Keep `?sslmode=require`. Prisma ignores Neon's `channel_binding` param
+      # if present, so the raw copy-paste string works too.
+      - key: DATABASE_URL
+        sync: false
+      # Signs session JWTs + OTP hashes. Render generates & keeps it stable.
+      # Rotating logs out every operator/customer session.
+      - key: JWT_SECRET
+        generateValue: true
+      # Inlined into client bundles at BUILD time (canonicals, sitemap, OG).
+      # Set to your public origin — e.g. https://patelnetworks.onrender.com —
+      # BEFORE the first build; changing it later needs "Clear build cache & deploy".
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
+      # Operator bootstrap fallback (used only if no user matches this email).
+      # The DB ships pre-seeded — superadmin@patelnetworks.in — so these are
+      # optional; set them anyway for disaster recovery bootstrap.
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: NODE_VERSION
+        value: "22"

@@ -1,5 +1,16 @@
 # Patel Networks / MegaTech — Render Staging Deployment Guide
 
+> **Which Render path should I use?** Since Task 27 there are two supported
+> ways to run this repo on Render:
+> 1. **Node runtime + Blueprint (recommended — fastest)**: `render.yaml` +
+>    package-lock.json, build `npm install && npm run db:sync && npm run build`.
+>    Full runbook: **[`deploy/RENDER-STEPS.md`](../deploy/RENDER-STEPS.md)**.
+> 2. **Docker runtime (this document)**: builds the repo Dockerfile (bun
+>    inside the image) — matches the VPS Docker-Compose production path
+>    1:1. Use it when you want the container parity.
+> Both connect to the same external Neon Postgres; data is identical either way.
+
+
 > **Goal**: Auto-deploy the app to a live URL on every GitHub commit. No local dev server needed — just `git push` and Render rebuilds + republishes automatically.
 >
 > This is a **staging/preview environment**, not the final production deployment (which is the client's Ubuntu VPS via Docker Compose per [`deploy/DEPLOY-STEPS.md`](../deploy/DEPLOY-STEPS.md) and [DEPLOYMENT.md](./DEPLOYMENT.md)). Render gives you a public URL to demo and QA the app while the VPS is being provisioned.

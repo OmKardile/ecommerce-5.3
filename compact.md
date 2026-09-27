@@ -1,6 +1,6 @@
 # Compact — one-file project context
 
-Last updated: 2026-09-27 (Task 23 — Owner + scoped-Staff account model). Keep under ~200 lines. Full map in `README.md`.
+Last updated: 2026-09-27 (Task 27 — runtime DB switched to Neon PostgreSQL + Render kit). Keep under ~200 lines. Full map in `README.md`.
 
 ## Identity
 - **Patel Networks / MegaTech** — CCTV & networking hardware e-commerce, Surat (GSTIN 24AAACP1234F1Z8).
@@ -8,11 +8,11 @@ Last updated: 2026-09-27 (Task 23 — Owner + scoped-Staff account model). Keep 
 - Sandbox: `/home/z/my-project`, Next.js 16 + bun, port 3000 only. **No AI-generated images** (real files via `prisma/seed-images.json`).
 
 ## Stack & commands
-- Next.js 16 App Router · TS strict · Tailwind 4 · shadcn/ui · Prisma 6 · SQLite dev / PostgreSQL prod · Zustand islands.
+- Next.js 16 App Router · TS strict · Tailwind 4 · shadcn/ui · Prisma 6 · **PostgreSQL (Neon) dev + prod** (SQLite = documented fallback; D-13) · Zustand islands.
 - `bun run dev` · `bun run lint` · `bunx tsc --noEmit` · `bun run db:push` · `bun run db:seed` (restore) · `bun run scripts/qa-fixtures.ts` (demo data) · `bun run scripts/qa-clean.ts` (purge before go-live) · `bash scripts/responsive-sweep.sh` + `responsive-sweep-admin.sh` (0px-overflow gate @375/768/1280) · health: `GET /api/health`.
 
 ## Non-negotiable conventions
-1. Money = **integer paise** everywhere. 2. API envelope `{ok,data}` via `ok()/fail()`. 3. **Route handlers for all mutations** (Zod from `lib/validators`). 4. FSMs server-enforced forward-only + `recordAudit`. 5. SQLite `contains` only — **no `mode:'insensitive'`**. 6. Client islands use plain `role=tablist` button groups (not Radix Tabs). 7. All admin mutations permission-gated (`requirePermission(scope)`/`requireOwner()` — DB-fresh per request; legacy fixed roles removed, D-12). 8. Phone normalization via `localPhoneFromInput()`. 9. **Motion contract**: parallax only via `components/motion/parallax.tsx` — transform-only, reduced-motion-safe, editorial surfaces only (heroes/bands/covers); catalog/PDP/cart/checkout/account/admin stay motion-quiet. Responsive: `ui/Card` carries `min-w-0`, `ui/TabsList` scrolls, PageShell grids declare base `grid-cols-1`. 10. **Theme contract**: light is brand-default; dark is manual-only via the nav toggle (persisted localStorage) and token-first through the `.dark` trust-pine block in globals.css — `dark:` utilities are sanctioned only for hand-tinted chips and slight photo dims.
+1. Money = **integer paise** everywhere. 2. API envelope `{ok,data}` via `ok()/fail()`. 3. **Route handlers for all mutations** (Zod from `lib/validators`). 4. FSMs server-enforced forward-only + `recordAudit`. 5. Runtime DB is PostgreSQL — `mode:'insensitive'` allowed; SQLite fallback would break it. 6. Client islands use plain `role=tablist` button groups (not Radix Tabs). 7. All admin mutations permission-gated (`requirePermission(scope)`/`requireOwner()` — DB-fresh per request; legacy fixed roles removed, D-12). 8. Phone normalization via `localPhoneFromInput()`. 9. **Motion contract**: parallax only via `components/motion/parallax.tsx` — transform-only, reduced-motion-safe, editorial surfaces only (heroes/bands/covers); catalog/PDP/cart/checkout/account/admin stay motion-quiet. Responsive: `ui/Card` carries `min-w-0`, `ui/TabsList` scrolls, PageShell grids declare base `grid-cols-1`. 10. **Theme contract**: light is brand-default; dark is manual-only via the nav toggle (persisted localStorage) and token-first through the `.dark` trust-pine block in globals.css — `dark:` utilities are sanctioned only for hand-tinted chips and slight photo dims.
 
 ## Scale
 38 Prisma models · 50 pages (24 storefront + 17 admin + auth) · 78 API route files · 2 operator roles: **Owner** (implicit full) + **Staff** (dynamic `permissions` scope, 15 grantable keys) · dual-mode integrations (Razorpay / Shiprocket-Delhivery / Fast2SMS / WhatsApp Cloud API — live with creds, deterministic simulation without).
