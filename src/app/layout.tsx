@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "next-themes";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -39,8 +40,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <body className={`${fraunces.variable} ${inter.variable} font-sans antialiased bg-background text-foreground`}>
-        {children}
-        <Toaster />
+        {/* Manual light/dark switch (class strategy). Light is the brand-default
+            editorial theme; the toggle in the storefront header + admin chrome
+            flips the trust-pine night theme. suppressHydrationWarning is on <html>. */}
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

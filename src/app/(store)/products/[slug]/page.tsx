@@ -374,7 +374,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                       ))}
                     </div>
                     {review.isVerified && (
-                      <span className="inline-flex items-center gap-1 rounded-sm bg-[#e7ede9] px-1.5 py-0.5 text-[10px] font-medium text-[#1a3c34]">
+                      <span className="inline-flex items-center gap-1 rounded-sm bg-[#e7ede9] px-1.5 py-0.5 text-[10px] font-medium text-[#1a3c34] dark:bg-[#1e332c] dark:text-[#a9d0c0]">
                         <PackageCheck className="h-3 w-3" aria-hidden /> Verified purchase
                       </span>
                     )}

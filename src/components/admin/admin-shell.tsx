@@ -30,6 +30,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
 import { ROLES, STORE } from '@/lib/constants';
 import { api } from '@/components/admin/api';
@@ -236,6 +237,7 @@ export function AdminShell({
             </div>
 
             <div className="ml-auto flex items-center gap-2 sm:gap-3 min-w-0">
+              <ThemeToggle className="text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent" />
               <div className="hidden sm:block text-right min-w-0">
                 <p className="text-xs font-medium truncate max-w-[220px]">{session.fullName || session.email}</p>
                 <p className="text-[10px] text-sidebar-foreground/60 truncate max-w-[220px]">{session.email}</p>

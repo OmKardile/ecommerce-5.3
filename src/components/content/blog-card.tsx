@@ -66,7 +66,7 @@ export function PostCover({
         {parallax ? (
           <ParallaxImage src={post.coverImageUrl} alt={post.title} offset={["start end", "end start"]} scale={1.16} from="-6%" to="6%" />
         ) : (
-          <img src={post.coverImageUrl} alt={post.title} loading="lazy" className="h-full w-full object-cover" />
+          <img src={post.coverImageUrl} alt={post.title} loading="lazy" className="h-full w-full object-cover dark:brightness-[.9]" />
         )}
       </div>
     );

@@ -151,7 +151,7 @@ export function ReviewsConsole() {
             >
               {t.label}
               {t.key === 'PENDING' && Boolean(data?.pendingCount) && (
-                <span className="ml-1.5 rounded-full bg-[#f7f6f1] px-1.5 py-0.5 text-[10px] font-semibold leading-none text-[#142a24] tabular-nums">
+                <span className="ml-1.5 rounded-full bg-[#f7f6f1] px-1.5 py-0.5 text-[10px] font-semibold leading-none text-[#142a24] tabular-nums dark:bg-[#1e332c] dark:text-[#cfe3d8]">
                   {data?.pendingCount}
                 </span>
               )}
@@ -230,7 +230,7 @@ export function ReviewsConsole() {
                   variant="outline"
                   className={cn(
                     'text-[10px] uppercase tracking-wide',
-                    row.isApproved ? 'bg-[#e7ede9] text-[#1a3c34] border-[#c8d6cf]' : 'bg-[#f4ead8] text-[#7a5a1d] border-[#e2cfa8]',
+                    row.isApproved ? 'bg-[#e7ede9] text-[#1a3c34] border-[#c8d6cf] dark:bg-[#1e332c] dark:text-[#a9d0c0] dark:border-[#2e4a3f]' : 'bg-[#f4ead8] text-[#7a5a1d] border-[#e2cfa8] dark:bg-[#33270f] dark:text-[#d9b06a] dark:border-[#4d3c1c]',
                   )}
                 >
                   {row.isApproved ? 'Live' : 'Pending'}

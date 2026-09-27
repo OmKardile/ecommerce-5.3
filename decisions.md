@@ -4,6 +4,14 @@ Older records: conflict resolutions **C1..C12** and **ADR-020/021** live in [`do
 
 ---
 
+## D-9 · 2026-09-27 · Dark mode is a manual toggle and a token-only theme
+
+**Context**: Request was "clean trust themed dark mode (on switch)". Two failure modes to avoid: an off-brand dark palette (the stock `.dark` block was warm-brown, not pine), and scattered `dark:` patches as the only mechanism.
+
+**Decision**: (1) **Manual switch only** — `next-themes` with `defaultTheme="light"`, `enableSystem={false}`: the light editorial theme stays the brand's first impression; dark is opt-in via the nav toggle (storefront header ≥sm + mobile drawer "Appearance" row; admin operator header), persisted in localStorage. (2) **Token-first**: the `.dark` block is a re-tuned trust-pine palette — pine-forest `#0e1513` surfaces (never pure black), mist text, mint-pine `#7fc4ab` actions, brightened brass — so every var-driven component adapts with zero per-page work. (3) The only sanctioned `dark:` utilities are recipes for the hand-tinted status/count chips and slight `brightness` dims on cover photography (convention 10 in technical-documentation.md).
+
+**Rejected**: system-preference auto-dark as default (the designed light experience would stop being the first impression); pure-black surfaces (harsh, off-brand); heavy CSS photo filters beyond a slight dim.
+
 ## D-8 · 2026-09-27 · Responsive hardening at the primitive level, verified by repeatable sweeps
 
 **Context**: The whole-site responsive audit found the *same class* of bug in several unrelated places: grid/flex items defaulting to `min-width:auto` sized themselves to a wide table's min-content and blew out horizontally at 375px (shipping-policy 641px, admin dashboard 331px, admin/returns 53px).

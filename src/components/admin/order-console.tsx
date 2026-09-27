@@ -313,7 +313,7 @@ export function OrderFulfillmentConsole({ initialStatus = 'ALL' }: { initialStat
                       <div className="flex items-center gap-1.5">
                         <span className="text-xs font-medium max-w-[160px] truncate">{o.deliveryName}</span>
                         {o.isB2B && (
-                          <Badge variant="outline" className="text-[9px] px-1 py-0 bg-[#e7ede9] text-[#1a3c34] border-[#c8d6cf]">
+                          <Badge variant="outline" className="text-[9px] px-1 py-0 bg-[#e7ede9] text-[#1a3c34] border-[#c8d6cf] dark:bg-[#1e332c] dark:text-[#a9d0c0] dark:border-[#2e4a3f]">
                             B2B
                           </Badge>
                         )}
@@ -416,7 +416,7 @@ function OrderDetailSheet({
                   {detail.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Prepaid'}
                 </Badge>
                 {detail.isB2B && (
-                  <Badge variant="outline" className="text-[10px] bg-[#e7ede9] text-[#1a3c34] border-[#c8d6cf]">
+                  <Badge variant="outline" className="text-[10px] bg-[#e7ede9] text-[#1a3c34] border-[#c8d6cf] dark:bg-[#1e332c] dark:text-[#a9d0c0] dark:border-[#2e4a3f]">
                     B2B{detail.gstin ? ` · ${detail.gstin}` : ''}
                   </Badge>
                 )}

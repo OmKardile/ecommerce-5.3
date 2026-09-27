@@ -7,6 +7,7 @@ import { Search, ShoppingCart, User, Menu, X, Heart, Phone, ChevronDown } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { useCartCount } from "@/store/cart-store";
 import { cn } from "@/lib/utils";
 
@@ -215,6 +216,9 @@ export function Header() {
 
         {/* actions */}
         <div className="flex items-center gap-1">
+          {/* Standalone icon toggle lives on ≥sm rows; below sm it moves into the
+              menu drawer (labeled row) so the 375px actions row never overflows. */}
+          <ThemeToggle className="hidden sm:inline-flex" />
           <Button asChild variant="ghost" size="icon" className="hidden sm:inline-flex" aria-label="Wishlist">
             <Link href="/account/wishlist">
               <Heart className="h-5 w-5" />
@@ -272,6 +276,10 @@ export function Header() {
                   <Link href="/contact" onClick={() => setMobileOpen(false)} className="py-2 text-sm text-muted-foreground hover:text-foreground">
                     B2B / Wholesale Desk
                   </Link>
+                </div>
+                <div className="mt-4 flex items-center justify-between border-t border-border/60 px-5 pt-4">
+                  <span className="text-sm text-muted-foreground">Appearance</span>
+                  <ThemeToggle />
                 </div>
               </nav>
             </SheetContent>

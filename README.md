@@ -4,6 +4,7 @@ E-commerce + operations platform for **Patel Networks** (Surat, Gujarat): CCTV, 
 
 > Stack: **Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 · shadcn/ui · Prisma ORM · SQLite (dev) / PostgreSQL (prod) · bun**
 > 35 Prisma models · 48 pages · 67 API route handlers · money always integer paise
+> Appearance: editorial light theme (default) · **trust-pine dark mode** via the nav toggle (storefront header, mobile drawer, admin chrome)
 
 ---
 

@@ -81,38 +81,40 @@
 }
 
 .dark {
-  --background: #12100e;
-  --foreground: #e9e5dd;
-  --card: #1a1715;
-  --card-foreground: #e9e5dd;
-  --popover: #1a1715;
-  --popover-foreground: #e9e5dd;
-  --primary: #8ec5b3;
-  --primary-foreground: #10201b;
-  --secondary: #26221d;
-  --secondary-foreground: #e9e5dd;
-  --muted: #221f1b;
-  --muted-foreground: #a39b8d;
-  --accent: #c8781f;
-  --accent-foreground: #1a1206;
-  --destructive: #d4574d;
+  /* Trust dark — deep pine-forest surfaces (never pure black), mist text, mint-pine actions.
+     Same hue family as the light palette (#1a3c34) so the brand reads identical at night. */
+  --background: #0e1513;
+  --foreground: #e6ebe7;
+  --card: #131c19;
+  --card-foreground: #e6ebe7;
+  --popover: #131c19;
+  --popover-foreground: #e6ebe7;
+  --primary: #7fc4ab;
+  --primary-foreground: #0b1d16;
+  --secondary: #1a2521;
+  --secondary-foreground: #dbe2dc;
+  --muted: #17211d;
+  --muted-foreground: #9db0a6;
+  --accent: #d19a4a;
+  --accent-foreground: #211605;
+  --destructive: #e0655c;
   --destructive-foreground: #fff5f4;
-  --border: #2c2823;
-  --input: #2c2823;
-  --ring: #8ec5b3;
-  --chart-1: #8ec5b3;
-  --chart-2: #c8781f;
-  --chart-3: #8b8578;
-  --chart-4: #7f9c56;
-  --chart-5: #a97e46;
-  --sidebar: #0d0b09;
-  --sidebar-foreground: #b5afa4;
-  --sidebar-primary: #8ec5b3;
-  --sidebar-primary-foreground: #10201b;
-  --sidebar-accent: #1c1915;
-  --sidebar-accent-foreground: #e9e5dd;
-  --sidebar-border: #26221d;
-  --sidebar-ring: #8ec5b3;
+  --border: #22302a;
+  --input: #22302a;
+  --ring: #7fc4ab;
+  --chart-1: #7fc4ab;
+  --chart-2: #d19a4a;
+  --chart-3: #93a89d;
+  --chart-4: #8fb573;
+  --chart-5: #b98a54;
+  --sidebar: #0b1310;
+  --sidebar-foreground: #c3cdc6;
+  --sidebar-primary: #7fc4ab;
+  --sidebar-primary-foreground: #0b1d16;
+  --sidebar-accent: #152420;
+  --sidebar-accent-foreground: #e6ebe7;
+  --sidebar-border: #1d2b25;
+  --sidebar-ring: #7fc4ab;
 }
 
 @layer base {

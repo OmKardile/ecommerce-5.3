@@ -61,7 +61,7 @@ export function ParallaxImage({
         style={reduce ? { scale } : { y, scale }}
         whileHover={hoverScale ? { scale: hoverScale } : undefined}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className={`absolute inset-0 h-full w-full object-cover will-change-transform ${imgClassName}`}
+        className={`absolute inset-0 h-full w-full object-cover will-change-transform dark:brightness-[.88] ${imgClassName}`}
       />
     </div>
   );

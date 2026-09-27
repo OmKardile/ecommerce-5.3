@@ -34,6 +34,7 @@ For the owner and staff. Everything is clickable in the admin console at **/admi
 - **Wishlist price drops**: items show a green "Dropped ₹X since saved" badge when the current best price falls below the price when saved.
 - **Notify me**: on an out-of-stock variant, customers opt in; they're pinged on restock (and a back-in-stock ribbon shows for 14 days).
 - **Compare**: pick up to 4 products; the table highlights the lowest price per row. The selection survives page reloads.
+- **Dark mode**: the sun/moon button in the header (inside the menu drawer under "Appearance" on phones) switches the whole site — storefront and staff console — to the pine night theme and back. The choice is remembered per browser.
 
 ## Troubleshooting
 

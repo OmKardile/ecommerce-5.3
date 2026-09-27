@@ -2,6 +2,15 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-27 — Task 20 (trust-pine dark mode on toggle)
+
+**Feature — dark mode (manual switch)**
+- `next-themes` provider (class strategy, `defaultTheme="light"`, no system override, `disableTransitionOnChange`) in the root layout.
+- `.dark` palette re-tuned from the stock warm-brown to a **trust-pine night theme**: pine-forest surfaces (`#0e1513` bg, `#131c19` cards — never pure black), mist text `#e6ebe7`, mint-pine action `#7fc4ab`, brightened brass `#d19a4a`, hairline borders `#22302a`, sidebar deepened to `#0b1310` — same hue family as the light brand palette.
+- New `ThemeToggle` (Sun/Moon, mounted-gated via `useSyncExternalStore`). Placed in the storefront header actions (≥sm) and the admin operator header; below `sm` it lives in the menu drawer as a labeled "Appearance" row (the standalone icon caused a 23px blowout at 375px — found and fixed).
+- Dark adaptations: hand-tinted sage/brass status chips + paper count pills got dark recipes (status-badge, order-console, reviews-console, inquiry-inbox, customer-directory, PDP verified chip); Tailwind `*-100/900` chips → `dark:*-950/60 + *-300`; ParallaxImage/blog covers dim slightly (`dark:brightness-[.88/.9]`).
+- Verified: light↔dark round-trip with localStorage persistence across reloads; home / kit band / PDP / admin dashboard / mobile drawer screenshots clean; storefront + admin sweeps stay 0px overflow at 375/768/1280; lint 0 · tsc 0 · 0 console errors. (Sandbox DB wiped again mid-round — restored via db:push + db:seed + qa-fixtures per runbook.)
+
 ## 2026-09-27 — Task 18 (parallax + responsive hardening)
 
 **Feature — scroll parallax system**

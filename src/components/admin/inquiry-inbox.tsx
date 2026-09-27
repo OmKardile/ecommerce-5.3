@@ -40,8 +40,8 @@ interface ListResponse {
 type Filter = 'ALL' | 'NEW' | 'CONTACTED' | 'CLOSED';
 
 const STATUS_STYLE: Record<InquiryRow['status'], string> = {
-  NEW: 'bg-[#f4ead8] text-[#7a5a1d] border-[#e2cfa8]',
-  CONTACTED: 'bg-[#e7ede9] text-[#1a3c34] border-[#c8d6cf]',
+  NEW: 'bg-[#f4ead8] text-[#7a5a1d] border-[#e2cfa8] dark:bg-[#33270f] dark:text-[#d9b06a] dark:border-[#4d3c1c]',
+  CONTACTED: 'bg-[#e7ede9] text-[#1a3c34] border-[#c8d6cf] dark:bg-[#1e332c] dark:text-[#a9d0c0] dark:border-[#2e4a3f]',
   CLOSED: 'bg-muted text-muted-foreground border-border',
 };
 
@@ -139,7 +139,7 @@ export function InquiryInbox() {
             >
               {t.label}
               {t.key === 'NEW' && Boolean(data?.openCount) && (
-                <span className="ml-1.5 rounded-full bg-[#f7f6f1] px-1.5 py-0.5 text-[10px] font-semibold leading-none text-[#142a24] tabular-nums">
+                <span className="ml-1.5 rounded-full bg-[#f7f6f1] px-1.5 py-0.5 text-[10px] font-semibold leading-none text-[#142a24] tabular-nums dark:bg-[#1e332c] dark:text-[#cfe3d8]">
                   {data?.openCount}
                 </span>
               )}

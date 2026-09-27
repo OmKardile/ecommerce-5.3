@@ -8,7 +8,7 @@ Single entry point for engineers. Deep dives live in `docs/`; this file stays th
 |---|---|---|
 | Framework | Next.js 16 App Router, React 19 | All mutations via **route handlers** (no server actions) |
 | Language | TypeScript 5 (strict) | |
-| Styling | Tailwind CSS 4 + shadcn/ui (New York) | Editorial light theme, pine `#1e3a2f`-family primary |
+| Styling | Tailwind CSS 4 + shadcn/ui (New York) | Editorial light theme (default) + trust-pine dark mode via `.dark` tokens (manual toggle — decisions.md D-9) |
 | DB | Prisma 6 · **SQLite in dev, PostgreSQL in prod** | Portable schema: no enums, no `String[]`, money = integer paise |
 | Auth | Phone-OTP (customers) · email+password scrypt (admins) | JWT in httpOnly cookies, `secure` in prod |
 | Cache/state | Local memory caching, Zustand (client islands) | No Redis by design |
@@ -52,6 +52,7 @@ scripts/              ← qa-fixtures.ts / qa-clean.ts / checkdb.ts / rma-e2e.sh
 7. **Audit**: state-changing admin actions call `recordAudit(action, entity, id, details, userId)` (self-heals stale sessions — see decisions.md D-3).
 8. Client islands use the app's plain `role="tablist"` button-group pattern (not Radix Tabs) for consistency.
 9. **Motion contract**: scroll effects live in `src/components/motion/parallax.tsx` — transform-only, reduced-motion-safe, and only on editorial surfaces (heroes, bands, covers). Catalog/PDP/cart/checkout/account/admin data panels stay motion-quiet. `ui/Card` carries `min-w-0` and `ui/TabsList` carries `max-w-full overflow-x-auto` as permanent anti-blowout hardening; PageShell grids always declare a base `grid-cols-1`. Responsive regressions are caught by `scripts/responsive-sweep.sh` + `responsive-sweep-admin.sh` (0px horizontal overflow required at 375/768/1280).
+10. **Theme contract**: light is the brand default; dark mode is manual-only (`next-themes`, class strategy, `defaultTheme="light"`, `enableSystem={false}`) toggled from the storefront header / mobile drawer / admin operator header, persisted in localStorage. The `.dark` block in globals.css is the single source of the trust-pine night palette — new components must use semantic tokens (`bg-background`, `text-muted-foreground`, …), never hard-coded light colors; the only sanctioned `dark:` utilities are chip recipes and slight photo dims.
 
 ## Auth model
 

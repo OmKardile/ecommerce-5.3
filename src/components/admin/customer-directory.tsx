@@ -157,7 +157,7 @@ export function CustomerDirectory() {
                     <TableCell>
                       <p className="text-xs font-medium">{c.fullName}</p>
                       {c.isB2BVerified && (
-                        <Badge variant="outline" className="mt-0.5 text-[9px] px-1 py-0 bg-[#e7ede9] text-[#1a3c34] border-[#c8d6cf]">
+                        <Badge variant="outline" className="mt-0.5 text-[9px] px-1 py-0 bg-[#e7ede9] text-[#1a3c34] border-[#c8d6cf] dark:bg-[#1e332c] dark:text-[#a9d0c0] dark:border-[#2e4a3f]">
                           B2B verified
                         </Badge>
                       )}
