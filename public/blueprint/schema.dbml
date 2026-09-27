@@ -1,0 +1,582 @@
+// Patel Networks / MegaTech — full database schema (38 tables)
+// Paste this whole file into https://dbdiagram.io → New Diagram → paste → instant ERD.
+// Colors group tables by domain. All money columns are integers in paise (1 INR = 100 paise).
+// Generated from prisma/schema.prisma (Task 24).
+
+Project patel_networks {
+  database_type: 'PostgreSQL'
+  Note: 'CCTV & networking hardware e-commerce — Surat, India. Portable schema (SQLite dev / PostgreSQL prod). Money = integer paise.'
+}
+
+// ───────────────────────────────────────────────
+// 1. IDENTITY & ACCESS
+// ───────────────────────────────────────────────
+
+Table users [headercolor: #1A3C34] {
+  id varchar [pk]
+  phone varchar [unique, not null, note: 'Indian mobile, login key for customers']
+  email varchar [unique, note: 'admin/staff login key; null for customers']
+  password_hash varchar [note: 'scrypt (admins) — customers have none']
+  full_name varchar
+  role varchar [not null, note: 'CUSTOMER | SUPER_ADMIN | STAFF (D-12)']
+  permissions json [note: 'STAFF only: array of scope keys e.g. ["orders","inventory"] — Owner is implicitly full']
+  is_active boolean [not null, default: true, note: 'deactivate staff without deleting']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+  deleted_at timestamp [note: 'soft delete']
+}
+
+Table otp_verifications [headercolor: #1A3C34] {
+  id varchar [pk]
+  phone varchar [not null]
+  code_hash varchar [not null, note: '6-digit OTP, hashed; 5-min expiry, max 5 attempts, 3 req/10min']
+  expires_at timestamp [not null]
+  is_verified boolean [not null, default: false]
+  attempts int [not null, default: 0]
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table customers [headercolor: #1A3C34] {
+  id varchar [pk]
+  user_id varchar [unique, not null]
+  full_name varchar [not null]
+  company_name varchar [note: 'B2B']
+  gstin varchar [note: '15-char GSTIN, B2B input tax credit']
+  is_b2b_verified boolean [not null, default: false]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table addresses [headercolor: #1A3C34] {
+  id varchar [pk]
+  customer_id varchar [not null]
+  recipient_name varchar [not null]
+  phone varchar [not null]
+  address_line1 varchar [not null]
+  address_line2 varchar
+  landmark varchar
+  city varchar [not null]
+  state varchar [not null]
+  pincode varchar [not null]
+  is_default boolean [not null, default: false]
+  type varchar [not null, default: 'HOME', note: 'HOME | WORK | WAREHOUSE — max 10 per book']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+// ───────────────────────────────────────────────
+// 2. CATALOG — Category > Brand > Product > Variant > SKU
+// ───────────────────────────────────────────────
+
+Table categories [headercolor: #7A5C2E] {
+  id varchar [pk]
+  name varchar [not null]
+  slug varchar [unique, not null]
+  description varchar
+  image_url varchar
+  parent_id varchar [note: 'self-reference — 5 roots + subcategories']
+  hsn_code varchar [not null, default: '8525', note: 'GST HSN classification']
+  gst_rate int [not null, default: 18, note: 'percent (28 for large monitors)']
+  sort_order int [not null, default: 0]
+  is_active boolean [not null, default: true]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table brands [headercolor: #7A5C2E] {
+  id varchar [pk]
+  name varchar [not null]
+  slug varchar [unique, not null]
+  logo_url varchar
+  description varchar
+  is_active boolean [not null, default: true]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table products [headercolor: #7A5C2E] {
+  id varchar [pk]
+  name varchar [not null]
+  slug varchar [unique, not null]
+  brand_id varchar [not null]
+  category_id varchar [not null]
+  short_desc varchar
+  description varchar [not null]
+  model_number varchar
+  is_active boolean [not null, default: true]
+  is_featured boolean [not null, default: false]
+  is_cod_allowed boolean [not null, default: true, note: 'ADR-004 selective COD per product']
+  specifications varchar [note: 'JSON key/value spec map']
+  documents varchar [note: 'JSON array [{title,url}] datasheets']
+  warranty_months int [not null, default: 12]
+  meta_title varchar
+  meta_description varchar
+  restocked_at timestamp [note: 'stamped on OOS→available, powers back-in-stock ribbon']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+  deleted_at timestamp
+}
+
+Table product_images [headercolor: #7A5C2E] {
+  id varchar [pk]
+  product_id varchar [not null]
+  url varchar [not null]
+  alt_text varchar
+  sort_order int [not null, default: 0]
+}
+
+Table product_variants [headercolor: #7A5C2E] {
+  id varchar [pk]
+  product_id varchar [not null]
+  name varchar [not null]
+  attributes varchar [not null, note: 'JSON map {resolution:"2MP", lens:"3.6mm"} → resolves to one SKU (ADR-005)']
+  sku_id varchar [unique, not null, note: '1:1 with SKU']
+  is_active boolean [not null, default: true]
+  sort_order int [not null, default: 0]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table skus [headercolor: #7A5C2E] {
+  id varchar [pk, note: 'THE stock-keeping unit — all inventory lives here']
+  code varchar [unique, not null, note: 'e.g. CPP-B01-2MP-36']
+  barcode varchar [unique]
+  mrp int [not null, note: 'paise — strike-through price']
+  selling_price int [not null, note: 'paise, GST-INCLUSIVE']
+  weight_grams int [not null, default: 500]
+  dimensions varchar [note: 'JSON {l,w,h} cm']
+  is_active boolean [not null, default: true]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+// ───────────────────────────────────────────────
+// 3. INVENTORY (stock ONLY at SKU level, immutable ledger)
+// ───────────────────────────────────────────────
+
+Table inventory [headercolor: #2E5E4E] {
+  id varchar [pk]
+  sku_id varchar [unique, not null]
+  current_stock int [not null, default: 0]
+  reserved_stock int [not null, default: 0, note: 'held by unpaid/processing orders; available = current − reserved']
+  low_stock_threshold int [not null, default: 5]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table inventory_movements [headercolor: #2E5E4E] {
+  id varchar [pk]
+  sku_id varchar [not null]
+  quantity int [not null, note: 'signed']
+  reason varchar [not null, note: 'PURCHASE_RECEIPT | ORDER_RESERVED | ORDER_DISPATCHED | ORDER_CANCELLED_RESTOCK | RETURN_RESTOCK | MANUAL_ADJUSTMENT | DAMAGED_WRITE_OFF']
+  reference_id varchar [note: 'order / session / request id']
+  notes varchar
+  created_by_id varchar
+  created_at timestamp [not null, default: `now()`]
+}
+
+// ───────────────────────────────────────────────
+// 3b. STOCK MONITOR — observe-and-report layer (ADR-010)
+// ───────────────────────────────────────────────
+
+Table stock_count_sessions [headercolor: #2E5E4E] {
+  id varchar [pk]
+  title varchar [not null, note: '"Monsoon shelf check — cameras"']
+  status varchar [not null, default: 'OPEN', note: 'OPEN | COUNTING | SUBMITTED | CLOSED | CANCELLED']
+  scope_kind varchar [not null, note: 'CATEGORY | BRAND | ALL']
+  scope_ref_id varchar
+  expected json [note: 'snapshot [{skuId, code, expectedQty}] so later edits don''t skew the count']
+  opened_by_id varchar
+  closed_by_id varchar
+  closed_at timestamp
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table stock_count_lines [headercolor: #2E5E4E] {
+  id varchar [pk]
+  session_id varchar [not null]
+  sku_id varchar [not null]
+  expected_qty int [not null]
+  counted_qty int [note: 'null until counted']
+  variance int [note: 'counted − expected, derived on write']
+  counted_by_id varchar
+  counted_at timestamp
+  note varchar
+  applied_at timestamp [note: 'single-apply marker — variance can never double-post']
+  applied_movement_id varchar
+}
+
+Table stock_adjustment_requests [headercolor: #2E5E4E] {
+  id varchar [pk]
+  sku_id varchar [not null]
+  delta int [not null, note: 'signed proposed change (0 for WRONG_LOCATION ack)']
+  reason varchar [not null, note: 'DAMAGED | MISSING | FOUND | WRONG_LOCATION | OTHER']
+  note varchar
+  status varchar [not null, default: 'PENDING', note: 'PENDING | APPROVED | REJECTED — two-man rule: staff proposes, manager approves']
+  requested_by_id varchar
+  decided_by_id varchar
+  decided_at timestamp
+  movement_id varchar [note: 'the real InventoryMovement created on approval']
+  created_at timestamp [not null, default: `now()`]
+}
+
+// ───────────────────────────────────────────────
+// 4. KIT BUILDER (ADR-006)
+// ───────────────────────────────────────────────
+
+Table bundles [headercolor: #7A5C2E] {
+  id varchar [pk]
+  name varchar [not null]
+  slug varchar [unique, not null]
+  description varchar
+  discount_pct int [not null, default: 5]
+  is_active boolean [not null, default: true]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table bundle_items [headercolor: #7A5C2E] {
+  id varchar [pk]
+  bundle_id varchar [not null]
+  sku_id varchar [not null]
+  slot varchar [not null, note: 'recorder | camera | hdd | power | cable | connector']
+  quantity int [not null, default: 1]
+  is_optional boolean [not null, default: false]
+}
+
+// ───────────────────────────────────────────────
+// 5. CART & WISHLIST
+// ───────────────────────────────────────────────
+
+Table carts [headercolor: #4E5E2E] {
+  id varchar [pk]
+  user_id varchar [unique, note: 'null while guest']
+  guest_token varchar [unique, note: 'anonymous cart cookie token; merged into user cart on login']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table cart_items [headercolor: #4E5E2E] {
+  id varchar [pk]
+  cart_id varchar [not null]
+  sku_id varchar [not null]
+  quantity int [not null, default: 1]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table Wishlist [headercolor: #4E5E2E, note: 'uses default Prisma table name (no @@map in schema)'] {
+  id varchar [pk]
+  user_id varchar [unique, not null]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table WishlistItem [headercolor: #4E5E2E, note: 'uses default Prisma table name (no @@map in schema)'] {
+  id varchar [pk]
+  wishlist_id varchar [not null]
+  product_id varchar [not null]
+  price_at_add_paise int [note: 'snapshot — powers price-drop badge']
+  created_at timestamp [not null, default: `now()`]
+}
+
+// ───────────────────────────────────────────────
+// 6. ORDERS, PAYMENTS, FULFILLMENT
+// ───────────────────────────────────────────────
+
+Table orders [headercolor: #6B2E2E] {
+  id varchar [pk]
+  order_number varchar [unique, not null, note: 'human-facing id e.g. PN-2026-000123']
+  user_id varchar [not null]
+  status varchar [not null, default: 'PENDING_PAYMENT', note: '13-state FSM enforced server-side (ORDER_TRANSITIONS)']
+  payment_method varchar [not null, default: 'RAZORPAY', note: 'RAZORPAY | COD']
+  is_b2b boolean [not null, default: false]
+  gstin varchar
+  company_name varchar
+  subtotal int [not null, note: 'paise']
+  discount_amount int [not null, default: 0]
+  bundle_discount int [not null, default: 0]
+  bundle_name varchar
+  coupon_code varchar
+  shipping_amount int [not null, default: 0]
+  cod_fee int [not null, default: 0]
+  gst_amount int [not null, note: 'GST split from inclusive price']
+  cgst_amount int [not null, default: 0, note: 'intra-state (Gujarat): CGST+SGST']
+  sgst_amount int [not null, default: 0]
+  igst_amount int [not null, default: 0, note: 'inter-state: IGST']
+  total_amount int [not null]
+  delivery_name varchar [not null]
+  delivery_phone varchar [not null]
+  delivery_line1 varchar [not null]
+  delivery_line2 varchar
+  delivery_landmark varchar
+  delivery_city varchar [not null]
+  delivery_state varchar [not null]
+  delivery_pincode varchar [not null]
+  customer_note varchar
+  estimated_delivery_at timestamp
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+  deleted_at timestamp
+}
+
+Table order_items [headercolor: #6B2E2E] {
+  id varchar [pk]
+  order_id varchar [not null]
+  sku_id varchar [not null]
+  product_name varchar [not null, note: 'snapshot — survives product edits']
+  variant_name varchar [not null]
+  sku_code varchar [not null]
+  hsn_code varchar [not null]
+  quantity int [not null]
+  unit_price int [not null, note: 'paise, GST-inclusive snapshot']
+  tax_rate int [not null]
+  tax_amount int [not null]
+  line_discount int [not null, default: 0]
+  total_price int [not null]
+  serial_numbers varchar [note: 'JSON string[] — hardware serials captured at packing, keys RMA/warranty']
+  is_cod_allowed boolean [not null, default: true]
+}
+
+Table order_status_history [headercolor: #6B2E2E] {
+  id varchar [pk]
+  order_id varchar [not null]
+  status varchar [not null]
+  comment varchar
+  changed_by varchar
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table payments [headercolor: #6B2E2E] {
+  id varchar [pk]
+  order_id varchar [not null]
+  gateway varchar [not null, default: 'RAZORPAY']
+  gateway_order_id varchar [unique]
+  gateway_payment_id varchar [unique]
+  amount int [not null, note: 'paise']
+  currency varchar [not null, default: 'INR']
+  method varchar [not null, default: 'ONLINE', note: 'ONLINE | COD']
+  status varchar [not null, default: 'INITIATED', note: 'INITIATED | SUCCESS | FAILED | REFUNDED']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table payment_events [headercolor: #6B2E2E] {
+  id varchar [pk]
+  payment_id varchar
+  event_id varchar [unique, not null, note: 'Razorpay event id — webhook dedup/idempotency']
+  event_type varchar [not null]
+  payload varchar [not null, note: 'raw webhook JSON']
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table shipments [headercolor: #6B2E2E] {
+  id varchar [pk]
+  order_id varchar [unique, not null]
+  provider varchar [not null, default: 'SHIPROCKET', note: 'SHIPROCKET | DELHIVERY (ADR-012 abstraction)']
+  courier_name varchar
+  provider_shipment_id varchar
+  awb varchar [unique, note: 'tracking number']
+  tracking_url varchar
+  label_url varchar
+  status varchar [not null, default: 'MANIFESTED', note: 'MANIFESTED | PICKED_UP | IN_TRANSIT | OUT_FOR_DELIVERY | DELIVERED | RTO_INITIATED | RTO_DELIVERED | CANCELLED']
+  estimated_delivery_at timestamp
+  dispatched_at timestamp [note: 'physical stock decrements at dispatch']
+  delivered_at timestamp
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table shipment_events [headercolor: #6B2E2E] {
+  id varchar [pk]
+  shipment_id varchar [not null]
+  event_id varchar [unique, not null, note: 'provider event id — webhook dedup']
+  status varchar [not null]
+  location varchar
+  occurred_at timestamp [not null]
+  payload varchar [not null]
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table order_returns [headercolor: #6B2E2E] {
+  id varchar [pk]
+  order_id varchar [not null]
+  reason varchar [not null]
+  status varchar [not null, default: 'REQUESTED', note: 'REQUESTED | APPROVED | REJECTED | RESTOCKED | REFUNDED']
+  is_rma boolean [not null, default: false, note: 'DOA / warranty claim flow']
+  refund_amount int [not null, default: 0]
+  inward_courier varchar [note: 'courier that brought the unit back']
+  inward_tracking varchar [note: 'return AWB, validated server-side']
+  inward_note varchar [note: 'unit condition at inward check']
+  inward_at timestamp
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+// ───────────────────────────────────────────────
+// 7. MARKETING & CONTENT
+// ───────────────────────────────────────────────
+
+Table coupons [headercolor: #51355A] {
+  id varchar [pk]
+  code varchar [unique, not null]
+  description varchar
+  type varchar [not null, default: 'PERCENT', note: 'PERCENT | FIXED']
+  value int [not null, note: 'percent 0-100 OR paise']
+  min_order_value int
+  max_discount_value int
+  starts_at timestamp
+  ends_at timestamp
+  usage_limit int
+  used_count int [not null, default: 0]
+  is_active boolean [not null, default: true]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table coupon_redemptions [headercolor: #51355A] {
+  id varchar [pk]
+  coupon_id varchar [not null]
+  order_id varchar [not null]
+  discount_amount int [not null]
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table banners [headercolor: #51355A] {
+  id varchar [pk]
+  title varchar [not null]
+  subtitle varchar
+  image_url varchar [not null]
+  link_url varchar
+  placement varchar [not null, default: 'HOME_HERO', note: 'HOME_HERO | HOME_STRIP']
+  sort_order int [not null, default: 0]
+  is_active boolean [not null, default: true]
+  starts_at timestamp
+  ends_at timestamp
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table posts [headercolor: #51355A] {
+  id varchar [pk]
+  title varchar [not null]
+  slug varchar [unique, not null]
+  excerpt varchar
+  content varchar [not null]
+  cover_image_url varchar
+  status varchar [not null, default: 'DRAFT', note: 'DRAFT | PUBLISHED']
+  published_at timestamp
+  tags varchar [note: 'JSON string[]']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table reviews [headercolor: #51355A] {
+  id varchar [pk]
+  product_id varchar [not null]
+  user_id varchar [not null]
+  rating int [not null, default: 5, note: '1-5']
+  title varchar
+  comment varchar
+  is_verified boolean [not null, default: false, note: 'user bought the product']
+  is_approved boolean [not null, default: false, note: 'moderation gate — only approved show']
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table b2b_inquiries [headercolor: #51355A] {
+  id varchar [pk]
+  name varchar [not null]
+  phone varchar [not null]
+  email varchar
+  company_name varchar
+  gstin varchar
+  message varchar [not null]
+  product_id varchar [note: 'loose reference — inquiry may be catalog-wide']
+  status varchar [not null, default: 'NEW', note: 'NEW | CONTACTED | CLOSED']
+  note varchar [note: 'trade-desk follow-up (quoted price, next step)']
+  handled_at timestamp
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table stock_alerts [headercolor: #51355A] {
+  id varchar [pk]
+  sku_id varchar [not null]
+  phone varchar [not null]
+  status varchar [not null, default: 'PENDING', note: 'PENDING | NOTIFIED | EXPIRED — notify-me when back in stock']
+  notified_at timestamp
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+// ───────────────────────────────────────────────
+// 8. PLATFORM
+// ───────────────────────────────────────────────
+
+Table audit_logs [headercolor: #37352F] {
+  id varchar [pk]
+  user_id varchar [note: 'nullable — guest events allowed']
+  action varchar [not null, note: 'e.g. OWNER_CREATED, STAFF_UPDATED, STOCK_REQUEST_APPROVED, ORDER_STATUS_CHANGED']
+  entity varchar [not null]
+  entity_id varchar
+  details varchar [note: 'JSON diff/payload']
+  ip varchar
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table settings [headercolor: #37352F] {
+  key varchar [pk, note: 'e.g. cod_rules, shipping_config']
+  value varchar [not null, note: 'JSON blob']
+  updated_at timestamp [not null, default: `now()`]
+}
+
+// ───────────────────────────────────────────────
+// RELATIONSHIPS
+// ───────────────────────────────────────────────
+
+Ref: customers.user_id > users.id
+Ref: addresses.customer_id > customers.id
+
+Ref: categories.parent_id > categories.id
+Ref: products.brand_id > brands.id
+Ref: products.category_id > categories.id
+Ref: product_images.product_id > products.id
+Ref: product_variants.product_id > products.id
+Ref: product_variants.sku_id - skus.id
+Ref: inventory.sku_id - skus.id
+Ref: inventory_movements.sku_id > skus.id
+Ref: inventory_movements.created_by_id > users.id
+
+Ref: stock_count_sessions.opened_by_id > users.id
+Ref: stock_count_lines.session_id > stock_count_sessions.id
+Ref: stock_count_lines.sku_id > skus.id
+Ref: stock_adjustment_requests.sku_id > skus.id
+Ref: stock_adjustment_requests.requested_by_id > users.id
+Ref: stock_adjustment_requests.decided_by_id > users.id
+
+Ref: bundle_items.bundle_id > bundles.id
+Ref: bundle_items.sku_id > skus.id
+
+Ref: carts.user_id > users.id
+Ref: cart_items.cart_id > carts.id
+Ref: cart_items.sku_id > skus.id
+Ref: Wishlist.user_id > users.id
+Ref: WishlistItem.wishlist_id > Wishlist.id
+Ref: WishlistItem.product_id > products.id
+
+Ref: orders.user_id > users.id
+Ref: order_items.order_id > orders.id
+Ref: order_items.sku_id > skus.id
+Ref: order_status_history.order_id > orders.id
+Ref: payments.order_id > orders.id
+Ref: payment_events.payment_id > payments.id
+Ref: shipments.order_id - orders.id
+Ref: shipment_events.shipment_id > shipments.id
+Ref: order_returns.order_id > orders.id
+Ref: coupon_redemptions.coupon_id > coupons.id
+Ref: coupon_redemptions.order_id > orders.id
+
+Ref: reviews.product_id > products.id
+Ref: reviews.user_id > users.id
+Ref: stock_alerts.sku_id > skus.id
+Ref: audit_logs.user_id > users.id

@@ -15,6 +15,11 @@ For the owner and staff. Everything is clickable in the admin console at **/admi
 - **Your own login**: Owner → **Staff & access** → *Your login* card → new email and/or new password; the current password is always required. This is also where extra **Superadmin (Owner)** accounts are created — use sparingly.
 - Scoped staff hitting a URL they don't have bounces them to their home section; the APIs behind it refuse too (401). All of it is audited.
 
+## System Blueprint (explaining the system to a client)
+
+- Owner sidebar → **System blueprint** (or open `/blueprint/index.html` directly): one printable page covering the database (all 38 tables, field by field), the backend flow, roles & the 15 staff scopes, the order lifecycle, and every route. **Print / Save PDF** at the top produces a client-ready document.
+- Want a zoomable picture of the database? Download `/blueprint/schema.dbml` and paste it into **dbdiagram.io** (free) — you get an interactive ER diagram you can export as PNG/PDF. More tools (dbdocs, Eraser, drawSQL, Mermaid) are compared at the bottom of the blueprint page.
+
 ## Where do I do X?
 
 | I want to… | Go to | Notes |

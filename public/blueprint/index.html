@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Patel Networks — System Blueprint</title>
+<style>
+  :root{
+    --paper:#FAF9F6; --card:#FFFFFF; --ink:#1C1917; --muted:#6B6459; --faint:#9C948A;
+    --line:#E5E0D6; --pine:#1A3C34; --pine-soft:#EDF2EF; --brass:#A8743A; --brass-soft:#F7EFE3;
+    --red-soft:#F9ECEA; --red:#8C3A2E;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --display:Georgia,"Times New Roman",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:84px}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+
+  /* ── top nav ─────────────────────────── */
+  .topnav{position:sticky;top:0;z-index:50;background:rgba(250,249,246,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topnav .wrap{display:flex;align-items:center;gap:6px;height:56px;overflow-x:auto;scrollbar-width:none}
+  .topnav .wrap::-webkit-scrollbar{display:none}
+  .brand{font-family:var(--display);font-weight:700;color:var(--pine);white-space:nowrap;margin-right:10px;font-size:16px}
+  .brand small{display:block;font-family:var(--sans);font-weight:600;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+  .topnav a.nl{white-space:nowrap;font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;padding:6px 11px;border-radius:999px}
+  .topnav a.nl:hover{color:var(--pine);background:var(--pine-soft)}
+  .printbtn{margin-left:auto;white-space:nowrap;font-size:12px;font-weight:700;color:var(--pine);border:1.5px solid var(--pine);background:transparent;padding:6px 13px;border-radius:999px;cursor:pointer}
+  .printbtn:hover{background:var(--pine);color:#fff}
+
+  /* ── hero ────────────────────────────── */
+  header.hero{border-bottom:1px solid var(--line);background:linear-gradient(180deg,#F3F0E9 0%,var(--paper) 100%);padding:52px 0 40px}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--brass)}
+  h1{font-family:var(--display);font-size:clamp(30px,5vw,46px);line-height:1.12;font-weight:700;color:var(--pine);margin:10px 0 14px;max-width:760px}
+  .lede{max-width:720px;color:var(--muted);font-size:16px}
+  .metachips{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+  .mchip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 15px;font-size:13px;font-weight:600;color:var(--pine)}
+  .mchip b{font-family:var(--display);font-size:15px}
+
+  /* ── sections ────────────────────────── */
+  section{padding:52px 0 8px}
+  .sec-eyebrow{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--brass)}
+  h2{font-family:var(--display);font-size:clamp(24px,3.4vw,32px);color:var(--pine);margin:8px 0 8px}
+  .sec-sub{color:var(--muted);max-width:760px;margin-bottom:28px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:900px){.grid3{grid-template-columns:1fr 1fr}}
+  @media(max-width:640px){.grid2,.grid3{grid-template-columns:1fr}}
+
+  table.simple{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.simple th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);font-weight:700;padding:8px 10px;border-bottom:1.5px solid var(--line)}
+  table.simple td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.simple tr:last-child td{border-bottom:none}
+  .k{font-family:var(--mono);font-size:12px;background:var(--pine-soft);color:var(--pine);border-radius:6px;padding:2px 7px;font-weight:600}
+
+  /* ── layered architecture bands ──────── */
+  .band{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .band h3{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:12.5px;font-weight:600;background:var(--paper);color:var(--ink)}
+  .chip.hl{background:var(--pine);border-color:var(--pine);color:#fff}
+  .chip.brass{background:var(--brass-soft);border-color:#E4D3B8;color:#6B4A1F}
+  .flowsep{display:flex;justify-content:center;padding:6px 0;color:var(--faint);font-size:18px;line-height:1}
+  .cols{display:grid;grid-template-columns:2.2fr 1fr;gap:16px}
+  @media(max-width:860px){.cols{grid-template-columns:1fr}}
+
+  /* ── domain cards (database) ─────────── */
+  .dcard{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+  .dcard .dhead{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+  .dcard .dhead h3{font-family:var(--display);font-size:17px;color:var(--pine)}
+  .dcard .dhead .count{font-size:11px;font-weight:700;color:var(--brass);white-space:nowrap}
+  .dcard .dmodels{padding:12px 18px 16px;display:flex;flex-wrap:wrap;gap:7px}
+  .dcard p.dnote{padding:0 18px 16px;font-size:12.5px;color:var(--muted)}
+  .tname{font-family:var(--mono);font-size:11.5px;font-weight:600;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:3px 8px;color:var(--ink)}
+
+  /* ── entity spine ────────────────────── */
+  .spine{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+  .spine-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;row-gap:12px}
+  .ent{border:1.5px solid var(--pine);color:var(--pine);background:var(--pine-soft);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:700}
+  .ent.gold{border-color:var(--brass);color:#6B4A1F;background:var(--brass-soft)}
+  .ent.gray{border-color:var(--line);color:var(--muted);background:var(--paper);font-weight:600}
+  .arr{color:var(--faint);font-size:14px;font-weight:700}
+  .spine-cap{font-size:12.5px;color:var(--muted);margin-top:10px}
+
+  /* ── per-domain ER tables ────────────── */
+  details.er{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:14px;overflow:hidden}
+  details.er summary{cursor:pointer;list-style:none;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  details.er summary::-webkit-details-marker{display:none}
+  details.er summary h3{font-family:var(--display);font-size:17px;color:var(--pine)}
+  details.er summary .cnt{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--brass);text-transform:uppercase}
+  details.er summary .tgl{font-size:18px;color:var(--faint)}
+  details.er[open] summary{border-bottom:1px solid var(--line)}
+  .erbody{padding:8px 20px 18px}
+  .etbl{padding:12px 0;border-bottom:1px dashed var(--line)}
+  .etbl:last-child{border-bottom:none}
+  .etbl h4{font-family:var(--mono);font-size:13px;color:var(--pine);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .etbl h4 .pk{font-size:9.5px;font-weight:800;background:var(--pine);color:#fff;border-radius:4px;padding:1px 6px;letter-spacing:.06em}
+  .etbl ul{list-style:none;margin-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:3px 22px}
+  @media(max-width:640px){.etbl ul{grid-template-columns:1fr}}
+  .etbl li{font-size:12.5px;color:var(--muted);padding-left:14px;position:relative}
+  .etbl li::before{content:"·";position:absolute;left:2px;color:var(--brass);font-weight:800}
+  .etbl li b{color:var(--ink);font-family:var(--mono);font-size:11.5px;font-weight:600}
+  .etbl .rel{margin-top:7px;font-size:12px;color:var(--brass);font-weight:600}
+  .badge-note{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.05em;border-radius:4px;padding:1px 6px;vertical-align:1px}
+  .bn-money{background:var(--brass-soft);color:#6B4A1F}
+  .bn-json{background:#EEF0E8;color:#4A5236}
+  .bn-uniq{background:var(--pine-soft);color:var(--pine)}
+
+  /* ── roles ───────────────────────────── */
+  .ladder{display:grid;grid-template-columns:1fr 44px 1.6fr 44px 1fr;gap:0;align-items:stretch}
+  @media(max-width:900px){.ladder{grid-template-columns:1fr;gap:12px}.ladder .larr{transform:rotate(90deg);margin:0 auto}}
+  .rolecard{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:20px}
+  .rolecard.owner{border-color:var(--pine);box-shadow:0 2px 0 0 var(--pine)}
+  .rolecard.staff{border-color:var(--brass)}
+  .rolecard h3{font-family:var(--display);font-size:19px;color:var(--pine)}
+  .rolecard .tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;border-radius:5px;padding:2px 8px;margin-bottom:10px}
+  .rolecard.owner .tag{background:var(--pine);color:#fff}
+  .rolecard.staff .tag{background:var(--brass-soft);color:#6B4A1F}
+  .rolecard.cust .tag{background:var(--paper);color:var(--muted);border:1px solid var(--line)}
+  .rolecard ul{list-style:none;margin-top:8px}
+  .rolecard li{font-size:13px;color:var(--muted);padding:4px 0 4px 20px;position:relative}
+  .rolecard li::before{content:"✓";position:absolute;left:0;color:var(--brass);font-weight:800}
+  .larr{display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:20px}
+  .scopegrp{margin-top:14px}
+  .scopegrp h4{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+  .gatemap{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
+  .gatemap .step{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:6px 11px;font-size:12px;font-weight:600}
+  .gatemap .step.fail{background:var(--red-soft);border-color:#E4C4BC;color:var(--red)}
+  .gatemap .step.ok{background:var(--pine-soft);border-color:var(--pine);color:var(--pine)}
+  .gatemap .a{color:var(--faint);font-weight:700}
+
+  /* ── order lifecycle ─────────────────── */
+  .phase{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+  .phase h3{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:17px;color:var(--pine)}
+  .phase h3 .num{font-size:11px;font-weight:800;color:#fff;background:var(--pine);border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--sans)}
+  .strow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:14px;row-gap:10px}
+  .st{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 13px;font-size:12px;font-weight:700;color:var(--ink);white-space:nowrap}
+  .st.pay{border-color:#C9B280;background:var(--brass-soft);color:#6B4A1F}
+  .st.run{border-color:var(--pine);background:var(--pine-soft);color:var(--pine)}
+  .st.done{border-color:var(--pine);background:var(--pine);color:#fff}
+  .st.term{border-color:#E4C4BC;background:var(--red-soft);color:var(--red)}
+  .phase .pnote{margin-top:14px;font-size:12.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px}
+
+  /* ── routes ──────────────────────────── */
+  .route-sec h3{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:22px 0 10px}
+  .routes{display:flex;flex-wrap:wrap;gap:7px}
+  .rt{font-family:var(--mono);font-size:12px;background:var(--card);border:1px solid var(--line);border-radius:7px;padding:5px 10px;color:var(--ink)}
+  .rt i{font-style:normal;color:var(--faint);font-size:10.5px;margin-left:6px}
+  .rt.scoped{border-left:3px solid var(--brass)}
+
+  /* ── tools ───────────────────────────── */
+  .tool{border-top:1px solid var(--line);padding:16px 0}
+  .tool:first-of-type{border-top:none;padding-top:0}
+  .tool h3{font-size:15px;color:var(--pine);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .tool h3 .rec{font-size:9.5px;font-weight:800;letter-spacing:.08em;background:var(--pine);color:#fff;border-radius:4px;padding:2px 7px;text-transform:uppercase}
+  .tool h3 .url{font-family:var(--mono);font-size:11.5px;color:var(--brass);font-weight:400}
+  .tool p{font-size:13px;color:var(--muted);margin-top:5px;max-width:820px}
+  .tool ol{margin:8px 0 0 18px;font-size:13px;color:var(--muted)}
+  .tool ol li{margin:3px 0}
+  details.code{margin-top:10px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+  details.code summary{cursor:pointer;font-size:12px;font-weight:700;color:var(--pine)}
+  details.code pre{font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--ink);overflow-x:auto;padding:10px 2px 2px;white-space:pre}
+
+  footer{border-top:1px solid var(--line);margin-top:64px;padding:26px 0 40px;color:var(--faint);font-size:12.5px}
+  footer .wrap{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+
+  .callout{display:flex;gap:12px;background:var(--brass-soft);border:1px solid #E4D3B8;border-radius:12px;padding:14px 16px;font-size:13.5px;color:#5C421C;margin-top:18px}
+  .callout b{color:#4A3413}
+
+  @media print{
+    .topnav,.printbtn{display:none}
+    body{background:#fff;font-size:12px}
+    section{padding:26px 0 0;page-break-inside:avoid}
+    header.hero{padding:24px 0}
+    details.er{page-break-inside:avoid}
+    details.er:not([open]){} 
+    a{color:inherit;text-decoration:none}
+    h1,h2{color:#000}
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav" aria-label="Blueprint sections">
+  <div class="wrap">
+    <span class="brand">Patel Networks<small>System Blueprint</small></span>
+    <a class="nl" href="#overview">Overview</a>
+    <a class="nl" href="#system">How it works</a>
+    <a class="nl" href="#database">Database</a>
+    <a class="nl" href="#access">Roles &amp; access</a>
+    <a class="nl" href="#orders">Order lifecycle</a>
+    <a class="nl" href="#routes">Routes</a>
+    <a class="nl" href="#tools">Online tools</a>
+    <button class="printbtn" onclick="window.print()" type="button">Print / Save PDF</button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Internal blueprint · v1.0 · September 2026</p>
+    <h1>Patel Networks / MegaTech — how the whole system fits together</h1>
+    <p class="lede">One page for the owner and the client: the database, the backend, the roles and permissions, and every route of the web store — drawn from the live codebase, not from memory.</p>
+    <div class="metachips">
+      <span class="mchip"><b>38</b> database tables</span>
+      <span class="mchip"><b>78</b> API route files</span>
+      <span class="mchip"><b>50</b> pages</span>
+      <span class="mchip"><b>3</b> roles · <b>15</b> staff scopes</span>
+      <span class="mchip"><b>13</b>-state order lifecycle</span>
+    </div>
+  </div>
+</header>
+
+<!-- ════════════════════ 1. OVERVIEW ════════════════════ -->
+<section id="overview">
+  <div class="wrap">
+    <p class="sec-eyebrow">Section 1</p>
+    <h2>What this system is</h2>
+    <p class="sec-sub">A single web application with three faces: a public storefront for buyers, a self-service account area for customers, and a permission-scoped operations console for the shop team. One Next.js codebase, one database, one deployment.</p>
+
+    <div class="grid3">
+      <div class="card">
+        <h3 style="font-family:var(--display);font-size:17px;color:var(--pine)">Storefront (public)</h3>
+        <p style="font-size:13px;color:var(--muted);margin-top:6px">Catalog, filters, product pages, CCTV kit builder, cart, checkout with GST invoices, order tracking, blog and policy pages. Customers log in with an <b>OTP to their phone</b> — no passwords to forget.</p>
+      </div>
+      <div class="card">
+        <h3 style="font-family:var(--display);font-size:17px;color:var(--pine)">Customer account</h3>
+        <p style="font-size:13px;color:var(--muted);margin-top:6px">Order history, live tracking timeline, printable GST invoices, address book, wishlist with price-drop tracking, B2B profile (GSTIN) for input tax credit.</p>
+      </div>
+      <div class="card">
+        <h3 style="font-family:var(--display);font-size:17px;color:var(--pine)">Operations console</h3>
+        <p style="font-size:13px;color:var(--muted);margin-top:6px">The <span class="k">/admin</span> panel: orders &amp; fulfillment, inventory &amp; stock monitor, catalog management, customers, marketing content, reports, settings — each section granted per staff account by the Owner.</p>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:16px">
+      <div class="card">
+        <h3 style="font-family:var(--display);font-size:17px;color:var(--pine)">Technology at a glance</h3>
+        <table class="simple" style="margin-top:10px">
+          <tr><th>Layer</th><th>Choice</th></tr>
+          <tr><td>Web app</td><td>Next.js 16 (React + TypeScript), App Router</td></tr>
+          <tr><td>UI</td><td>Tailwind CSS 4 + shadcn/ui — light &amp; dark themes</td></tr>
+          <tr><td>Database</td><td>PostgreSQL in production (client VPS, Docker); SQLite in this sandbox — same schema, one-line switch</td></tr>
+          <tr><td>Data access</td><td>Prisma ORM — typed queries, migrations, seed data</td></tr>
+          <tr><td>Auth</td><td>JWT in httpOnly cookies — phone+OTP for customers, email+password (scrypt) for staff</td></tr>
+          <tr><td>Payments</td><td>Razorpay (UPI / cards / netbanking) + selective COD</td></tr>
+          <tr><td>Shipping</td><td>Shiprocket / Delhivery with pincode intelligence &amp; AWB tracking</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3 style="font-family:var(--display);font-size:17px;color:var(--pine)">Three rules baked into the design</h3>
+        <ul style="list-style:none;margin-top:10px">
+          <li class="etbl" style="padding:10px 0;border-bottom:1px dashed var(--line)"><b style="font-family:var(--sans);font-size:13.5px">1 · Money is never a decimal.</b><br><span style="font-size:12.5px;color:var(--muted)">Every amount is stored as an <b>integer of paise</b> (₹1,450.00 = 145000). Rounding errors are impossible; GST splits (CGST/SGST vs IGST) are computed server-side.</span></li>
+          <li class="etbl" style="padding:10px 0;border-bottom:1px dashed var(--line)"><b style="font-family:var(--sans);font-size:13.5px">2 · Stock only exists at the SKU.</b><br><span style="font-size:12.5px;color:var(--muted)">Every physical unit is one SKU row; every change to stock is appended to an immutable <b>inventory_movements</b> ledger with a reason code. Stock can always be reconstructed and audited.</span></li>
+          <li class="etbl" style="padding:10px 0"><b style="font-family:var(--sans);font-size:13.5px">3 · Staff never touch stock directly.</b><br><span style="font-size:12.5px;color:var(--muted)">The stock monitor is observe-and-report: employees propose corrections, a manager approves, and <i>only then</i> a real movement is written (two-man rule, fully audited).</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ 2. SYSTEM FLOW ════════════════════ -->
+<section id="system">
+  <div class="wrap">
+    <p class="sec-eyebrow">Section 2</p>
+    <h2>How a request flows through the backend</h2>
+    <p class="sec-sub">From the browser to the database and out to payment/shipping gateways. Every mutation goes through the same four layers — there is no second, hidden path.</p>
+
+    <div class="cols">
+      <div>
+        <div class="band">
+          <h3>1 · People &amp; devices</h3>
+          <div class="chips">
+            <span class="chip">Customer — phone + OTP</span>
+            <span class="chip">Staff — email + password</span>
+            <span class="chip hl">Owner — full access</span>
+            <span class="chip">Guest with cart cookie</span>
+            <span class="chip brass">Payment &amp; shipping webhooks</span>
+          </div>
+        </div>
+        <div class="flowsep">▼</div>
+        <div class="band">
+          <h3>2 · Next.js application (one deployable)</h3>
+          <div class="chips">
+            <span class="chip">Edge guard — protects /admin &amp; /account, injects route header</span>
+            <span class="chip">50 pages — storefront · account · console</span>
+            <span class="chip hl">78 API route files — Zod-validated inputs</span>
+            <span class="chip">Sessions — pn_session (customer) · pn_admin_session (staff)</span>
+          </div>
+        </div>
+        <div class="flowsep">▼</div>
+        <div class="band">
+          <h3>3 · Service layer (business rules live here)</h3>
+          <div class="chips">
+            <span class="chip">catalog</span><span class="chip">cart</span><span class="chip">order — 13-state machine</span>
+            <span class="chip">payment — HMAC verify, idempotent</span><span class="chip">shipping — AWB, tracking sync</span>
+            <span class="chip">inventory — transactional reserve/dispatch</span><span class="chip">stock-monitor</span>
+            <span class="chip">staff &amp; permissions</span><span class="chip">notification — SMS/WhatsApp</span><span class="chip">reports — GSTR-1</span>
+          </div>
+        </div>
+        <div class="flowsep">▼</div>
+        <div class="band">
+          <h3>4 · Data layer</h3>
+          <div class="chips">
+            <span class="chip hl">Prisma ORM</span>
+            <span class="chip">38 tables — SQLite (sandbox) → PostgreSQL (VPS)</span>
+            <span class="chip">audit_logs — every staff action recorded</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="band" style="border-left:3px solid var(--brass)">
+          <h3>External gateways (dual-mode)</h3>
+          <div style="display:grid;gap:12px;margin-top:4px">
+            <div><b style="font-size:13px">Razorpay</b><p style="font-size:12.5px;color:var(--muted)">Checkout + payment webhooks (signature-verified, event-deduplicated). Placeholder keys → deterministic sandbox simulation.</p></div>
+            <div><b style="font-size:13px">Shiprocket / Delhivery</b><p style="font-size:12.5px;color:var(--muted)">AWB creation, labels, tracking events pushed to our webhook; dispatch decrements physical stock.</p></div>
+            <div><b style="font-size:13px">SMS (OTP)</b><p style="font-size:12.5px;color:var(--muted)">Login codes; prints to server log while no provider key is set.</p></div>
+            <div><b style="font-size:13px">WhatsApp</b><p style="font-size:12.5px;color:var(--muted)">Inbound webhook for order/support conversations.</p></div>
+          </div>
+        </div>
+        <div class="callout" style="margin-top:16px">
+          <div>🔐 <b>Why this shape is safe:</b> the browser never touches the database; every input is validated; every staff mutation lands in <span class="k">audit_logs</span>; gateways can only talk to signed webhooks.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ 3. DATABASE ════════════════════ -->
+<section id="database">
+  <div class="wrap">
+    <p class="sec-eyebrow">Section 3</p>
+    <h2>The database — 38 tables in 8 domains</h2>
+    <p class="sec-sub">Read it top-down: first the map, then the spine every product flows through, then every table field-by-field (expand a domain). Table names are the real ones used in the database.</p>
+
+    <div class="grid3" style="margin-bottom:18px">
+      <div class="dcard">
+        <div class="dhead"><h3>Identity &amp; Access</h3><span class="count">4 tables</span></div>
+        <div class="dmodels"><span class="tname">users</span><span class="tname">otp_verifications</span><span class="tname">customers</span><span class="tname">addresses</span></div>
+        <p class="dnote">Who can act. One <b>users</b> row per human; customers add a profile, staff carry role + permission scopes.</p>
+      </div>
+      <div class="dcard">
+        <div class="dhead"><h3>Catalog</h3><span class="count">6 tables</span></div>
+        <div class="dmodels"><span class="tname">categories</span><span class="tname">brands</span><span class="tname">products</span><span class="tname">product_images</span><span class="tname">product_variants</span><span class="tname">skus</span></div>
+        <p class="dnote">What we sell: category tree → brand → product → variant → the SKU that is actually priced and stocked.</p>
+      </div>
+      <div class="dcard">
+        <div class="dhead"><h3>Inventory &amp; Stock ops</h3><span class="count">5 tables</span></div>
+        <div class="dmodels"><span class="tname">inventory</span><span class="tname">inventory_movements</span><span class="tname">stock_count_sessions</span><span class="tname">stock_count_lines</span><span class="tname">stock_adjustment_requests</span></div>
+        <p class="dnote">Where every unit stands. The ledger is append-only; counting &amp; correction requests layer on top.</p>
+      </div>
+      <div class="dcard">
+        <div class="dhead"><h3>Cart &amp; Wishlist</h3><span class="count">4 tables</span></div>
+        <div class="dmodels"><span class="tname">carts</span><span class="tname">cart_items</span><span class="tname">Wishlist</span><span class="tname">WishlistItem</span></div>
+        <p class="dnote">Buying intent before the order. Guest carts merge into the account on login.</p>
+      </div>
+      <div class="dcard">
+        <div class="dhead"><h3>Orders &amp; Fulfillment</h3><span class="count">8 tables</span></div>
+        <div class="dmodels"><span class="tname">orders</span><span class="tname">order_items</span><span class="tname">order_status_history</span><span class="tname">payments</span><span class="tname">payment_events</span><span class="tname">shipments</span><span class="tname">shipment_events</span><span class="tname">order_returns</span></div>
+        <p class="dnote">The money trail: order → items → payment events → shipment events → returns. Snapshotted so history never changes.</p>
+      </div>
+      <div class="dcard">
+        <div class="dhead"><h3>Marketing &amp; Content</h3><span class="count">7 tables</span></div>
+        <div class="dmodels"><span class="tname">coupons</span><span class="tname">coupon_redemptions</span><span class="tname">banners</span><span class="tname">posts</span><span class="tname">reviews</span><span class="tname">b2b_inquiries</span><span class="tname">stock_alerts</span></div>
+        <p class="dnote">What draws buyers in and brings them back — promos, blog, moderated reviews, B2B trade desk, back-in-stock alerts.</p>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="dcard">
+        <div class="dhead"><h3>Kit Builder</h3><span class="count">2 tables</span></div>
+        <div class="dmodels"><span class="tname">bundles</span><span class="tname">bundle_items</span></div>
+        <p class="dnote">CCTV kit recipes (recorder / camera / HDD / cable slots) sold at a bundle discount.</p>
+      </div>
+      <div class="dcard">
+        <div class="dhead"><h3>Platform</h3><span class="count">2 tables</span></div>
+        <div class="dmodels"><span class="tname">audit_logs</span><span class="tname">settings</span></div>
+        <p class="dnote">Cross-cutting: the who-did-what log and JSON store configuration (COD rules, store config).</p>
+      </div>
+    </div>
+
+    <h2 style="font-size:22px;margin-top:44px">The catalog spine — how one camera reaches a customer</h2>
+    <p class="sec-sub" style="margin-bottom:16px">Follow the brass boxes left to right. This is the single most important chain in the database.</p>
+    <div class="spine">
+      <div class="spine-row">
+        <span class="ent gray">categories</span><span class="arr">＋</span>
+        <span class="ent gray">brands</span><span class="arr">→</span>
+        <span class="ent">products</span><span class="arr">→</span>
+        <span class="ent gray">product_images</span>
+        <span class="arr">·</span>
+        <span class="ent">product_variants</span><span class="arr">→</span>
+        <span class="ent gold">skus</span><span class="arr">→</span>
+        <span class="ent gold">inventory</span><span class="arr">→</span>
+        <span class="ent gray">inventory_movements</span>
+      </div>
+      <div class="spine-row" style="margin-top:14px">
+        <span style="font-size:12px;font-weight:700;color:var(--faint);letter-spacing:.08em">ONE SKU FEEDS ↓</span>
+        <span class="ent gray">cart_items</span>
+        <span class="ent gray">order_items</span>
+        <span class="ent gray">bundle_items</span>
+        <span class="ent gray">stock_alerts</span>
+        <span class="ent gray">stock_count_lines</span>
+        <span class="ent gray">adjustment_requests</span>
+      </div>
+      <p class="spine-cap">A <b>Product</b> is the brochure ("2MP Dome Camera"); a <b>Variant</b> is one combination of attributes (2MP · 3.6mm lens); a <b>SKU</b> is the warehouse item with a price and stock count. Orders snapshot SKU data at purchase time, so editing the catalog later never rewrites history.</p>
+    </div>
+
+    <h2 style="font-size:22px;margin-top:44px">Every table, field by field</h2>
+    <p class="sec-sub" style="margin-bottom:16px">Open a domain to see its tables. Legend: <span class="badge-note bn-money">₹ paise</span> money as integer paise · <span class="badge-note bn-json">JSON</span> flexible JSON column · <span class="badge-note bn-uniq">U</span> unique.</p>
+
+    <details class="er" open>
+      <summary><h3>Identity &amp; Access</h3><span class="cnt">4 tables</span><span class="tgl">▾</span></summary>
+      <div class="erbody">
+        <div class="etbl">
+          <h4>users <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>phone</b> — login key for customers <span class="badge-note bn-uniq">U</span></li>
+            <li><b>email</b> — login key for staff <span class="badge-note bn-uniq">U</span></li>
+            <li><b>password_hash</b> — scrypt, staff only</li>
+            <li><b>role</b> — CUSTOMER | SUPER_ADMIN | STAFF</li>
+            <li><b>permissions</b> <span class="badge-note bn-json">JSON</span> — staff scope keys</li>
+            <li><b>is_active</b> — deactivate without deleting</li>
+            <li><b>deleted_at</b> — soft delete</li>
+          </ul>
+          <p class="rel">→ customers, carts, wishlists, orders, reviews, audit_logs, stock count sessions</p>
+        </div>
+        <div class="etbl">
+          <h4>otp_verifications <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>phone</b> + <b>code_hash</b> — 6-digit OTP</li>
+            <li><b>expires_at</b> — 5-minute expiry</li>
+            <li><b>attempts</b> — max 5 tries; 3 requests / 10 min</li>
+          </ul>
+          <p class="rel">standalone (rate-limited by phone)</p>
+        </div>
+        <div class="etbl">
+          <h4>customers <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>user_id</b> — 1:1 to users <span class="badge-note bn-uniq">U</span></li>
+            <li><b>full_name</b></li>
+            <li><b>company_name</b>, <b>gstin</b> — B2B buyers</li>
+            <li><b>is_b2b_verified</b></li>
+          </ul>
+          <p class="rel">→ addresses; belongs to users</p>
+        </div>
+        <div class="etbl">
+          <h4>addresses <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>customer_id</b> — FK</li>
+            <li><b>recipient_name</b>, <b>phone</b></li>
+            <li><b>address_line1/2</b>, <b>landmark</b></li>
+            <li><b>city</b>, <b>state</b>, <b>pincode</b></li>
+            <li><b>type</b> — HOME | WORK | WAREHOUSE</li>
+            <li><b>is_default</b> — max 10 per book</li>
+          </ul>
+          <p class="rel">belongs to customers</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="er">
+      <summary><h3>Catalog</h3><span class="cnt">6 tables</span><span class="tgl">▾</span></summary>
+      <div class="erbody">
+        <div class="etbl">
+          <h4>categories <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>name</b>, <b>slug</b> <span class="badge-note bn-uniq">U</span>, <b>image_url</b></li>
+            <li><b>parent_id</b> — self-FK (tree: 5 roots + subs)</li>
+            <li><b>hsn_code</b> — GST classification</li>
+            <li><b>gst_rate</b> — 18% (28% large monitors)</li>
+            <li><b>sort_order</b>, <b>is_active</b></li>
+          </ul>
+          <p class="rel">→ products; parent/children of itself</p>
+        </div>
+        <div class="etbl">
+          <h4>brands <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>name</b>, <b>slug</b> <span class="badge-note bn-uniq">U</span>, <b>logo_url</b></li>
+            <li><b>description</b>, <b>is_active</b></li>
+          </ul>
+          <p class="rel">→ products (Hikvision, Dahua, CP Plus, MTC…)</p>
+        </div>
+        <div class="etbl">
+          <h4>products <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>name</b>, <b>slug</b> <span class="badge-note bn-uniq">U</span></li>
+            <li><b>brand_id</b>, <b>category_id</b> — FKs</li>
+            <li><b>description</b>, <b>short_desc</b>, <b>model_number</b></li>
+            <li><b>specifications</b> <span class="badge-note bn-json">JSON</span> — key/value specs</li>
+            <li><b>documents</b> <span class="badge-note bn-json">JSON</span> — datasheets</li>
+            <li><b>is_cod_allowed</b> — selective COD flag</li>
+            <li><b>warranty_months</b>, <b>meta_title/description</b></li>
+            <li><b>restocked_at</b> — "back in stock" ribbon</li>
+            <li><b>deleted_at</b> — soft delete</li>
+          </ul>
+          <p class="rel">→ images, variants, reviews, wishlist items</p>
+        </div>
+        <div class="etbl">
+          <h4>product_images <span class="pk">PK id</span></h4>
+          <ul><li><b>product_id</b> — FK · <b>url</b>, <b>alt_text</b>, <b>sort_order</b></li></ul>
+          <p class="rel">belongs to products</p>
+        </div>
+        <div class="etbl">
+          <h4>product_variants <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>product_id</b> — FK</li>
+            <li><b>attributes</b> <span class="badge-note bn-json">JSON</span> — {"resolution":"2MP","lens":"3.6mm"}</li>
+            <li><b>sku_id</b> — 1:1 to skus <span class="badge-note bn-uniq">U</span></li>
+          </ul>
+          <p class="rel">belongs to products; points to skus</p>
+        </div>
+        <div class="etbl">
+          <h4>skus <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>code</b> <span class="badge-note bn-uniq">U</span> — e.g. CPP-B01-2MP-36</li>
+            <li><b>barcode</b> <span class="badge-note bn-uniq">U</span></li>
+            <li><b>mrp</b>, <b>selling_price</b> <span class="badge-note bn-money">₹ paise</span> — GST-inclusive</li>
+            <li><b>weight_grams</b>, <b>dimensions</b> <span class="badge-note bn-json">JSON</span></li>
+          </ul>
+          <p class="rel">the stock-keeping unit — feeds inventory, cart, orders, bundles, alerts, counts</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="er">
+      <summary><h3>Inventory &amp; Stock operations</h3><span class="cnt">5 tables</span><span class="tgl">▾</span></summary>
+      <div class="erbody">
+        <div class="etbl">
+          <h4>inventory <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>sku_id</b> — 1:1 <span class="badge-note bn-uniq">U</span></li>
+            <li><b>current_stock</b>, <b>reserved_stock</b></li>
+            <li style="grid-column:1/-1">available = current − reserved · <b>low_stock_threshold</b> powers the "Low stock" wall state</li>
+          </ul>
+          <p class="rel">belongs to skus</p>
+        </div>
+        <div class="etbl">
+          <h4>inventory_movements <span class="pk">PK id</span> — append-only ledger</h4>
+          <ul>
+            <li><b>sku_id</b>, <b>quantity</b> (signed)</li>
+            <li><b>reason</b> — PURCHASE_RECEIPT · ORDER_RESERVED · ORDER_DISPATCHED · ORDER_CANCELLED_RESTOCK · RETURN_RESTOCK · MANUAL_ADJUSTMENT · DAMAGED_WRITE_OFF</li>
+            <li><b>reference_id</b> — points at the order/session/request</li>
+            <li><b>created_by_id</b> — which operator</li>
+          </ul>
+          <p class="rel">belongs to skus — stock history is fully reconstructable</p>
+        </div>
+        <div class="etbl">
+          <h4>stock_count_sessions <span class="pk">PK id</span> — cycle counts</h4>
+          <ul>
+            <li><b>title</b> — "Monsoon shelf check — cameras"</li>
+            <li><b>status</b> — OPEN → COUNTING → SUBMITTED → CLOSED</li>
+            <li><b>scope_kind</b> — CATEGORY | BRAND | ALL</li>
+            <li><b>expected</b> <span class="badge-note bn-json">JSON</span> — frozen snapshot of expected quantities</li>
+          </ul>
+          <p class="rel">→ stock_count_lines; opened by a user</p>
+        </div>
+        <div class="etbl">
+          <h4>stock_count_lines <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>session_id</b>, <b>sku_id</b> — unique together</li>
+            <li><b>expected_qty</b> vs <b>counted_qty</b> → <b>variance</b></li>
+            <li><b>applied_at</b> — single-apply marker (no double-posting)</li>
+          </ul>
+          <p class="rel">belongs to session + sku</p>
+        </div>
+        <div class="etbl">
+          <h4>stock_adjustment_requests <span class="pk">PK id</span> — two-man rule</h4>
+          <ul>
+            <li><b>sku_id</b>, <b>delta</b> (signed), <b>reason</b> — DAMAGED | MISSING | FOUND | WRONG_LOCATION | OTHER</li>
+            <li><b>status</b> — PENDING → APPROVED / REJECTED</li>
+            <li><b>requested_by</b> (staff) vs <b>decided_by</b> (manager)</li>
+            <li><b>movement_id</b> — real ledger entry on approval</li>
+          </ul>
+          <p class="rel">staff proposes → manager approves → inventory_moves</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="er">
+      <summary><h3>Cart &amp; Wishlist</h3><span class="cnt">4 tables</span><span class="tgl">▾</span></summary>
+      <div class="erbody">
+        <div class="etbl">
+          <h4>carts <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>user_id</b> <span class="badge-note bn-uniq">U</span> — null while guest</li>
+            <li><b>guest_token</b> <span class="badge-note bn-uniq">U</span> — cookie token; merged on login</li>
+          </ul>
+          <p class="rel">→ cart_items; belongs to users (optional)</p>
+        </div>
+        <div class="etbl">
+          <h4>cart_items <span class="pk">PK id</span></h4>
+          <ul><li><b>cart_id</b>, <b>sku_id</b> — unique together · <b>quantity</b></li></ul>
+          <p class="rel">belongs to carts + skus</p>
+        </div>
+        <div class="etbl">
+          <h4>Wishlist <span class="pk">PK id</span> · WishlistItem <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>Wishlist.user_id</b> — 1:1 <span class="badge-note bn-uniq">U</span></li>
+            <li><b>WishlistItem.wishlist_id</b> + <b>product_id</b> — unique together</li>
+            <li><b>price_at_add_paise</b> <span class="badge-note bn-money">₹ paise</span> — powers the price-drop badge</li>
+          </ul>
+          <p class="rel">wishlist belongs to user; items to product</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="er">
+      <summary><h3>Orders &amp; Fulfillment</h3><span class="cnt">8 tables</span><span class="tgl">▾</span></summary>
+      <div class="erbody">
+        <div class="etbl">
+          <h4>orders <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>order_number</b> <span class="badge-note bn-uniq">U</span> — human-facing id</li>
+            <li><b>user_id</b> — FK · <b>status</b> — 13-state FSM</li>
+            <li><b>payment_method</b> — RAZORPAY | COD</li>
+            <li><b>is_b2b</b>, <b>gstin</b>, <b>company_name</b></li>
+            <li><b>subtotal / discount / bundle_discount / coupon_code</b> <span class="badge-note bn-money">₹ paise</span></li>
+            <li><b>shipping_amount / cod_fee</b> <span class="badge-note bn-money">₹ paise</span></li>
+            <li><b>cgst / sgst / igst</b> <span class="badge-note bn-money">₹ paise</span> — computed GST split</li>
+            <li><b>total_amount</b> <span class="badge-note bn-money">₹ paise</span></li>
+            <li><b>delivery_*</b> — full shipping address snapshot</li>
+            <li><b>estimated_delivery_at</b></li>
+          </ul>
+          <p class="rel">→ items, history, payments, shipments, returns</p>
+        </div>
+        <div class="etbl">
+          <h4>order_items <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>order_id</b>, <b>sku_id</b> — FKs</li>
+            <li><b>product_name / variant_name / sku_code</b> — snapshots</li>
+            <li><b>hsn_code</b>, <b>tax_rate</b>, <b>tax_amount</b> <span class="badge-note bn-money">₹ paise</span></li>
+            <li><b>unit_price / total_price</b> <span class="badge-note bn-money">₹ paise</span></li>
+            <li><b>serial_numbers</b> <span class="badge-note bn-json">JSON</span> — captured at packing, keys RMA</li>
+          </ul>
+          <p class="rel">belongs to orders + skus</p>
+        </div>
+        <div class="etbl">
+          <h4>order_status_history <span class="pk">PK id</span></h4>
+          <ul><li><b>order_id</b> · <b>status</b> · <b>comment</b> · <b>changed_by</b></li></ul>
+          <p class="rel">append-only audit of the pipeline</p>
+        </div>
+        <div class="etbl">
+          <h4>payments <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>order_id</b> · <b>gateway</b> — RAZORPAY</li>
+            <li><b>gateway_order_id / gateway_payment_id</b> <span class="badge-note bn-uniq">U</span></li>
+            <li><b>amount</b> <span class="badge-note bn-money">₹ paise</span> · <b>method</b> — ONLINE | COD</li>
+            <li><b>status</b> — INITIATED | SUCCESS | FAILED | REFUNDED</li>
+          </ul>
+          <p class="rel">→ payment_events</p>
+        </div>
+        <div class="etbl">
+          <h4>payment_events <span class="pk">PK id</span></h4>
+          <ul><li><b>event_id</b> <span class="badge-note bn-uniq">U</span> — webhook dedup · <b>event_type</b> · <b>payload</b> <span class="badge-note bn-json">JSON</span></li></ul>
+          <p class="rel">raw gateway callbacks — replay-safe</p>
+        </div>
+        <div class="etbl">
+          <h4>shipments <span class="pk">PK id</span> — 1:1 with order</h4>
+          <ul>
+            <li><b>provider</b> — SHIPROCKET | DELHIVERY</li>
+            <li><b>awb</b> <span class="badge-note bn-uniq">U</span> · <b>courier_name</b> · <b>tracking_url</b> · <b>label_url</b></li>
+            <li><b>status</b> — MANIFESTED → PICKED_UP → IN_TRANSIT → OUT_FOR_DELIVERY → DELIVERED (RTO states)</li>
+            <li><b>dispatched_at</b> — physical stock decrements here</li>
+          </ul>
+          <p class="rel">→ shipment_events</p>
+        </div>
+        <div class="etbl">
+          <h4>shipment_events <span class="pk">PK id</span></h4>
+          <ul><li><b>event_id</b> <span class="badge-note bn-uniq">U</span> · <b>status</b> · <b>location</b> · <b>occurred_at</b> · <b>payload</b></li></ul>
+          <p class="rel">courier tracking feed — powers customer timeline</p>
+        </div>
+        <div class="etbl">
+          <h4>order_returns <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>order_id</b> · <b>reason</b> · <b>status</b> — REQUESTED → APPROVED → RESTOCKED → REFUNDED</li>
+            <li><b>is_rma</b> — DOA / warranty claims</li>
+            <li><b>inward_courier / inward_tracking / inward_note</b> — unit receipt check</li>
+            <li><b>refund_amount</b> <span class="badge-note bn-money">₹ paise</span></li>
+          </ul>
+          <p class="rel">belongs to orders</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="er">
+      <summary><h3>Marketing &amp; Content</h3><span class="cnt">7 tables</span><span class="tgl">▾</span></summary>
+      <div class="erbody">
+        <div class="etbl">
+          <h4>coupons <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>code</b> <span class="badge-note bn-uniq">U</span> · <b>type</b> — PERCENT | FIXED</li>
+            <li><b>value</b> — % or <span class="badge-note bn-money">₹ paise</span> · min order · max discount</li>
+            <li><b>starts_at / ends_at / usage_limit / used_count</b></li>
+          </ul>
+          <p class="rel">→ coupon_redemptions (one per order)</p>
+        </div>
+        <div class="etbl">
+          <h4>banners <span class="pk">PK id</span></h4>
+          <ul><li><b>title</b>, <b>image_url</b>, <b>link_url</b>, <b>placement</b> — HOME_HERO | HOME_STRIP · schedule + sort</li></ul>
+          <p class="rel">homepage promos</p>
+        </div>
+        <div class="etbl">
+          <h4>posts <span class="pk">PK id</span></h4>
+          <ul><li><b>title</b>, <b>slug</b> <span class="badge-note bn-uniq">U</span>, <b>content</b>, <b>cover_image_url</b></li><li><b>status</b> — DRAFT | PUBLISHED · <b>tags</b> <span class="badge-note bn-json">JSON</span></li></ul>
+          <p class="rel">blog / buying guides</p>
+        </div>
+        <div class="etbl">
+          <h4>reviews <span class="pk">PK id</span></h4>
+          <ul><li><b>product_id</b>, <b>user_id</b> — unique together (1 review each)</li><li><b>rating</b> 1–5 · <b>is_verified</b> (bought it) · <b>is_approved</b> (moderated)</li></ul>
+          <p class="rel">belongs to products + users</p>
+        </div>
+        <div class="etbl">
+          <h4>b2b_inquiries <span class="pk">PK id</span> — Trade Desk</h4>
+          <ul><li><b>name</b>, <b>phone</b>, <b>email</b>, <b>company_name</b>, <b>gstin</b>, <b>message</b></li><li><b>product_id</b> — loose ref · <b>status</b> — NEW | CONTACTED | CLOSED · <b>note</b> — follow-up</li></ul>
+          <p class="rel">bulk-buyer leads from storefront</p>
+        </div>
+        <div class="etbl">
+          <h4>stock_alerts <span class="pk">PK id</span></h4>
+          <ul><li><b>sku_id</b> + <b>phone</b> — unique together</li><li><b>status</b> — PENDING | NOTIFIED | EXPIRED</li></ul>
+          <p class="rel">"notify me" when back in stock</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="er">
+      <summary><h3>Kit Builder · Platform</h3><span class="cnt">4 tables</span><span class="tgl">▾</span></summary>
+      <div class="erbody">
+        <div class="etbl">
+          <h4>bundles <span class="pk">PK id</span> + bundle_items <span class="pk">PK id</span></h4>
+          <ul>
+            <li><b>bundle.name/slug/discount_pct</b> — e.g. custom-cctv-kit −5%</li>
+            <li><b>item.slot</b> — recorder | camera | hdd | power | cable | connector</li>
+            <li><b>item.sku_id</b>, <b>quantity</b>, <b>is_optional</b></li>
+          </ul>
+          <p class="rel">kit recipes map SKUs into build steps</p>
+        </div>
+        <div class="etbl">
+          <h4>audit_logs <span class="pk">PK id</span></h4>
+          <ul><li><b>user_id</b> (nullable) · <b>action</b> · <b>entity</b> + <b>entity_id</b></li><li><b>details</b> <span class="badge-note bn-json">JSON</span> diff · <b>ip</b> · timestamp</li></ul>
+          <p class="rel">every staff mutation lands here</p>
+        </div>
+        <div class="etbl">
+          <h4>settings <span class="pk">PK key</span></h4>
+          <ul><li><b>value</b> <span class="badge-note bn-json">JSON</span> — COD rules, store config</li></ul>
+          <p class="rel">key/value store editable in /admin/settings</p>
+        </div>
+      </div>
+    </details>
+
+    <div class="callout">
+      📐 <span><b>Want this as a picture you can zoom?</b> Go to <b>dbdiagram.io</b>, create a free diagram, delete the sample code, and paste the file <span class="k">/blueprint/schema.dbml</span> from this site — you'll get an interactive ER diagram of all 38 tables with colors by domain, exportable as PNG/PDF. Full tool guide in <a href="#tools" style="color:var(--brass);font-weight:700">Section 7</a>.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ 4. ROLES & ACCESS ════════════════════ -->
+<section id="access">
+  <div class="wrap">
+    <p class="sec-eyebrow">Section 4</p>
+    <h2>Roles &amp; access — Owner, Staff, Customer</h2>
+    <p class="sec-sub">There are exactly three roles (D-12). The Owner holds every permission and hands out scopes to each staff account at creation time through a wizard — there is no fixed "manager" tier anymore.</p>
+
+    <div class="ladder">
+      <div class="rolecard owner">
+        <span class="tag">Role · SUPER_ADMIN</span>
+        <h3>Owner</h3>
+        <ul>
+          <li>Everything below, plus:</li>
+          <li>Manage own login (email/password)</li>
+          <li>Create another Owner account</li>
+          <li>Create/edit/deactivate Staff</li>
+          <li>Set each Staff's function scopes</li>
+          <li>Cannot be locked out of anything</li>
+        </ul>
+      </div>
+      <div class="larr" aria-hidden="true">→</div>
+      <div class="rolecard staff">
+        <span class="tag">Role · STAFF — scope set by Owner</span>
+        <h3>Staff (per-account functions)</h3>
+        <div class="scopegrp"><h4>Fulfillment</h4><div class="chips"><span class="chip">Orders &amp; fulfillment</span><span class="chip">Returns &amp; DOA</span></div></div>
+        <div class="scopegrp"><h4>Catalog &amp; stock</h4><div class="chips"><span class="chip">Products</span><span class="chip">Categories</span><span class="chip">Brands</span><span class="chip">Inventory</span><span class="chip">Stock Monitor</span></div></div>
+        <div class="scopegrp"><h4>People &amp; support</h4><div class="chips"><span class="chip">Customers</span><span class="chip">Trade Desk</span><span class="chip">Reviews</span></div></div>
+        <div class="scopegrp"><h4>Content &amp; marketing</h4><div class="chips"><span class="chip">Coupons</span><span class="chip">Banners</span><span class="chip">Blog</span></div></div>
+        <div class="scopegrp"><h4>Insights &amp; config</h4><div class="chips"><span class="chip">Reports</span><span class="chip">Settings</span></div></div>
+      </div>
+      <div class="larr" aria-hidden="true">→</div>
+      <div class="rolecard cust">
+        <span class="tag">Role · CUSTOMER</span>
+        <h3>Customer</h3>
+        <ul>
+          <li>Shop, cart, checkout</li>
+          <li>Phone + OTP login</li>
+          <li>Orders, invoices, tracking</li>
+          <li>Wishlist, reviews, alerts</li>
+          <li>B2B profile (GSTIN)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:20px">
+      <div class="card">
+        <h3 style="font-family:var(--display);font-size:17px;color:var(--pine)">How a permission is checked — every single request</h3>
+        <div class="gatemap" style="margin-top:12px">
+          <span class="step">Request + session cookie</span><span class="a">→</span>
+          <span class="step">Route guard (/admin)</span><span class="a">→</span>
+          <span class="step">API validates input (Zod)</span><span class="a">→</span>
+          <span class="step">Re-reads user row from DB — fresh</span><span class="a">→</span>
+          <span class="step ok">Scope granted? → run</span>
+          <span class="step fail">Not granted → 401</span>
+        </div>
+        <p style="font-size:13px;color:var(--muted);margin-top:12px">Because gates re-read the database each time (not a cached token), <b>the moment the Owner edits a staff member's scopes or deactivates them, it bites on that person's very next click</b> — no logout needed. Every grant/revoke lands in the audit log.</p>
+      </div>
+      <div class="card">
+        <h3 style="font-family:var(--display);font-size:17px;color:var(--pine)">Staff creation wizard — the 3 steps</h3>
+        <ol style="margin:10px 0 0 18px;font-size:13.5px;color:var(--muted);display:grid;gap:8px">
+          <li><b style="color:var(--ink)">Identity</b> — name, email, auto-generated password (shown once, copyable).</li>
+          <li><b style="color:var(--ink)">Functions</b> — account type (Staff or second Owner), then tick exactly which of the 15 functions this person gets. Quick presets: Counter, Warehouse, Fulfillment, Catalog, Content.</li>
+          <li><b style="color:var(--ink)">Review &amp; create</b> — confirm; the account is live immediately and scoped to the ticked functions only.</li>
+        </ol>
+        <p style="font-size:12.5px;color:var(--muted);margin-top:10px">Editing later: the Owner can rename, reset passwords, change scopes, or deactivate — all audited. A staff member with zero scopes sees an empty console, never another department's data.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3 style="font-family:var(--display);font-size:17px;color:var(--pine)">Worked examples — who sees what</h3>
+      <table class="simple" style="margin-top:8px">
+        <tr><th>Person</th><th>Scopes granted</th><th>Console experience</th></tr>
+        <tr><td><b>Owner</b></td><td>— (implicit full)</td><td>All 17 nav sections + "Staff &amp; access"</td></tr>
+        <tr><td><b>Counter staff</b></td><td>Stock Monitor</td><td>Lands straight on the stock wall; deep-links to /admin/orders bounce back</td></tr>
+        <tr><td><b>Warehouse staff</b></td><td>Inventory + Stock Monitor</td><td>Inventory adjustments, CSV import, approves count variances</td></tr>
+        <tr><td><b>Fulfillment staff</b></td><td>Orders + Returns</td><td>Order pipeline, packing, AWB, serials, RMA queue — sees no catalog or pricing</td></tr>
+        <tr><td><b>Content staff</b></td><td>Banners + Blog + Coupons</td><td>Marketing tools only; zero stock or order access</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ 5. ORDER LIFECYCLE ════════════════════ -->
+<section id="orders">
+  <div class="wrap">
+    <p class="sec-eyebrow">Section 5</p>
+    <h2>Order lifecycle — 13 states, strictly enforced</h2>
+    <p class="sec-sub">The server allows only the transitions drawn below (a finite state machine). Customer tracking, staff pipeline, and the ledger all read from this single truth.</p>
+
+    <div style="display:grid;gap:14px">
+      <div class="phase">
+        <h3><span class="num">A</span> Checkout &amp; payment</h3>
+        <div class="strow">
+          <span class="st pay">PENDING_PAYMENT</span><span class="arr">→</span>
+          <span class="st pay">PAID</span><span class="arr">→</span>
+          <span class="st run">CONFIRMED</span>
+          <span style="width:14px"></span>
+          <span class="st pay">COD_PENDING</span><span class="arr">→</span>
+          <span class="st run">CONFIRMED</span>
+        </div>
+        <p class="pnote">Stock is <b>reserved</b> the moment the order is created (available = current − reserved). Razorpay payments are signature-verified and replay-safe; COD follows the selective-COD rules (per-product flag, ₹15,000 ceiling, air-cargo zones blocked). B2B buyers add GSTIN for input tax credit.</p>
+      </div>
+      <div class="phase">
+        <h3><span class="num">B</span> Fulfillment</h3>
+        <div class="strow">
+          <span class="st run">CONFIRMED</span><span class="arr">→</span>
+          <span class="st run">PROCESSING</span><span class="arr">→</span>
+          <span class="st run">PACKED</span><span class="arr">→</span>
+          <span class="st run">SHIPPED</span><span class="arr">→</span>
+          <span class="st run">OUT_FOR_DELIVERY</span><span class="arr">→</span>
+          <span class="st done">DELIVERED</span>
+        </div>
+        <p class="pnote">At <b>PACKED</b>: hardware serial numbers captured (warranty/RMA keys) and AWB generated. At <b>SHIPPED</b>: physical stock decrements via an ORDER_DISPATCHED movement; courier events stream into shipment_events and the customer timeline.</p>
+      </div>
+      <div class="phase">
+        <h3><span class="num">C</span> After-sales</h3>
+        <div class="strow">
+          <span class="st done">DELIVERED</span><span class="arr">→</span>
+          <span class="st pay">RETURN_REQUESTED</span><span class="arr">→</span>
+          <span class="st run">RETURNED</span><span class="arr">→</span>
+          <span class="st done">REFUNDED</span>
+          <span style="width:14px"></span>
+          <span class="st term">CANCELLED</span>
+          <span style="font-size:11.5px;color:var(--faint)">possible from any pre-dispatch state</span>
+        </div>
+        <p class="pnote">Returns (and DOA/RMA claims) restock units via RETURN_RESTOCK movements; refunds flip the payment record. Cancelling before dispatch releases the reservation — nothing is ever double-counted.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ 6. ROUTE MAP ════════════════════ -->
+<section id="routes">
+  <div class="wrap">
+    <p class="sec-eyebrow">Section 6</p>
+    <h2>Every route in the system</h2>
+    <p class="sec-sub">50 pages + 78 API route files. Admin pages marked in brass are scope-gated — a staff member sees only the sections the Owner granted.</p>
+
+    <div class="route-sec">
+      <h3>Storefront — public (24)</h3>
+      <div class="routes">
+        <span class="rt">/ <i>home</i></span><span class="rt">/products</span><span class="rt">/products/[slug]</span>
+        <span class="rt">/brands</span><span class="rt">/brands/[slug]</span><span class="rt">/kit-builder</span>
+        <span class="rt">/search</span><span class="rt">/compare</span><span class="rt">/cart</span><span class="rt">/checkout</span>
+        <span class="rt">/order-success/[orderNumber]</span><span class="rt">/track</span><span class="rt">/wishlist</span>
+        <span class="rt">/login</span><span class="rt">/contact</span><span class="rt">/about</span><span class="rt">/blog</span>
+        <span class="rt">/blog/[slug]</span><span class="rt">/faq</span><span class="rt">/shipping-policy</span>
+        <span class="rt">/privacy-policy</span><span class="rt">/return-policy</span><span class="rt">/terms</span><span class="rt">/blueprint <i>this page</i></span>
+      </div>
+
+      <h3>Customer account — OTP-guarded (7)</h3>
+      <div class="routes">
+        <span class="rt">/account <i>profile + LTV</i></span><span class="rt">/account/login</span>
+        <span class="rt">/account/orders</span><span class="rt">/account/orders/[orderNumber]</span>
+        <span class="rt">/account/orders/[orderNumber]/invoice <i>GST print</i></span>
+        <span class="rt">/account/addresses</span><span class="rt">/account/wishlist</span>
+      </div>
+
+      <h3>Operations console — /admin (18)</h3>
+      <div class="routes">
+        <span class="rt">/admin <i>dashboard</i></span><span class="rt">/admin/login</span>
+        <span class="rt scoped">/admin/orders <i>scope: orders</i></span>
+        <span class="rt scoped">/admin/returns <i>returns</i></span>
+        <span class="rt scoped">/admin/products <i>products</i></span>
+        <span class="rt scoped">/admin/products/new</span><span class="rt scoped">/admin/products/[id]</span>
+        <span class="rt scoped">/admin/categories <i>categories</i></span>
+        <span class="rt scoped">/admin/brands <i>brands</i></span>
+        <span class="rt scoped">/admin/inventory <i>inventory</i></span>
+        <span class="rt scoped">/admin/stock-monitor <i>stock_monitor</i></span>
+        <span class="rt scoped">/admin/customers <i>customers</i></span>
+        <span class="rt scoped">/admin/inquiries <i>inquiries</i></span>
+        <span class="rt scoped">/admin/reviews <i>reviews</i></span>
+        <span class="rt scoped">/admin/coupons <i>coupons</i></span>
+        <span class="rt scoped">/admin/banners <i>banners</i></span>
+        <span class="rt scoped">/admin/blog <i>blog</i></span>
+        <span class="rt scoped">/admin/reports <i>reports</i></span>
+        <span class="rt scoped">/admin/settings <i>settings</i></span>
+        <span class="rt scoped" style="border-left-color:var(--pine)">/admin/staff <i>Owner only</i></span>
+      </div>
+
+      <h3>API surface — 78 route files in 6 groups</h3>
+      <table class="simple">
+        <tr><th>Group</th><th>Files</th><th>Examples</th></tr>
+        <tr><td>Auth &amp; session (customer)</td><td>6</td><td><span class="k">/api/auth/otp/request</span> <span class="k">/api/auth/otp/verify</span> <span class="k">/api/auth/me</span></td></tr>
+        <tr><td>Shop — catalog &amp; discovery</td><td>4</td><td><span class="k">/api/products</span> <span class="k">/api/products/[slug]</span> <span class="k">/api/search/quick</span></td></tr>
+        <tr><td>Shop — cart, wishlist, checkout</td><td>15</td><td><span class="k">/api/cart/item</span> <span class="k">/api/coupon/validate</span> <span class="k">/api/shipping/pincode</span> <span class="k">/api/orders</span> <span class="k">/api/payments/razorpay/*</span></td></tr>
+        <tr><td>Admin — gated by scopes (44)</td><td>44</td><td><span class="k">/api/admin/orders/*</span> <span class="k">/api/admin/inventory/*</span> <span class="k">/api/admin/staff</span> <span class="k">/api/admin/stock-monitor/*</span></td></tr>
+        <tr><td>Webhooks (signed)</td><td>3</td><td><span class="k">/api/webhooks/razorpay</span> <span class="k">/api/webhooks/shipping</span> <span class="k">/api/webhooks/whatsapp</span></td></tr>
+        <tr><td>Utilities</td><td>6</td><td><span class="k">/api/health</span> <span class="k">/api/track</span> <span class="k">/api/reviews</span> <span class="k">/api/stock-alerts</span> <span class="k">/api/contact</span></td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ 7. TOOLS ════════════════════ -->
+<section id="tools">
+  <div class="wrap">
+    <p class="sec-eyebrow">Section 7</p>
+    <h2>Online tools to explore this with your client</h2>
+    <p class="sec-sub">Everything below is free to start and needs no installation. The recommended combo: <b>dbdiagram.io</b> for the database picture, <b>this blueprint page</b> (print to PDF) for the system story.</p>
+
+    <div class="card">
+      <div class="tool">
+        <h3>dbdiagram.io <span class="rec">Recommended — database ERD</span> <span class="url">dbdiagram.io</span></h3>
+        <p>Turns the schema file shipped with this blueprint into a clean, zoomable, interactive ER diagram. Best single tool for "make me and my client understand the whole DATABASE".</p>
+        <ol>
+          <li>Download/copy <span class="k">/blueprint/schema.dbml</span> from this site (already written for dbdiagram — colors and relationships included).</li>
+          <li>Go to dbdiagram.io → <b>New Diagram</b> → delete the sample → paste → the 38-table ERD renders instantly.</li>
+          <li>Hover a table to highlight its relationships; export <b>PNG / PDF</b> for the client deck.</li>
+        </ol>
+      </div>
+      <div class="tool">
+        <h3>dbdocs.io <span class="rec">Shareable DB docs site</span> <span class="url">dbdocs.io</span></h3>
+        <p>From the makers of dbdiagram. The same DBML file becomes a searchable documentation website with a table-of-contents — good for sharing a permanent link with the client instead of screenshots.</p>
+      </div>
+      <div class="tool">
+        <h3>Eraser.io <span class="rec">Architecture + ERD as code</span> <span class="url">eraser.io</span></h3>
+        <p>Draws both the system architecture and the ERD from plain text ("diagram-as-code"). Has an AI mode: paste SQL or a description and it proposes the diagram. Best when you want one canvas mixing tables, services and gateways.</p>
+      </div>
+      <div class="tool">
+        <h3>drawSQL <span class="url">drawsql.app</span></h3>
+        <p>Visual, editable database diagrams — nice when the client wants to drag tables around during a workshop. Imports from SQL dumps; free tier covers ~15 tables, so use it for the core spine.</p>
+      </div>
+      <div class="tool">
+        <h3>Mermaid Live Editor <span class="url">mermaid.live</span></h3>
+        <p>Paste diagram code, get an image, embed in Git/Markdown/Notion. A starter ER snippet for the catalog spine is below — paste and edit freely.</p>
+        <details class="code">
+          <summary>Show starter Mermaid code (paste at mermaid.live)</summary>
+          <pre>erDiagram
+  CATEGORIES ||--o{ PRODUCTS : contains
+  BRANDS ||--o{ PRODUCTS : supplies
+  PRODUCTS ||--o{ PRODUCT_IMAGES : "shown by"
+  PRODUCTS ||--o{ PRODUCT_VARIANTS : "sold as"
+  PRODUCT_VARIANTS ||--|| SKUS : "maps to"
+  SKUS ||--|| INVENTORY : "stocked at"
+  SKUS ||--o{ INVENTORY_MOVEMENTS : "moves via"
+  SKUS ||--o{ CART_ITEMS : "added as"
+  SKUS ||--o{ ORDER_ITEMS : "ordered as"
+  USERS ||--o| CUSTOMERS : "profile"
+  USERS ||--o{ ORDERS : places
+  USERS ||--o{ CARTS : owns
+  USERS ||--o{ REVIEWS : writes
+  ORDERS ||--o{ ORDER_ITEMS : contains
+  ORDERS ||--o{ PAYMENTS : "paid via"
+  ORDERS ||--|| SHIPMENTS : "shipped by"
+  ORDERS ||--o{ ORDER_RETURNS : "after-sales"
+  CUSTOMERS ||--o{ ADDRESSES : stores
+  COUPONS ||--o{ COUPON_REDEMPTIONS : "used in"</pre>
+        </details>
+      </div>
+      <div class="tool">
+        <h3>Prisma ERD Generator <span class="url">github.com/keonik/prisma-erd-generator</span></h3>
+        <p>A dev-dependency that renders the ERD straight from <span class="k">prisma/schema.prisma</span> into <span class="k">ERD.svg</span> every time the schema changes — the picture can never go stale. Ask me to wire it in and it takes one command.</p>
+      </div>
+      <div class="tool">
+        <h3>DBeaver / TablePlus <span class="url">dbeaver.io · tableplus.com</span></h3>
+        <p>Desktop database browsers. Point one at the live SQLite file (sandbox) or the production PostgreSQL, and you can browse real rows — useful when a question is "what's actually in the orders table right now?"</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      🖨️ <span><b>Client-ready pack in 2 minutes:</b> hit <b>Print / Save PDF</b> at the top of this page for the full story (system + database + roles + orders + routes), then add the dbdiagram.io PNG of the 38-table ERD as the annex. That pair answers "database, backend, roles, routes" end-to-end.</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Patel Networks / MegaTech — System Blueprint v1.0 · generated from the live codebase (38 models · 78 API files · 50 pages) · September 2026</span>
+    <a href="/" style="color:var(--brass);font-weight:700">← Back to storefront</a>
+  </div>
+</footer>
+
+</body>
+</html>

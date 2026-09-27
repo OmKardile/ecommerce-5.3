@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   BarChart3,
+  BookOpen,
   Boxes,
   ClipboardList,
   Image as ImageIcon,
@@ -135,6 +136,17 @@ function SidebarNav({ session, badges, onNavigate }: { session: AdminShellSessio
       </nav>
 
       <div className="px-3 py-4 border-t border-sidebar-border space-y-2">
+        {session.isOwner && (
+          <a
+            href="/blueprint/index.html"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
+          >
+            <BookOpen className="h-4 w-4" aria-hidden />
+            <span>System blueprint</span>
+          </a>
+        )}
         <a
           href="/"
           target="_blank"

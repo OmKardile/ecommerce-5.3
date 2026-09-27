@@ -2,6 +2,14 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-27 — Task 24 (System Blueprint: visual docs for owner & client)
+
+**Feature — a shareable "how the whole system works" page + ready-to-paste schema**
+- **`/blueprint/index.html`** (static, self-contained, no JS deps, unlisted): the whole platform on one page — overview & tech table, the 4-layer request flow (people → Next.js app → services → Prisma/DB + external gateways), the **38-table database mapped in 8 domains** (domain map, catalog-spine diagram, per-domain expandable ER cards with real fields, ₹-paise/JSON/unique badges), the **Owner/Staff/Customer access model** (role ladder, 15 scopes in 5 groups, DB-fresh gate flow, wizard walkthrough, who-sees-what table), the **13-state order lifecycle** as three phases, the full **route map** (24 storefront + 7 account + 18 console pages, 78 API files in 6 groups), and an **online-tools guide** (dbdiagram.io, dbdocs, Eraser, drawSQL, Mermaid Live with a starter ER snippet, prisma-erd-generator, DBeaver). "Print / Save PDF" button + print stylesheet = client-ready deck in one click.
+- **`/blueprint/schema.dbml`**: the entire schema as DBML (38 tables, all relationships, per-domain header colors, paise/enum notes) — paste into **dbdiagram.io** for an instant interactive ER diagram, or **dbdocs.io** for a shareable docs site. Written from `prisma/schema.prisma` (incl. the faithful `Wishlist`/`WishlistItem` un-mapped table names).
+- **Admin shell**: owner-only **"System blueprint"** sidebar link (BookOpen, opens in new tab) — staff never see it (verified: counter staff → link hidden, fence intact, lands on stock monitor).
+- Verified live: page + DBML serve 200 with 0 console errors; **0px overflow at 375px** after fixing a real bug the sweep caught (`.chips` flex was scoped to `.band`, so role-ladder chips formed an unbreakable 411px inline run → grid min-content blowout); admin sweep passes at 375/768/1280 across 17 routes; lint 0 · tsc 0.
+
 ## 2026-09-27 — Task 23 (role overhaul: Owner + scoped Staff, D-12; login-loop fix)
 
 **Change — the account model you asked for**
