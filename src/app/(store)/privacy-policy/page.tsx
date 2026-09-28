@@ -5,7 +5,7 @@ import { PageShell, ContentSection, ContentContainer, CtaBand } from "@/componen
 import { STORE } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Data We Collect & How It Is Handled | Patel Networks",
+  title: "Privacy Policy — Data We Collect & How It Is Handled",
   description:
     "What Patel Networks collects (phone, addresses, GSTIN), how payments are processed by Razorpay without storing card data, WhatsApp notification consent, retention and grievance contact.",
   robots: { index: true, follow: true },

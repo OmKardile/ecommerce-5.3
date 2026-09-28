@@ -2,6 +2,22 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-28 — Task 39 (review & iterate: QA-driven bug batch + UX pass)
+
+**Change — "review and iterate, check if anything is remaining; test and debug loop; check for any space for ux improvements"**
+- **QA loop**: two agent-browser sweeps (storefront golden path + the full 17-section admin console as owner AND scoped staff). Verdict: admin airtight (staff scoping bounces all blocked routes; 182 orders / 51 customers / 23 SKUs / seed counts reconcile); storefront core flows all functional. Found 8 real issues → all fixed:
+  1. **/track phone paste bug (medium)** — pasting `+91 98765 03699` silently became `9198765036` (10-digit cap kept the country-code prefix) → guaranteed "mobile does not match" failures. Now uses the existing `localPhoneFromInput()` helper (the same one checkout/OTP/address-book already used — track was the last holdout).
+  2. **Duplicated `<title>` brand** — 19 surfaces rendered like "… | Patel Networks · Patel Networks" (14 static metadata titles + track/login layouts + 3 not-found fallbacks + PDP/blog-dynamic titles). All suffixes stripped; the root layout template (`%s · Patel Networks`) is the single brand-appender.
+  3. **Kit-builder Next bypass** — step 1 advanced with no recorder picked (step indicator mislead, guard message as a dead end). Next now disables per-step with an inline hint ("Pick a recorder type and channel capacity first" / "Add at least one camera to continue").
+  4. **Kit panel pre-seed** — the BNC/RJ45 connector pack showed in "YOUR KIT" before any recorder existed. Connector now enters the kit only once a recorder is in it.
+  5. **Radix a11y warning** — header mobile Sheet lacked a DialogDescription → added `sr-only` SheetDescription (fresh-session console clean).
+  6. **"1 items" pluralization** — header cart aria-label + cart & checkout subtotal lines now singularize.
+  7. **Admin dashboard pipeline labels** — "Shipped 20 vs tabs 26" confusion: chips renamed to the exact stages they aggregate ("Confirmed → Packed", "Shipped / OFD") + a caption stating counts are all-time, not the 30-day KPI window.
+  8. **Seed address correlation** — orders like "Delhi, Delhi — 395002" (a Surat PIN): the CITIES table now carries its matching PIN per city (Surat×5 weighted, Navsari/Bhavnagar/Bharuch/Vapi/Nashik added), reseed verified (8/8 sampled orders city↔PIN consistent).
+- **UX additions**: `/order-success` bare-hit rescue page (real 404 traffic observed in dev.log — checkout always links the numbered route, scanners don't) with Track/Account CTAs; `/track?order=PN-…` deep-link prefill (wired from the rescue page); desktop announcement bar gains a "Track order" link (Track was footer/mobile-only before); cart empty state gains a "Build a full kit instead" secondary CTA.
+- **Sandbox**: session restart wiped `.env` (Neon URL unrecoverable from the sandbox) — local dev restored via the documented SQLite fallback (provider flip + seed), guarded with `git update-index --skip-worktree prisma/schema.prisma` so the repo keeps `postgresql` for Render. Production (Render + Neon) unaffected. File-mode noise (644→755) normalized.
+- **Verified**: agent-browser — `+91` paste → `9876503699`; all sampled titles single-brand; kit Next disabled + hint; kit panel empty until recorder; rescue page + prefill; header track link; cart add→badge→line→free-ship meter; fresh-session console **zero warnings**; full responsive sweep **108/108 zero overflow** (27 routes × 4 viewports — added `/order-success`, `/order-success/PN-…`, `/track?order=…`); **lint 0 · tsc 0**.
+
 ## 2026-09-28 — Task 38 (white-button fix + deeper responsive pass incl. 320px)
 
 **Change — "some buttons are white by default and gets normal when on hover; fix them" + "make the showcase / pitching / help pages strictly and very perfectly responsive" (round 2)**

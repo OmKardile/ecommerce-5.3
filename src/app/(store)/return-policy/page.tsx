@@ -6,7 +6,7 @@ import { PageShell, ContentSection, ContentContainer, CtaBand } from "@/componen
 import { STORE } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Return & Warranty Policy — 7-Day DOA, RMA Process | Patel Networks",
+  title: "Return & Warranty Policy — 7-Day DOA, RMA Process",
   description:
     "7-day dead-on-arrival replacement with serial-number matched RMA, manufacturer warranty periods (CP Plus/Hikvision/Dahua 2 years, WD Purple 3 years) and the non-returnable categories.",
   robots: { index: true, follow: true },

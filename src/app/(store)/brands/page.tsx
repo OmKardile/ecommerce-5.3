@@ -4,7 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import { getBrands } from "@/server/services/catalog.service";
 
 export const metadata: Metadata = {
-  title: "Brands — Surveillance & Networking Hardware | Patel Networks",
+  title: "Brands — Surveillance & Networking Hardware",
   description:
     "Hikvision, Dahua, CP Plus, D-Link, Optilink and more — the brands we stock, warrant and support from our Surat hub.",
   robots: { index: true, follow: true },

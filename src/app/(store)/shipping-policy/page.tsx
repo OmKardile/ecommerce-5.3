@@ -6,7 +6,7 @@ import { PageShell, ContentSection, ContentContainer, CtaBand } from "@/componen
 import { STORE } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Shipping Policy — Dispatch Cutoff, Zones & Carriers | Patel Networks",
+  title: "Shipping Policy — Dispatch Cutoff, Zones & Carriers",
   description:
     "Orders paid before 4:00 PM IST dispatch same-day from Surat. Gujarat 1–2 days, metros 2–3, regional 3–4, special zones 5–7. Carriers: Delhivery, Shiprocket network, BlueDart air.",
   robots: { index: true, follow: true },

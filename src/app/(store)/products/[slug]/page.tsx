@@ -117,9 +117,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const raw = await getProductBySlug(slug);
   const product = getProduct(raw);
-  if (!product) return { title: "Product not found | Patel Networks", robots: { index: false, follow: false } };
+  if (!product) return { title: "Product not found", robots: { index: false, follow: false } };
 
-  const title = product.metaTitle ?? `${product.name} | ${product.brand.name} | Patel Networks`;
+  const title = product.metaTitle ?? `${product.name} | ${product.brand.name}`;
   const description = product.metaDescription ?? product.shortDesc ?? product.name;
   return {
     title,

@@ -10,7 +10,7 @@ import { PageShell, ContentSection, ContentContainer, CtaBand } from "@/componen
 import { STORE } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "FAQ — Buying, Installation, GST, Shipping & Returns | Patel Networks",
+  title: "FAQ — Buying, Installation, GST, Shipping & Returns",
   description:
     "Answers on HD analog vs IP cameras, surveillance HDD sizing, GST input tax credit for B2B buyers, the 4 PM dispatch cutoff, COD rules, the 7-day DOA replacement and warranty periods.",
   robots: { index: true, follow: true },

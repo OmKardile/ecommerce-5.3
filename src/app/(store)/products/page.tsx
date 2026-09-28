@@ -22,7 +22,7 @@ import { CatalogSort } from "@/components/storefront/catalog-sort";
 import { CatalogPagination } from "@/components/storefront/catalog-pagination";
 
 export const metadata: Metadata = {
-  title: "All Products — CCTV, Surveillance & Networking | Patel Networks",
+  title: "All Products — CCTV, Surveillance & Networking",
   description:
     "Browse surveillance cameras, DVRs, NVRs, monitors, cables and connectors. Faceted catalog with price, resolution and availability filters.",
   robots: { index: true, follow: true },

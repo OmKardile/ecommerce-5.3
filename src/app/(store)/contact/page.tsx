@@ -6,7 +6,7 @@ import { B2BInquiryForm } from "@/components/content/b2b-inquiry-form";
 import { STORE } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Contact the Trade Desk — B2B & Wholesale Surveillance Hardware | Patel Networks",
+  title: "Contact the Trade Desk — B2B & Wholesale Surveillance Hardware",
   description:
     "Commercial consultation desk for installers, contractors and institutional buyers: GST quotations, bulk pricing, bank-transfer settlement. Surat hub, Gujarat. Response within one working day.",
   robots: { index: true, follow: true },

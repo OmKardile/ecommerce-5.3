@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 // Preserve any ?next= redirect target for post-login navigation.
 
 export const metadata: Metadata = {
-  title: "Sign in — Patel Networks",
+  title: "Sign in",
   robots: { index: false, follow: true },
 };
 

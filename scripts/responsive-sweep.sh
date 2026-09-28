@@ -7,7 +7,7 @@ ROUTES=(
   "/cart" "/compare" "/contact" "/faq" "/kit-builder" "/privacy-policy"
   "/return-policy" "/shipping-policy" "/terms" "/track" "/search"
   "/products" "/products?category=cctv-surveillance" "/products?sort=price-asc&q=camera"
-  "/products/cp-plus-ir-bullet-camera" "/account/login" "/order-success" "/showcase" "/index-help.html"
+  "/products/cp-plus-ir-bullet-camera" "/account/login" "/order-success" "/order-success/PN-2026-300001" "/track?order=PN-2026-300001" "/showcase" "/index-help.html"
 )
 VIEWPORTS=("320 690" "375 812" "768 1024" "1280 800")
 for vp in "${VIEWPORTS[@]}"; do

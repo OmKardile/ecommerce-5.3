@@ -68,17 +68,18 @@ function genGstin(i: number): string {
 const FIRST_NAMES = ['Rajesh', 'Amit', 'Priya', 'Nilesh', 'Meera', 'Jignesh', 'Kinjal', 'Hardik', 'Bhavna', 'Paresh', 'Dhruv', 'Krina', 'Mayur', 'Nisha', 'Sandeep', 'Falgun', 'Tejas', 'Hetal', 'Vishal', 'Payal', 'Mehul', 'Shreya', 'Bhargav', 'Dhwani', 'Chirag', 'Foram', 'Kaushal', 'Mital', 'Nirav', 'Pooja'];
 const LAST_NAMES = ['Patel', 'Shah', 'Desai', 'Mehta', 'Trivedi', 'Joshi', 'Chauhan', 'Parmar', 'Modi', 'Bhatt', 'Rana', 'Solanki', 'Kapadia', 'Sanghvi', 'Amin'];
 const COMPANIES = ['Shreeji Electricals', 'Krishna Security Systems', 'Sardar Traders', 'Surat CCTV Hub', 'Navkar Enterprises', 'Golden Gate Computers', 'Om Sai Networks', 'Riddhi Siddhi Solutions', 'Vyapaar Technologies', 'Diamond City Security', 'Sahjanand Trading Co.', 'Jalaram Enterprises', 'Shakti Surveillance', 'Kuber Systems', 'Annapurna Cables'];
-// [city, state] — Surat/Assured Gujarat weighted (home turf)
-const CITIES: [string, string][] = [
-  ['Surat', 'Gujarat'], ['Surat', 'Gujarat'], ['Surat', 'Gujarat'], ['Surat', 'Gujarat'], ['Surat', 'Gujarat'],
-  ['Ahmedabad', 'Gujarat'], ['Ahmedabad', 'Gujarat'], ['Vadodara', 'Gujarat'], ['Rajkot', 'Gujarat'],
-  ['Bhavnagar', 'Gujarat'], ['Bharuch', 'Gujarat'], ['Vapi', 'Gujarat'],
-  ['Mumbai', 'Maharashtra'], ['Pune', 'Maharashtra'], ['Nashik', 'Maharashtra'],
-  ['Delhi', 'Delhi'], ['Jaipur', 'Rajasthan'], ['Indore', 'Madhya Pradesh'],
+// [city, state, pincode] — Surat/Gujarat weighted (home turf); PIN always matches its city
+const CITIES: [string, string, string][] = [
+  ['Surat', 'Gujarat', '395009'], ['Surat', 'Gujarat', '395010'], ['Surat', 'Gujarat', '395006'],
+  ['Surat', 'Gujarat', '395002'], ['Surat', 'Gujarat', '395007'],
+  ['Ahmedabad', 'Gujarat', '380015'], ['Ahmedabad', 'Gujarat', '380006'], ['Vadodara', 'Gujarat', '390019'],
+  ['Rajkot', 'Gujarat', '360005'], ['Bhavnagar', 'Gujarat', '364001'], ['Bharuch', 'Gujarat', '392001'],
+  ['Vapi', 'Gujarat', '396195'], ['Navsari', 'Gujarat', '396445'],
+  ['Mumbai', 'Maharashtra', '400001'], ['Pune', 'Maharashtra', '411001'], ['Nashik', 'Maharashtra', '422001'],
+  ['Delhi', 'Delhi', '110001'], ['Jaipur', 'Rajasthan', '302001'], ['Indore', 'Madhya Pradesh', '452001'],
 ];
 const STREETS = ['Shop 14, Ring Road Market', 'B-402, Silver Business Point, VIP Circle', 'Plot 27, GIDC Pandesara', '3rd Floor, Millennium Mall, Adajan', '22, Udhna Udyog Nagar, Udhna', 'A-9, Lajamni Complex, Mota Varachha', '501, Iscon Emporio, Vesu', '15, Bhatar Road, Opp. Big Bazaar', 'Survey 218, Dumas Road, Piplod', 'Warehouse 4, Sachin GIDC'];
 const LANDMARKS = ['Near Omega Hospital', 'Opp. Rajhans Multiplex', 'Behind VR Surat', 'Airport Circle', 'Near Star Bazaar', 'Opp. Maharashtra Store'];
-const PINCODES = ['395009', '395010', '394210', '395006', '395002', '380015', '390019', '360005', '400001', '411001', '110001', '302001', '452001', '396215'];
 const COURIERS = ['Delhivery Surface', 'XpressBees', 'DTDC Express', 'BlueDart Surface', 'Ecom Express'];
 const TRANSIT_HUBS = ['Ahmedabad Hub', 'Vadodara Hub', 'Mumbai Hub', 'Surat Hub'];
 const REVIEW_POOL: [number, string, string][] = [
@@ -930,8 +931,8 @@ async function main() {
   custProfiles.forEach((c, idx) => {
     const n = randInt(1, 3);
     for (let j = 0; j < n; j++) {
-      const [city, state] = pick(CITIES);
-      addrRows.push({ customerId: c.id, recipientName: c.fullName, phone: custUsers[idx].phone, addressLine1: pick(STREETS), addressLine2: rnd() < 0.5 ? pick(LANDMARKS) : null, city, state, pincode: pick(PINCODES), isDefault: j === 0, type: pick(['HOME', 'WORK', 'WAREHOUSE']), createdAt: custUsers[idx].createdAt, updatedAt: custUsers[idx].createdAt });
+      const [city, state, pincode] = pick(CITIES);
+      addrRows.push({ customerId: c.id, recipientName: c.fullName, phone: custUsers[idx].phone, addressLine1: pick(STREETS), addressLine2: rnd() < 0.5 ? pick(LANDMARKS) : null, city, state, pincode, isDefault: j === 0, type: pick(['HOME', 'WORK', 'WAREHOUSE']), createdAt: custUsers[idx].createdAt, updatedAt: custUsers[idx].createdAt });
     }
   });
   const addresses = await prisma.address.createManyAndReturn({ data: addrRows });

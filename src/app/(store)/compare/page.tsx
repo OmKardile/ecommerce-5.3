@@ -12,7 +12,7 @@ import { CompareIdsBridge } from "@/components/storefront/compare-ids-bridge";
 import { Columns3, ShieldCheck, Truck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Compare Products — Side-by-side specs | Patel Networks",
+  title: "Compare Products — Side-by-side specs",
   description:
     "Compare up to 4 CCTV cameras, DVRs, NVRs and networking products side by side — price, warranty, COD availability and full specifications.",
 };

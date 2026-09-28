@@ -680,7 +680,7 @@ export function CheckoutView() {
 
             <div className="mt-5 space-y-2.5 border-t border-border pt-4 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Subtotal ({cart.itemCount} items)</span>
+                <span className="text-muted-foreground">Subtotal ({cart.itemCount} {cart.itemCount === 1 ? "item" : "items"})</span>
                 <span className="font-medium">{formatINR(cart.subtotalPaise)}</span>
               </div>
               {cart.bundleApplied && bundleDiscount > 0 && (

@@ -22,10 +22,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPost(slug);
   if (!post) {
-    return { title: "Article not found — Patel Networks" };
+    return { title: "Article not found" };
   }
   return {
-    title: `${post.title} | Patel Networks Blog`,
+    title: `${post.title} | Blog`,
     description: post.excerpt ?? undefined,
     alternates: { canonical: `/blog/${post.slug}` },
     robots: { index: true, follow: true },

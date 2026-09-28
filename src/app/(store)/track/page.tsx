@@ -5,7 +5,7 @@
 //  2. phone only                     -> minimal "my orders" index; pick one to drill in
 // No sign-in needed. The phone number is the shared secret for both modes.
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -23,6 +23,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { TrackingTimeline } from "@/components/storefront/tracking-timeline";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { localPhoneFromInput } from "@/lib/phone";
 import { ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/constants";
 
 interface TrackResult {
@@ -120,6 +121,13 @@ export default function TrackPage() {
   const [result, setResult] = useState<TrackResult | null>(null);
   const [list, setList] = useState<TrackListItem[] | null>(null);
   const drillRef = useRef<HTMLInputElement>(null);
+
+  // Deep-link support: /track?order=PN-2026-000123 prefills the order field
+  // (used by the /order-success rescue page and account order links).
+  useEffect(() => {
+    const pre = new URLSearchParams(window.location.search).get("order");
+    if (pre) setOrderNumber(pre.trim().toUpperCase());
+  }, []);
 
   async function lookup(overrideOrderNumber?: string) {
     if (loading) return;
@@ -224,7 +232,7 @@ export default function TrackPage() {
               id="tr-phone"
               inputMode="numeric"
               value={phone}
-              onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+              onChange={(e) => setPhone(localPhoneFromInput(e.target.value))}
               placeholder="98765 43210"
               className="h-10"
               autoComplete="tel-national"

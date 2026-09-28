@@ -7,7 +7,7 @@ import { Reveal } from "@/components/content/reveal";
 import { db } from "@/lib/db";
 
 export const metadata: Metadata = {
-  title: "Blog — Field Notes on CCTV, Storage & GST | Patel Networks",
+  title: "Blog — Field Notes on CCTV, Storage & GST",
   description:
     "Installer-oriented guides from the Patel Networks trade desk: HD analog vs IP, surveillance HDD sizing, GST input tax credit on security hardware, and more.",
   robots: { index: true, follow: true },

@@ -200,7 +200,7 @@ export function KitBuilderWizard({ data }: { data: KitData }) {
         lineTotalPaise: cableVariant.pricePaise,
       });
     }
-    if (connectorOn && connectorVariant) {
+    if (connectorOn && connectorVariant && recorderVariant) {
       items.push({
         skuId: connectorVariant.skuId,
         skuCode: connectorVariant.skuCode,
@@ -219,6 +219,14 @@ export function KitBuilderWizard({ data }: { data: KitData }) {
   const totalPaise = subtotalPaise - discountPaise;
 
   const kitValid = Boolean(recorderVariant) && usedChannels > 0;
+
+  // Step gates — each step may require the previous one's anchor pick before advancing.
+  const stepBlocked: string | null =
+    step === 1 && !recorderVariant
+      ? "Pick a recorder type and channel capacity first"
+      : step === 2 && usedChannels === 0
+        ? "Add at least one camera to continue"
+        : null;
 
   function pickRecorderType(type: RecorderType) {
     setRecType(type);
@@ -747,10 +755,18 @@ export function KitBuilderWizard({ data }: { data: KitData }) {
             Back
           </Button>
           {step < STEP_LABELS.length ? (
-            <Button type="button" onClick={() => setStep((s) => Math.min(STEP_LABELS.length, s + 1))} className="h-10 rounded-md px-5 text-sm">
-              Next
-              <ChevronRight className="ml-1 h-4 w-4" aria-hidden />
-            </Button>
+            <div className="flex items-center gap-3">
+              {stepBlocked && <p className="hidden text-xs text-muted-foreground sm:block">{stepBlocked}</p>}
+              <Button
+                type="button"
+                onClick={() => setStep((s) => Math.min(STEP_LABELS.length, s + 1))}
+                disabled={Boolean(stepBlocked)}
+                className="h-10 rounded-md px-5 text-sm"
+              >
+                Next
+                <ChevronRight className="ml-1 h-4 w-4" aria-hidden />
+              </Button>
+            </div>
           ) : (
             <Button type="button" onClick={addKitToCart} disabled={!kitValid || adding} className="h-10 rounded-md px-5 text-sm">
               {adding ? (

@@ -14,7 +14,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const result = await getBrandBySlug(slug);
-  if (!result) return { title: "Brand not found | Patel Networks", robots: { index: false, follow: false } };
+  if (!result) return { title: "Brand not found", robots: { index: false, follow: false } };
   return {
     title: `${result.brand.name} — Products | Patel Networks`,
     description:

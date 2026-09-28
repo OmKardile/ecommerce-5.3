@@ -7,7 +7,7 @@ import { mapProductCard } from "@/lib/serializers";
 import { ProductCard } from "@/components/storefront/product-card";
 
 export const metadata: Metadata = {
-  title: "Search | Patel Networks",
+  title: "Search",
   description: "Search surveillance cameras, recorders, cables and networking hardware.",
   robots: { index: false, follow: true },
 };

@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { KitBuilderWizard, type KitData, type KitProduct, type KitVariant } from "@/components/storefront/kit-builder-wizard";
 
 export const metadata: Metadata = {
-  title: "CCTV Kit Builder — 5-step surveillance bundle | Patel Networks",
+  title: "CCTV Kit Builder — 5-step surveillance bundle",
   description:
     "Pick a recorder, cameras bounded by channels, surveillance storage, cabling and connectors. Automatic 5% bundle discount, GST-inclusive.",
   robots: { index: true, follow: true },

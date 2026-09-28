@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, ShoppingCart, User, Menu, X, Heart, Phone, ChevronDown } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, Heart, Phone, ChevronDown, PackageSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useCartCount } from "@/store/cart-store";
 import { cn } from "@/lib/utils";
@@ -176,9 +176,15 @@ export function Header() {
       <div className="bg-brand text-brand-foreground">
         <div className="mx-auto flex h-9 max-w-7xl items-center justify-between px-4 text-[11px] tracking-wide sm:px-6">
           <p className="truncate">Same-day dispatch on orders confirmed before 4:00 PM IST (Mon–Sat) · Pan-India delivery</p>
-          <a href="tel:+919876543210" className="hidden items-center gap-1.5 sm:flex hover:underline">
-            <Phone className="h-3 w-3" /> +91 98765 43210
-          </a>
+          <div className="flex items-center gap-3">
+            <Link href="/track" className="hidden items-center gap-1.5 hover:underline sm:flex">
+              <PackageSearch className="h-3 w-3" aria-hidden /> Track order
+            </Link>
+            <span className="hidden text-brand-foreground/40 sm:inline" aria-hidden>·</span>
+            <a href="tel:+919876543210" className="hidden items-center gap-1.5 sm:flex hover:underline">
+              <Phone className="h-3 w-3" /> +91 98765 43210
+            </a>
+          </div>
         </div>
       </div>
 
@@ -229,7 +235,7 @@ export function Header() {
               <User className="h-5 w-5" />
             </Link>
           </Button>
-          <Button asChild variant="ghost" size="icon" className="relative" aria-label={`Cart (${count} items)`}>
+          <Button asChild variant="ghost" size="icon" className="relative" aria-label={`Cart (${count} ${count === 1 ? "item" : "items"})`}>
             <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
               {count > 0 && (
@@ -248,6 +254,7 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-80 overflow-y-auto p-0">
+              <SheetDescription className="sr-only">Site navigation, search and account links</SheetDescription>
               <SheetTitle className="border-b border-border px-5 py-4 font-display text-lg">
                 Patel Networks
               </SheetTitle>

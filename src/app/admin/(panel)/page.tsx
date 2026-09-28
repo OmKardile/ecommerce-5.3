@@ -206,11 +206,14 @@ export default async function AdminDashboardPage() {
 
       {/* Pipeline */}
       <section aria-label="Order pipeline">
-        <h2 className="label-caps mb-2">Order pipeline</h2>
+        <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+          <h2 className="label-caps">Order pipeline</h2>
+          <p className="text-xs text-muted-foreground">All-time counts, grouped by stage — not the same window as the 30-day KPIs above</p>
+        </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           <PipelineCard label="Pending / COD verify" count={m.pendingOrders} href="/admin/orders?status=PENDING_PAYMENT" />
-          <PipelineCard label="Processing" count={m.processingOrders} href="/admin/orders?status=PROCESSING" />
-          <PipelineCard label="Shipped" count={m.shippedOrders} href="/admin/orders?status=SHIPPED" />
+          <PipelineCard label="Confirmed → Packed" count={m.processingOrders} href="/admin/orders?status=PROCESSING" />
+          <PipelineCard label="Shipped / OFD" count={m.shippedOrders} href="/admin/orders?status=SHIPPED" />
           <PipelineCard label="Delivered" count={m.deliveredOrders} href="/admin/orders?status=DELIVERED" />
           <PipelineCard label="Cancelled" count={m.cancelledOrders} href="/admin/orders?status=CANCELLED" />
         </div>

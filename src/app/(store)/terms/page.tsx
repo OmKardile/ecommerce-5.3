@@ -5,7 +5,7 @@ import { PageShell, ContentSection, ContentContainer, CtaBand } from "@/componen
 import { STORE } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Terms of Sale — Commercial Terms, GST Invoicing & Jurisdiction | Patel Networks",
+  title: "Terms of Sale — Commercial Terms, GST Invoicing & Jurisdiction",
   description:
     "Terms for buying from Patel Networks: 18% GST tax invoicing, title transfer on carrier handoff at Surat, COD conditions, warranty disclaimer and Surat, Gujarat jurisdiction.",
   robots: { index: true, follow: true },

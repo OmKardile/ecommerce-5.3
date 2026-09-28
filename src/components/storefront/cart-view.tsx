@@ -202,11 +202,16 @@ export function CartView() {
         <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
           Browse cameras, recorders, cable and optical hardware — every SKU is serial-tracked, GST-invoiced and dispatched from Surat within one business day.
         </p>
-        <Button asChild className="mt-8 h-11 px-6">
-          <Link href="/products">
-            Browse the catalogue <ArrowRight className="h-4 w-4" aria-hidden />
-          </Link>
-        </Button>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Button asChild className="h-11 px-6">
+            <Link href="/products">
+              Browse the catalogue <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="h-11 px-6">
+            <Link href="/kit-builder">Build a full kit instead</Link>
+          </Button>
+        </div>
       </div>
     );
   }
@@ -290,7 +295,7 @@ export function CartView() {
 
             <div className="mt-5 space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Subtotal ({cart.itemCount} items)</span>
+                <span className="text-muted-foreground">Subtotal ({cart.itemCount} {cart.itemCount === 1 ? "item" : "items"})</span>
                 <span className="font-medium tabular-nums">{formatINR(cart.subtotalPaise)}</span>
               </div>
               {savings > 0 && (
