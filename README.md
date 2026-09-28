@@ -46,6 +46,7 @@ Quality gates per round: `bun run lint` (0) · `bunx tsc --noEmit` (0) · `bash 
 | [`docs/ROUTES.md`](docs/ROUTES.md) | **Routes cheat sheet**: every URL + login pages & credentials (staff login = `/admin/login`) |
 | [`technical-documentation.md`](technical-documentation.md) | **Tech hub**: architecture, module map, API index, conventions |
 | [`business-documentation.md`](business-documentation.md) | Business model, ops flows, GST, vendor integrations, roles |
+| [`business-pitch.md`](business-pitch.md) | **The designer's pitch**: what the platform is, why it's special, business outcomes — visual version lives at `/showcase` |
 | [`changelog.md`](changelog.md) | Release-by-release change log |
 | [`decisions.md`](decisions.md) | Decision log (conflict resolutions + ADRs, incl. recent) |
 | [`help.md`](help.md) | Operator help: how to run the store day-to-day, troubleshooting |

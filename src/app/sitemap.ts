@@ -6,7 +6,7 @@ const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const statics: MetadataRoute.Sitemap = [
     "", "/products", "/kit-builder", "/brands", "/cart", "/track", "/about", "/contact", "/faq",
-    "/blog", "/shipping-policy", "/return-policy", "/privacy-policy", "/terms", "/login",
+    "/blog", "/shipping-policy", "/return-policy", "/privacy-policy", "/terms", "/login", "/showcase",
   ].map((path) => ({
     url: `${BASE}${path}`,
     lastModified: new Date(),

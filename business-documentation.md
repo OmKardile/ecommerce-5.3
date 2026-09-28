@@ -2,6 +2,8 @@
 
 Patel Networks / MegaTech — what the system does for the business, in business terms.
 
+> For the **sales/pitch version** of this story (features, design rationale, business outcomes), see [`business-pitch.md`](business-pitch.md) — and the designed visual pitch at **`/showcase`** on the site.
+
 ## The business
 
 **Patel Networks** is a Surat-based (Gujarat, India) trader and installer of CCTV, surveillance and networking hardware: cameras (analog HD + IP), DVRs/NVRs, monitors, cables, connectors, converters, switches, storage, tools, and full install kits. Two revenue lines:

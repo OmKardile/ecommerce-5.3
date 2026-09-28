@@ -55,6 +55,7 @@ Test customer in sandbox/demo: phone **`+91 98765 43210`** — the OTP prints to
 | `/track` | Public order tracking |
 | `/blog` · `/blog/[slug]` | Blog index · post |
 | `/about` · `/contact` · `/faq` | Content pages (contact includes B2B inquiry form) |
+| `/showcase` | The platform pitch page — what the system is, design story, business outcomes (public) |
 | `/shipping-policy` · `/return-policy` · `/privacy-policy` · `/terms` | Policy pages |
 | `/index-help` | System guide (printable explainer: database, backend flow, roles, order lifecycle, routes) — linked owner-only from the admin sidebar |
 

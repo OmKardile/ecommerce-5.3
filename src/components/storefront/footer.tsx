@@ -23,6 +23,7 @@ const accountLinks = [
 
 const policyLinks = [
   { href: "/about", label: "About Us" },
+  { href: "/showcase", label: "Our Platform" },
   { href: "/blog", label: "Blog" },
   { href: "/faq", label: "FAQ" },
   { href: "/shipping-policy", label: "Shipping Policy" },
