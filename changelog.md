@@ -2,6 +2,14 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-28 — Task 37 (strict responsive pass + MegaTechzy rebrand & personal-project attribution)
+
+**Change — "make the showcase / pitching / help pages strictly and very perfectly responsive" + "rename everything related to mega tech to MegaTechzy; only keep that megatechzy and related at footer of storefront; other else make this as my personal project (omkardile.is-a.dev)"**
+- **Responsive**: full overflow sweep of `/showcase` + `/index-help.html` at 375/768/1280 passed (help page already had viewport meta, clamp() type, scrollable nav, pan/zoom canvas, tables ≤349px at 375). One real defect found & fixed: the `/showcase` palette swatch grid's border-neutralizers were `sm:`-prefixed, so at <640px the right column/bottom row doubled borders — rebuilt with the hairline-gap technique (`gap-px bg-border/60` + plain `bg-card` cells), correct at every width. Both pages added to `scripts/responsive-sweep.sh` (now **26 routes × 3 viewports**, full run: zero overflow).
+- **Rebrand**: every bare "MegaTech" → **"MegaTechzy"** (lookahead-safe rename across 2 code surfaces, 6 doc titles/intros/bylines, 5 deploy config headers, both prisma artifact headers; `docs/README.md` legal name corrected to match `STORE.legalName`). History files (changelog/worklog) untouched.
+- **Personal-project attribution (brand display → footer-only)**: `/showcase` metadata title + hero eyebrow + designer line now credit **Omkar Kardile** with links to <https://omkardile.is-a.dev/>; `/index-help.html` h1 de-branded + lede/footer attributed with links; storefront footer **keeps** the MegaTechzy branding (per instruction) with the author name now a portfolio link; README + docs/README gained attribution lines; five decorated doc bylines link the portfolio. Legal-name usages ("Patel Networks (MegaTechzy)") intentionally kept as seller identity.
+- **Verified (agent-browser)**: showcase title/eyebrow/designer-line + swatch hairlines confirmed (light & dark); index-help h1/lede/footer links confirmed; footer author link confirmed; **lint 0 · tsc 0**.
+
 ## 2026-09-28 — Task 36 (schema.dbml → prisma folder, next to schema.prisma)
 
 **Change — "that dbml code file also store it in prisma folder"**
