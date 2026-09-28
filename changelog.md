@@ -2,6 +2,14 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-28 — Task 32 (skeleton loading colour: orange → grey)
+
+**Fix — "change the skeleton loading colour to grey; why its orange??"**
+- **Cause**: the shared shadcn `<Skeleton>` (`src/components/ui/skeleton.tsx`) rendered `bg-accent`, and `--accent` is the brand's **brass** accent (`#b45309` light = amber-orange, `#d19a4a` dark) — so every loading skeleton pulsed orange: cart, checkout, the `products`/`account/orders` route-loading screens, and the sidebar primitive.
+- **Fix**: `bg-accent` → `bg-muted` in the Skeleton component — neutral grey (`#f1eee7` light / `#17211d` dark). This also unifies the Skeleton with the two hand-rolled pulse blocks (GSTR-1 card, account login) that already used `bg-muted`. The `--accent` token itself is untouched — it's correct for badges/links/highlights (e.g. the product discount chips stay brass by design).
+- **Verified (agent-browser)**: probe element with the Skeleton's exact classes resolves to grey in both themes (light `rgb(241,238,231)`, dark `rgb(23,33,29)`); `/products` renders 14 products from Neon with no error boundary; lint 0.
+- **Env incident (sandbox, not code)**: mid-round the sandbox `.env` had been overwritten to the single stale line `DATABASE_URL=file:…/custom.db` → Prisma failed with "the URL must start with the protocol `postgresql://`" (app error boundary). Restored the Neon URL in `.env` (gitignored — not a git change) and restarted via the keeper; health `{db:"up"}`. **Future rounds: if Prisma throws the URL-protocol validation error, check `.env` content first — the with-env shim is fine; it sources whatever is in the file.**
+
 ## 2026-09-28 — Task 31 (incident record: the go-live HTTP 502, documented end-to-end)
 
 **Docs — "Render's proxy could not successfully reach the running Next.js server" now has a dedicated post-mortem**

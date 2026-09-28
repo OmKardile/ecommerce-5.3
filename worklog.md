@@ -849,3 +849,20 @@ Stage Summary:
 - The 502 incident is now documented at three depths: the one-line gotcha in render.yaml's header, the decision record in D-14, and the full post-mortem in docs/incidents/ (timeline → root cause → resolution → playbook → lessons) — a future outage (or a future agent) can diagnose the proxy↔app hop in minutes instead of re-deriving it.
 - Files: docs/incidents/2026-09-27-render-502-proxy-unreachable.md (new), deploy/RENDER-STEPS.md, docs/RENDER-DEPLOYMENT.md, docs/README.md, README.md, decisions.md, changelog.md, worklog.md.
 - Next-round candidates: agent-browser sweep of data-heavy admin pages (orders console, reports, GSTR-1) at 375/768/1280 (carried from Task 30) · per-product image overrides · stock-monitor v2 (parked) · qa-clean.ts purge at go-live · NEXT_PUBLIC_APP_URL cache-clear redeploy if OG/canonicals show a stale origin.
+
+---
+Task ID: 32
+Agent: Z.ai Code (lead)
+Task: User asked "change the skeleton loading colour to grey; why its orange??" — diagnose the orange loading skeletons and make them grey.
+
+Work Log:
+- DIAGNOSIS: the shared shadcn `<Skeleton>` (src/components/ui/skeleton.tsx) rendered `bg-accent`; globals.css `--accent` is the brand's brass — `#b45309` light (Tailwind amber-700, reads as burnt orange) and `#d19a4a` dark. Upstream shadcn ships `bg-accent`, which is only neutral in shadcn's default zinc theme — in our trust-pine palette accent = brass, so every skeleton pulsed orange (cart-view, checkout-view, products/loading.tsx, account/orders/loading.tsx, ui/sidebar.tsx — no call-site overrides found, one-line fix covers all five consumers).
+- FIX: skeleton.tsx `bg-accent` → `bg-muted` (neutral grey `#f1eee7` light / `#17211d` dark). Unifies with the two hand-rolled `animate-pulse bg-muted` blocks (gstr1-card, account login) that were already grey. `--accent` token untouched — it's the intended brass for discount chips/links/highlights.
+- ENV INCIDENT (sandbox, caught mid-round): dev server was down at round start; my /tmp/devup.sh recreation brought it up, but /products then hit the app error boundary — dev.log showed Prisma "the URL must start with the protocol postgresql://" on getBrands/getSettings + /api/cart 500. `/proc` inspection + `.env` read revealed the sandbox `.env` had been WIPED to the single stale line `DATABASE_URL=file:…/custom.db` (something between rounds rewrote it — the with-env shim then faithfully sourced the wrong file; shim is NOT at fault). Restored the Neon URL into `.env` (gitignored, no git change), restarted → health {db:"up"}. Sandbox reaper also flapped the server twice mid-round (ERR_CONNECTION_REFUSED between tool calls); keeper restart pattern held each time. LESSON recorded in changelog: URL-protocol validation error ⇒ check `.env` content FIRST.
+- VERIFIED (agent-browser): probe element with the Skeleton's exact classes → light rgb(241,238,231), dark rgb(23,33,29) — grey in both themes, no orange; /products renders 14 products from Neon (12 product-link anchors + header), no error boundary; screenshot captured; lint 0.
+- DOCS DUTY: changelog Task 32 · worklog (this entry). One-line code change, no schema/API/route surface.
+
+Stage Summary:
+- Loading skeletons are now neutral grey in both themes (one token swap in the shared component), consistent with the design system's rule that brass is an accent for highlights, not a surface fill; the orange is gone from cart/checkout/products/orders/sidebar loading states.
+- Files: src/components/ui/skeleton.tsx, changelog.md, worklog.md (+ sandbox-only: .env restored to Neon URL, /tmp/devup.sh recreated).
+- Next-round candidates: agent-browser sweep of data-heavy admin pages at 375/768/1280 (carried) · per-product image overrides · stock-monitor v2 (parked) · qa-clean.ts purge at go-live · NEXT_PUBLIC_APP_URL cache-clear redeploy if OG/canonicals show a stale origin.
