@@ -56,6 +56,7 @@ Quality gates per round: `bun run lint` (0) · `bunx tsc --noEmit` (0) · `bash 
 | [`docs/VPS-SETUP-GUIDE.md`](docs/VPS-SETUP-GUIDE.md) | Phased VPS setup (Docker, TLS, backups) |
 | [`docs/PHYSICAL-SERVER-SETUP-GUIDE.md`](docs/PHYSICAL-SERVER-SETUP-GUIDE.md) | Bare-metal in-shop server guide |
 | [`docs/RENDER-DEPLOYMENT.md`](docs/RENDER-DEPLOYMENT.md) | Staging preview on Render |
+| [`docs/incidents/2026-09-27-render-502-proxy-unreachable.md`](docs/incidents/2026-09-27-render-502-proxy-unreachable.md) | Incident post-mortem: the go-live HTTP 502 (Render proxy ↔ Next standalone bind trap) |
 | [`docs/PRODUCTION-CHECKLIST.md`](docs/PRODUCTION-CHECKLIST.md) | Go-live checklist + smoke test |
 
 ## Repo

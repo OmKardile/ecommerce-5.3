@@ -5,6 +5,7 @@
 > shared Neon DB). Start-command gotcha learned live: Render sets `HOSTNAME`
 > to the service hostname, so the standalone server MUST pin
 > `HOSTNAME=0.0.0.0 PORT=$PORT` — `npm run start` now does this in-repo.
+> Full post-mortem: [incidents/2026-09-27-render-502-proxy-unreachable.md](./incidents/2026-09-27-render-502-proxy-unreachable.md).
 
 > **Which Render path should I use?** Since Task 27 there are two supported
 > ways to run this repo on Render:

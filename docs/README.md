@@ -18,6 +18,7 @@ The implementation was built from scratch by a multi-agent team; the authoritati
 | [VPS-SETUP-GUIDE.md](./VPS-SETUP-GUIDE.md) | Production on a cloud VPS: phased Docker Compose deployment with checkpoints, TLS, backups, hardening, rollback |
 | [PHYSICAL-SERVER-SETUP-GUIDE.md](./PHYSICAL-SERVER-SETUP-GUIDE.md) | Production on bare metal: hardware specs, OS install, SSH, network, BIOS, power resilience, monitoring |
 | [RENDER-DEPLOYMENT.md](./RENDER-DEPLOYMENT.md) | Staging preview (auto-deploy on commit): Render Docker runtime + managed Postgres, never touches production data |
+| [incidents/2026-09-27-render-502-proxy-unreachable.md](./incidents/2026-09-27-render-502-proxy-unreachable.md) | **Incident post-mortem**: the go-live HTTP 502 — Render's proxy couldn't reach the Next standalone server (HOSTNAME bind trap); timeline, root cause, resolution, recurrence playbook |
 | [PRODUCTION-CHECKLIST.md](./PRODUCTION-CHECKLIST.md) | Go-live vendor onboarding (Razorpay KYC, Shiprocket, WhatsApp/DLT) + pre-flight smoke test |
 | [API.md](./API.md) | Full endpoint catalog with methods, auth, shapes, error codes |
 | [SECURITY.md](./SECURITY.md) | Auth design, RBAC matrix, validation, idempotency, rate limits, hardening checklist |

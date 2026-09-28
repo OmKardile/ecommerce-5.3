@@ -2,6 +2,13 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-28 — Task 31 (incident record: the go-live HTTP 502, documented end-to-end)
+
+**Docs — "Render's proxy could not successfully reach the running Next.js server" now has a dedicated post-mortem**
+- New **`docs/incidents/2026-09-27-render-502-proxy-unreachable.md`** — the full story of the 502 that greeted the first green Render deploy: the owner's actual 6-step timeline (P1012 build failure as a separate incident → green build → 502 → dashboard Start-Command change → live → Task 29 back-port); the root-cause mechanics with a proxy-hop diagram (Render injects `HOSTNAME` = service hostname; Next standalone binds `process.env.HOSTNAME`; the edge proxy can't reach that interface → 502); a symptom-vs-reality table explaining how `✓ Ready in 802ms` + "Your service is live 🎉" coexisted with a dead site; why `bun` was incidental and `HOSTNAME=0.0.0.0 PORT=$PORT` was the fix; why the trap exists only on the Render Node runtime (dev binds broadly, Docker pinned `HOSTNAME` since Task 3-b); a recurrence playbook (Ready+502 = reachability, no Ready = boot; split the hop with an in-instance curl); lessons learned; and a verification record.
+- Cross-linked from: `deploy/RENDER-STEPS.md` (502 troubleshooting row), `docs/RENDER-DEPLOYMENT.md` (status banner), `docs/README.md` + root `README.md` (incidents row in both doc maps), and **D-14** in `decisions.md`.
+- No code changes. Live site re-verified healthy while documenting: `/api/health` → 200 `{"db":"up"}`, homepage 200 (~1.6 s).
+
 ## 2026-09-27 — Task 30 (volumetric seed: realistic operating history in every one of the 38 tables)
 
 **Change — "seed a lot of data in neon db in every table" (Neon re-seeded; live site shows it immediately)**

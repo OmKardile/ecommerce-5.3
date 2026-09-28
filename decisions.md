@@ -20,6 +20,8 @@ Older records: conflict resolutions **C1..C12** and **ADR-020/021** live in [`do
 
 **Rejected**: leaving the fix dashboard-only (per-service settings are invisible in the repo and resurrect the 502 on re-apply); switching the repo script to bun (the Docker/VPS path has no bun); hardcoding PORT (Render assigns `$PORT` per service).
 
+*Full post-mortem: [`docs/incidents/2026-09-27-render-502-proxy-unreachable.md`](docs/incidents/2026-09-27-render-502-proxy-unreachable.md) — timeline, root-cause mechanics, recurrence playbook, lessons learned.*
+
 ## D-13 · 2026-09-27 · Runtime DB is Neon PostgreSQL — repo provider flipped, scripts made env-proof
 
 **Context**: Owner provisioned a Neon Postgres instance and asked to drop SQLite ("stop using your sqlite db and switch to this") because the site is going to Render in a Node environment for client viewing. The schema was already 100% provider-portable (D-12's JSON-column choice included), so the flip touches configuration, not models.
