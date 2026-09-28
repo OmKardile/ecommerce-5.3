@@ -884,3 +884,22 @@ Stage Summary:
 - The owner now has one permanent file to answer "which URL was that again?": docs/ROUTES.md — logins and credentials at the top (staff login = /admin/login with the full persona table), then every storefront/account/admin page route and the API group map, linked from both README indexes and help.md.
 - Files: docs/ROUTES.md (new), README.md, docs/README.md, help.md, changelog.md, worklog.md.
 - Next-round candidates: agent-browser sweep of data-heavy admin pages at 375/768/1280 (carried) · per-product image overrides · stock-monitor v2 (parked) · qa-clean.ts purge at go-live.
+
+---
+Task ID: 34
+Agent: Z.ai Code (lead)
+Task: User: "REMOVE ANY SUCH GUIDE OR TEMPLATE THINGS AS THIS IS GONNA BE END PRODUCTION APP" (quoting the dbdiagram.io how-to callout on the blueprint page) + "change the blueprint/index.html to just /index-help.html" + "make sure all the docs are up to date".
+
+Work Log:
+- MOVES: git mv public/blueprint/index.html → public/index-help.html; public/blueprint/schema-diagram.svg → public/schema-diagram.svg (page references the canvas relatively, so it moved along to keep links working); public/blueprint/schema.dbml → scripts/schema.dbml (regeneration input for blueprint-erd.ts — a dev tool, no longer served by the site). public/blueprint/ folder removed; old URL 404s.
+- CONTENT REMOVED from the page (guide/template class, per the user's quote): entire Section 7 "Online tools to explore this with your client" (dbdiagram.io step-by-step, dbdocs.io live-site/push block, Eraser/drawSQL/Mermaid starter code, DBeaver/TablePlus, Prisma-ERD-generator note); the 📐 "Want this as a picture you can zoom? … paste /blueprint/schema.dbml … Full tool guide in Section 7" callout (the exact text the user quoted); the 🖨️ "Client-ready pack in 2 minutes" callout; both dbdocs.io links; the "regenerates from schema.dbml with bun scripts/blueprint-erd.ts" canvas notes; the "Online tools" nav item (page now 6 sections); the dead .tool/.rec/.url/details.code CSS. Kept: the 🔐 "Why this shape is safe" callout (product content) and the print button.
+- REBRAND: <title>/nav brand/aria-label/eyebrow/footer → "System Guide" (footer v1.2, dropped "includes the regenerable 38-table schema canvas" phrasing); routes section self-listing → "/index-help (this page)".
+- WIRING: src/components/admin/admin-shell.tsx owner-only sidebar link → /index-help.html, label "System blueprint" → "System guide"; scripts/blueprint-erd.ts paths (DBML=scripts/schema.dbml, OUT=public/schema-diagram.svg) — regeneration smoke test passed (identical 9036×4210 pt · 38 tables output).
+- DOCS UPDATED: help.md "System Blueprint" section → "System guide" with /index-help.html, deleted the dbdocs/dbdiagram/tool-comparison bullets; docs/ROUTES.md storefront table gains /index-help row. Repo-wide grep: zero live-doc references to the old path or external tool guides remain (changelog/worklog history untouched by design).
+- VERIFIED (agent-browser): /index-help.html → 200, title "Patel Networks — System Guide", sections [overview, system, database, access, orders, routes], toolsSection false, nav 6 items, canvas SVG loaded from relative path; /blueprint/index.html → 404; /schema-diagram.svg → 200; owner login → sidebar link "System guide" → /index-help.html confirmed post-hydration; lint 0 · tsc 0. Push auto-deploys the new path to Render (old URL will 404 there after deploy — the only inbound link was the owner sidebar, already updated).
+- DOCS DUTY: changelog Task 34 · worklog (this entry).
+
+Stage Summary:
+- The system explainer is now a production artifact: /index-help.html (System Guide v1.2, 6 sections + zoomable 38-table canvas) with every how-to-use-external-tools/template passage removed; the dev-only DBML lives in scripts/, the ERD generator still works, the owner sidebar link is rewired, and all live docs point at the new URL.
+- Files: public/index-help.html (moved + edited), public/schema-diagram.svg (moved), scripts/schema.dbml (moved), scripts/blueprint-erd.ts, src/components/admin/admin-shell.tsx, help.md, docs/ROUTES.md, changelog.md, worklog.md.
+- Next-round candidates: agent-browser sweep of data-heavy admin pages at 375/768/1280 (carried) · per-product image overrides · stock-monitor v2 (parked) · qa-clean.ts purge at go-live.

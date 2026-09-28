@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="robots" content="noindex, nofollow" />
-<title>Patel Networks — System Blueprint</title>
+<title>Patel Networks — System Guide</title>
 <style>
   :root{
     --paper:#FAF9F6; --card:#FFFFFF; --ink:#1C1917; --muted:#6B6459; --faint:#9C948A;
@@ -152,19 +152,6 @@
   .rt i{font-style:normal;color:var(--faint);font-size:10.5px;margin-left:6px}
   .rt.scoped{border-left:3px solid var(--brass)}
 
-  /* ── tools ───────────────────────────── */
-  .tool{border-top:1px solid var(--line);padding:16px 0}
-  .tool:first-of-type{border-top:none;padding-top:0}
-  .tool h3{font-size:15px;color:var(--pine);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .tool h3 .rec{font-size:9.5px;font-weight:800;letter-spacing:.08em;background:var(--pine);color:#fff;border-radius:4px;padding:2px 7px;text-transform:uppercase}
-  .tool h3 .url{font-family:var(--mono);font-size:11.5px;color:var(--brass);font-weight:400}
-  .tool p{font-size:13px;color:var(--muted);margin-top:5px;max-width:820px}
-  .tool ol{margin:8px 0 0 18px;font-size:13px;color:var(--muted)}
-  .tool ol li{margin:3px 0}
-  details.code{margin-top:10px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
-  details.code summary{cursor:pointer;font-size:12px;font-weight:700;color:var(--pine)}
-  details.code pre{font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--ink);overflow-x:auto;padding:10px 2px 2px;white-space:pre}
-
   footer{border-top:1px solid var(--line);margin-top:64px;padding:26px 0 40px;color:var(--faint);font-size:12.5px}
   footer .wrap{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
 
@@ -213,23 +200,22 @@
 </head>
 <body>
 
-<nav class="topnav" aria-label="Blueprint sections">
+<nav class="topnav" aria-label="System guide sections">
   <div class="wrap">
-    <span class="brand">Patel Networks<small>System Blueprint</small></span>
+    <span class="brand">Patel Networks<small>System Guide</small></span>
     <a class="nl" href="#overview">Overview</a>
     <a class="nl" href="#system">How it works</a>
     <a class="nl" href="#database">Database</a>
     <a class="nl" href="#access">Roles &amp; access</a>
     <a class="nl" href="#orders">Order lifecycle</a>
     <a class="nl" href="#routes">Routes</a>
-    <a class="nl" href="#tools">Online tools</a>
     <button class="printbtn" onclick="window.print()" type="button">Print / Save PDF</button>
   </div>
 </nav>
 
 <header class="hero">
   <div class="wrap">
-    <p class="eyebrow">Internal blueprint · v1.0 · September 2026</p>
+    <p class="eyebrow">System guide · September 2026</p>
     <h1>Patel Networks / MegaTech — how the whole system fits together</h1>
     <p class="lede">One page for the owner and the client: the database, the backend, the roles and permissions, and every route of the web store — drawn from the live codebase, not from memory.</p>
     <div class="metachips">
@@ -436,7 +422,7 @@
     </div>
 
     <h2 id="canvas" style="font-size:22px;margin-top:44px">The full canvas — all 38 tables on one map</h2>
-    <p class="sec-sub">The same schema that powers the live docs site (dbdocs.io/galat31868/patel), rendered as a single diagram and grouped into the 8 domains above — the colors match the cards. Drag to pan, scroll to zoom, double-click to dive in, or open the raw SVG full-size in a new tab.</p>
+    <p class="sec-sub">The same schema that powers the store, rendered as a single diagram and grouped into the 8 domains above — the colors match the cards. Drag to pan, scroll to zoom, double-click to dive in, or open the raw SVG full-size in a new tab.</p>
 
     <div class="canvas-wrap">
       <div class="canvas-frame" id="erdFrame" tabindex="0" role="application" aria-label="Interactive schema diagram. Toolbar buttons zoom; drag or arrow keys pan; scroll wheel zooms.">
@@ -464,8 +450,8 @@
         <span><i style="background:#7A5C2E"></i>Kit Builder</span>
         <span><i style="background:#37352F"></i>Platform</span>
       </div>
-      <p class="canvas-note">How to read it: each box is a real table (header = table name, rows = columns with types); <b>(!)</b> marks required/unique columns; arrows run from a child table to the table it references. The canvas regenerates from <span class="k">public/blueprint/schema.dbml</span> with <span class="k">bun scripts/blueprint-erd.ts</span> — so it can never go stale. Prefer browsing table-by-table? Use the live docs: <a href="https://dbdocs.io/galat31868/patel" target="_blank" rel="noopener" style="color:var(--brass);font-weight:700">dbdocs.io/galat31868/patel ↗</a>.</p>
-      <p class="canvas-print-note">The zoomable canvas is interactive-only and is hidden in print. For a printed database annex, export the PNG from dbdiagram.io (see Online tools below) or open the raw SVG and print it as a poster page.</p>
+      <p class="canvas-note">How to read it: each box is a real table (header = table name, rows = columns with types); <b>(!)</b> marks required/unique columns; arrows run from a child table to the table it references.</p>
+      <p class="canvas-print-note">The zoomable canvas is interactive-only and is hidden in print. For a printed database annex, open the raw SVG and print it as a poster page.</p>
     </div>
 
     <h2 style="font-size:22px;margin-top:44px">Every table, field by field</h2>
@@ -809,10 +795,6 @@
         </div>
       </div>
     </details>
-
-    <div class="callout">
-      📐 <span><b>Want this as a picture you can zoom?</b> Go to <b>dbdiagram.io</b>, create a free diagram, delete the sample code, and paste the file <span class="k">/blueprint/schema.dbml</span> from this site — you'll get an interactive ER diagram of all 38 tables with colors by domain, exportable as PNG/PDF. Full tool guide in <a href="#tools" style="color:var(--brass);font-weight:700">Section 7</a>.</span>
-    </div>
   </div>
 </section>
 
@@ -963,7 +945,7 @@
         <span class="rt">/order-success/[orderNumber]</span><span class="rt">/track</span><span class="rt">/wishlist</span>
         <span class="rt">/login</span><span class="rt">/contact</span><span class="rt">/about</span><span class="rt">/blog</span>
         <span class="rt">/blog/[slug]</span><span class="rt">/faq</span><span class="rt">/shipping-policy</span>
-        <span class="rt">/privacy-policy</span><span class="rt">/return-policy</span><span class="rt">/terms</span><span class="rt">/blueprint <i>this page</i></span>
+        <span class="rt">/privacy-policy</span><span class="rt">/return-policy</span><span class="rt">/terms</span><span class="rt">/index-help <i>this page</i></span>
       </div>
 
       <h3>Customer account — OTP-guarded (7)</h3>
@@ -1010,81 +992,9 @@
   </div>
 </section>
 
-<!-- ════════════════════ 7. TOOLS ════════════════════ -->
-<section id="tools">
-  <div class="wrap">
-    <p class="sec-eyebrow">Section 7</p>
-    <h2>Online tools to explore this with your client</h2>
-    <p class="sec-sub">Everything below is free to start and needs no installation. The recommended combo: <b>dbdiagram.io</b> for the database picture, <b>this blueprint page</b> (print to PDF) for the system story.</p>
-
-    <div class="card">
-      <div class="tool">
-        <h3>dbdiagram.io <span class="rec">Recommended — database ERD</span> <span class="url">dbdiagram.io</span></h3>
-        <p>Turns the schema file shipped with this blueprint into a clean, zoomable, interactive ER diagram. Best single tool for "make me and my client understand the whole DATABASE". <b>Already used for this project</b> — the published dbdocs site below was born from this exact file.</p>
-        <ol>
-          <li>Download/copy <span class="k">/blueprint/schema.dbml</span> from this site (already written for dbdiagram — colors and relationships included).</li>
-          <li>Go to dbdiagram.io → <b>New Diagram</b> → delete the sample → paste → the 38-table ERD renders instantly.</li>
-          <li>Hover a table to highlight its relationships; export <b>PNG / PDF</b> for the client deck.</li>
-        </ol>
-      </div>
-      <div class="tool">
-        <h3>dbdocs.io <span class="rec">Shareable DB docs site</span> <span class="done">Live — yours</span> <span class="url">dbdocs.io/galat31868/patel</span></h3>
-        <p>The Patel Networks documentation site is <b>already published</b>: <a href="https://dbdocs.io/galat31868/patel" target="_blank" rel="noopener">dbdocs.io/galat31868/patel ↗</a>. It carries every table, column and relationship — searchable, with a table of contents and the built-in schema diagram (the same picture as the canvas above). Share that single link with the client; re-push an updated DBML any time with <span class="k">dbdocs push</span> and the link stays the same.</p>
-      </div>
-      <div class="tool">
-        <h3>Eraser.io <span class="rec">Architecture + ERD as code</span> <span class="url">eraser.io</span></h3>
-        <p>Draws both the system architecture and the ERD from plain text ("diagram-as-code"). Has an AI mode: paste SQL or a description and it proposes the diagram. Best when you want one canvas mixing tables, services and gateways.</p>
-      </div>
-      <div class="tool">
-        <h3>drawSQL <span class="url">drawsql.app</span></h3>
-        <p>Visual, editable database diagrams — nice when the client wants to drag tables around during a workshop. Imports from SQL dumps; free tier covers ~15 tables, so use it for the core spine.</p>
-      </div>
-      <div class="tool">
-        <h3>Mermaid Live Editor <span class="url">mermaid.live</span></h3>
-        <p>Paste diagram code, get an image, embed in Git/Markdown/Notion. A starter ER snippet for the catalog spine is below — paste and edit freely.</p>
-        <details class="code">
-          <summary>Show starter Mermaid code (paste at mermaid.live)</summary>
-          <pre>erDiagram
-  CATEGORIES ||--o{ PRODUCTS : contains
-  BRANDS ||--o{ PRODUCTS : supplies
-  PRODUCTS ||--o{ PRODUCT_IMAGES : "shown by"
-  PRODUCTS ||--o{ PRODUCT_VARIANTS : "sold as"
-  PRODUCT_VARIANTS ||--|| SKUS : "maps to"
-  SKUS ||--|| INVENTORY : "stocked at"
-  SKUS ||--o{ INVENTORY_MOVEMENTS : "moves via"
-  SKUS ||--o{ CART_ITEMS : "added as"
-  SKUS ||--o{ ORDER_ITEMS : "ordered as"
-  USERS ||--o| CUSTOMERS : "profile"
-  USERS ||--o{ ORDERS : places
-  USERS ||--o{ CARTS : owns
-  USERS ||--o{ REVIEWS : writes
-  ORDERS ||--o{ ORDER_ITEMS : contains
-  ORDERS ||--o{ PAYMENTS : "paid via"
-  ORDERS ||--|| SHIPMENTS : "shipped by"
-  ORDERS ||--o{ ORDER_RETURNS : "after-sales"
-  CUSTOMERS ||--o{ ADDRESSES : stores
-  COUPONS ||--o{ COUPON_REDEMPTIONS : "used in"</pre>
-        </details>
-      </div>
-      <div class="tool">
-        <h3>Prisma ERD Generator <span class="done">Done — our own</span> <span class="url">scripts/blueprint-erd.ts</span></h3>
-        <p>Solved without the dependency: this blueprint ships its own generator. <span class="k">bun scripts/blueprint-erd.ts</span> re-renders <span class="k">public/blueprint/schema-diagram.svg</span> (the Section 3 canvas) from <span class="k">schema.dbml</span> via dbml-renderer + graphviz, with the 8 domain clusters colored to match this page. Run it after any schema change and both the canvas and the DBML stay in lockstep with <span class="k">prisma/schema.prisma</span>.</p>
-      </div>
-      <div class="tool">
-        <h3>DBeaver / TablePlus <span class="url">dbeaver.io · tableplus.com</span></h3>
-        <p>Desktop database browsers. Point one at the live SQLite file (sandbox) or the production PostgreSQL, and you can browse real rows — useful when a question is "what's actually in the orders table right now?"</p>
-      </div>
-    </div>
-
-    <div class="callout">
-      🖨️ <span><b>Client-ready pack in 2 minutes:</b> hit <b>Print / Save PDF</b> at the top of this page for the full story (system + database + roles + orders + routes), then add the dbdiagram.io PNG of the 38-table ERD as the annex — or simply open the <b>full canvas</b> in Section 3 on a shared screen and zoom live during the call. Pair it with the permanent docs link (<b>dbdocs.io/galat31868/patel</b>) and you have "database, backend, roles, routes" covered end-to-end.</span>
-    </div>
-  </div>
-</section>
-
 <footer>
   <div class="wrap">
-    <span>Patel Networks / MegaTech — System Blueprint v1.1 · generated from the live codebase (38 models · 78 API files · 50 pages) · includes the regenerable 38-table schema canvas · September 2026</span>
+    <span>Patel Networks / MegaTech — System Guide v1.2 · generated from the live codebase (38 models · 78 API files · 50 pages) · September 2026</span>
     <a href="/" style="color:var(--brass);font-weight:700">← Back to storefront</a>
   </div>
 </footer>

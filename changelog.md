@@ -2,6 +2,16 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-28 — Task 34 (blueprint page → /index-help.html; developer tool guides removed for production)
+
+**Change — "REMOVE ANY SUCH GUIDE OR TEMPLATE THINGS AS THIS IS GONNA BE END PRODUCTION APP" + "change the blueprint/index.html to just /index-help.html"**
+- **Moved**: `public/blueprint/index.html` → **`public/index-help.html`** (served at `/index-help.html`); `schema-diagram.svg` → `public/schema-diagram.svg` (the page's relative canvas links keep working); `schema.dbml` → `scripts/schema.dbml` (dev-tooling input, no longer served from the site). The `public/blueprint/` folder is gone; the old URL now 404s.
+- **Removed all developer-facing guide/template content** from the page: the entire **Section 7 "Online tools"** (dbdiagram.io walkthrough, dbdocs.io push instructions, Eraser/drawSQL/Mermaid starters, DBeaver notes), the "Want this as a picture you can zoom? Go to dbdiagram.io… paste /blueprint/schema.dbml" callout, the "Client-ready pack in 2 minutes" callout, all dbdocs.io links, the "regenerates from schema.dbml with bun scripts/blueprint-erd.ts" notes, and the "Online tools" nav item (page is now 6 sections) — plus the dead `.tool`/`details.code` CSS. What remains is pure product explanation: system flow, 38-table database with zoomable canvas, roles & scopes, order lifecycle, routes.
+- **Rebranded on-page**: title/nav/eyebrow/footer now say "System Guide" (v1.2); the routes section self-reference updated to `/index-help`.
+- **Wired up**: owner-only admin sidebar link → `/index-help.html` (label "System guide"); `scripts/blueprint-erd.ts` paths updated (reads `scripts/schema.dbml`, writes `public/schema-diagram.svg` — regeneration smoke-tested, same 9036×4210 output).
+- **Docs brought up to date**: `help.md` blueprint section rewritten (new URL, tool-guide/dbdocs paragraphs deleted), `docs/ROUTES.md` gains the `/index-help` row. Live docs contain zero references to the old path or the external tool guides.
+- **Verified (agent-browser)**: `/index-help.html` 200 with 6 sections + canvas SVG loaded; `/blueprint/index.html` **404**; SVG 200; owner login → sidebar shows "System guide" → `/index-help.html`; lint 0 · tsc 0. Deploy note: pushing `main` auto-deploys the new path to Render.
+
 ## 2026-09-28 — Task 33 (routes cheat sheet: docs/ROUTES.md — logins + every URL in one file)
 
 **Docs — "which is the file with all the info about routes and all; i cant remember which route was for staff login" → new permanent cheat sheet**

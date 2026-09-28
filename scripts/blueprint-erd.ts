@@ -1,22 +1,23 @@
 /**
- * Blueprint ERD generator — renders public/blueprint/schema.dbml into a
- * domain-clustered SVG diagram at public/blueprint/schema-diagram.svg.
+ * Blueprint ERD generator — renders scripts/schema.dbml into a
+ * domain-clustered SVG diagram at public/schema-diagram.svg.
  *
  * Pipeline: DBML → (dbml-renderer) DOT → inject per-domain clusters + spacing
  * → (graphviz dot) SVG. Regenerate whenever prisma/schema.prisma changes:
  *
  *   bun scripts/blueprint-erd.ts
  *
- * Domains mirror the blueprint page (Section 3) so the canvas and the cards
- * always tell the same story. Money = integer paise notes stay in the DBML.
+ * Domains mirror the system guide page (/index-help.html, Section 3) so the
+ * canvas and the cards always tell the same story. Money = integer paise notes
+ * stay in the DBML.
  */
 import { spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 const ROOT = path.resolve(import.meta.dir, "..");
-const DBML = path.join(ROOT, "public/blueprint/schema.dbml");
-const OUT_SVG = path.join(ROOT, "public/blueprint/schema-diagram.svg");
+const DBML = path.join(ROOT, "scripts/schema.dbml");
+const OUT_SVG = path.join(ROOT, "public/schema-diagram.svg");
 
 /** Domain grouping — MUST match the blueprint page's Section 3 domain cards. */
 const DOMAINS: Array<{ name: string; color: string; tables: string[] }> = [

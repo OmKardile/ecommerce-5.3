@@ -15,12 +15,10 @@ For the owner and staff. Everything is clickable in the admin console at **/admi
 - **Your own login**: Owner → **Staff & access** → *Your login* card → new email and/or new password; the current password is always required. This is also where extra **Superadmin (Owner)** accounts are created — use sparingly.
 - Scoped staff hitting a URL they don't have bounces them to their home section; the APIs behind it refuse too (401). All of it is audited.
 
-## System Blueprint (explaining the system to a client)
+## System guide (explaining the system to a client)
 
-- Owner sidebar → **System blueprint** (or open `/blueprint/index.html` directly): one printable page covering the database (all 38 tables, field by field), the backend flow, roles & the 15 staff scopes, the order lifecycle, and every route. **Print / Save PDF** at the top produces a client-ready document.
-- **Schema canvas** (Section 3 of the blueprint): all 38 tables as one zoomable diagram grouped into the 8 domains — drag to pan, scroll to zoom, fullscreen for demos, raw SVG opens in a new tab. It is generated from `schema.dbml` by `bun scripts/blueprint-erd.ts`, so it never goes stale.
-- **Live database docs are published**: [dbdocs.io/galat31868/patel](https://dbdocs.io/galat31868/patel) — searchable tables/columns from the same DBML. Share this link with the client; re-push updates with `dbdocs push`. (A copy of the DBML also ships at `/blueprint/schema.dbml` for dbdiagram.io.)
-- More tools (Eraser, drawSQL, Mermaid) are compared at the bottom of the blueprint page.
+- Owner sidebar → **System guide** (or open `/index-help.html` directly): one printable page covering the database (all 38 tables, field by field), the backend flow, roles & the 15 staff scopes, the order lifecycle, and every route. **Print / Save PDF** at the top produces a client-ready document.
+- **Schema canvas** (Section 3 of the guide): all 38 tables as one zoomable diagram grouped into the 8 domains — drag to pan, scroll to zoom, fullscreen for demos, raw SVG opens in a new tab.
 
 ## Where do I do X?
 
