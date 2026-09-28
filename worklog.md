@@ -923,3 +923,20 @@ Stage Summary:
 - The platform now has a pitch kit in both formats the user asked for: business-pitch.md to send/print, and /showcase (linked "Our Platform" in the footer) to open on a phone and hand over — every claim on both traceable to a real, clickable surface.
 - Files: business-pitch.md (new), src/app/(store)/showcase/page.tsx (new), src/components/storefront/footer.tsx, src/app/sitemap.ts, README.md, docs/README.md, docs/ROUTES.md, business-documentation.md, changelog.md, worklog.md.
 - Next-round candidates: agent-browser sweep of data-heavy admin pages at 375/768/1280 (carried from Task 30) · per-product image overrides · stock-monitor v2 (parked) · qa-clean.ts purge at go-live.
+
+---
+Task ID: 36
+Agent: Z.ai Code (lead)
+Task: User asked "that dbml code file also store it in prisma folder" — relocate the DBML (moved to scripts/ in Task 34) into the prisma folder next to schema.prisma.
+
+Work Log:
+- RECON: rg for schema.dbml across live files — only two references, both inside scripts/blueprint-erd.ts (header comment + DBML path constant); no doc references to update (changelog/worklog history untouched by design).
+- MOVE: git mv scripts/schema.dbml → prisma/schema.dbml (history-preserving). Decision: ONE canonical copy in prisma/ rather than duplicates in scripts/ + prisma/ — two copies drift silently; the generator is the only consumer.
+- WIRING: scripts/blueprint-erd.ts — header comment "renders prisma/schema.dbml into a domain-clustered SVG" + DBML = path.join(ROOT, "prisma/schema.dbml").
+- VERIFY: regeneration smoke test — md5 of public/schema-diagram.svg identical before/after regenerating from the new DBML path (9036×4210 pt · 38 tables · 345,580 bytes); /schema-diagram.svg serves 200 (345,580 bytes) from the dev server; 0 live refs to scripts/schema.dbml remain; lint 0 · tsc 0.
+- DOCS DUTY: changelog Task 36 · worklog (this entry).
+
+Stage Summary:
+- The DBML now lives where the schema lives (prisma/schema.dbml next to schema.prisma + seed.ts), the ERD generator reads from there, and the served schema canvas is byte-identical — one canonical data-model artifact per folder role (prisma/ = source of truth, public/ = rendered canvas, scripts/ = tooling).
+- Files: prisma/schema.dbml (moved), scripts/blueprint-erd.ts, changelog.md, worklog.md.
+- Next-round candidates: agent-browser sweep of data-heavy admin pages at 375/768/1280 (carried) · per-product image overrides · stock-monitor v2 (parked) · qa-clean.ts purge at go-live.

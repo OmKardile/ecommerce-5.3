@@ -2,6 +2,13 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-28 — Task 36 (schema.dbml → prisma folder, next to schema.prisma)
+
+**Change — "that dbml code file also store it in prisma folder"**
+- **Moved**: `scripts/schema.dbml` → **`prisma/schema.dbml`** — the DBML now lives beside `schema.prisma`, where anyone touching the data model will look. Single canonical copy (kept one file instead of a duplicate in both folders — duplicates drift silently).
+- **`scripts/blueprint-erd.ts`** updated (header comment + `DBML` path constant) to read from the new location.
+- **Verified**: regeneration smoke test from the new path produces the **byte-identical** SVG (9036×4210 pt · 38 tables · 345,580 bytes, md5 match); `/schema-diagram.svg` serves 200 from the dev server; zero live references to the old path remain; **lint 0 · tsc 0**.
+
 ## 2026-09-28 — Task 35 (the pitch kit: business-pitch.md + the /showcase page)
 
 **Change — "create one business related md file … basically like pitching or impressing .md and also one html directly viewable through some route with some great ui" (local e-commerce framing: "you know this is a local e commerce site right")**

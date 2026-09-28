@@ -1,5 +1,5 @@
 /**
- * Blueprint ERD generator — renders scripts/schema.dbml into a
+ * Blueprint ERD generator — renders prisma/schema.dbml into a
  * domain-clustered SVG diagram at public/schema-diagram.svg.
  *
  * Pipeline: DBML → (dbml-renderer) DOT → inject per-domain clusters + spacing
@@ -16,7 +16,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 const ROOT = path.resolve(import.meta.dir, "..");
-const DBML = path.join(ROOT, "scripts/schema.dbml");
+const DBML = path.join(ROOT, "prisma/schema.dbml");
 const OUT_SVG = path.join(ROOT, "public/schema-diagram.svg");
 
 /** Domain grouping — MUST match the blueprint page's Section 3 domain cards. */
