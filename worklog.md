@@ -866,3 +866,21 @@ Stage Summary:
 - Loading skeletons are now neutral grey in both themes (one token swap in the shared component), consistent with the design system's rule that brass is an accent for highlights, not a surface fill; the orange is gone from cart/checkout/products/orders/sidebar loading states.
 - Files: src/components/ui/skeleton.tsx, changelog.md, worklog.md (+ sandbox-only: .env restored to Neon URL, /tmp/devup.sh recreated).
 - Next-round candidates: agent-browser sweep of data-heavy admin pages at 375/768/1280 (carried) · per-product image overrides · stock-monitor v2 (parked) · qa-clean.ts purge at go-live · NEXT_PUBLIC_APP_URL cache-clear redeploy if OG/canonicals show a stale origin.
+
+---
+Task ID: 33
+Agent: Z.ai Code (lead)
+Task: User asked "which is the file with all the info about routes and all; i cant remember which route was for staff login i will keep needing it so find; if not exists create".
+
+Work Log:
+- ANSWER FOUND: staff login = `/admin/login` — one password login page for ALL operators (src/app/admin/login/page.tsx); the account's role picks the landing page. Seeded staff personas from prisma/seed.ts: staff@patelnetworks.in/counter@2026 (Stock Monitor home), inventory@/warehouse@2026, orders@/fulfill@2026, content@/content@2026; owner superadmin@patelnetworks.in/patel@admin2026. Customer side: /account/login (OTP; /login is a redirect alias preserving ?next=); guest tracking /track.
+- GAP CONFIRMED: docs/API.md catalogues the 78 API handlers, but no single PAGE-route reference existed (help.md has operator flows, blueprint has a static map) → created docs/ROUTES.md per the user's "if not exists create".
+- docs/ROUTES.md: §1 logins first (the part the user keeps needing) — operator credentials table (5 accounts + landing pages + scope notes + /admin/logout escape hatch + env bootstrap fallback), customer OTP logins + test customer, guest /track; §2 storefront page routes (incl. dynamic [slug] shapes); §3 customer account routes; §4 admin console access map (17 sections with Owner-only/granted-scope/staff-home markers); §5 API group map → API.md for per-endpoint detail; closing note that page routes mirror the src/app folder tree.
+- CROSS-LINKS: root README docs map (row 2, flagged "staff login = /admin/login" right in the row), docs/README.md index (row 2), help.md First-5-minutes step 1.
+- DOCS DUTY: changelog Task 33 · worklog (this entry). Zero code changes.
+- VERIFIED: all routes in ROUTES.md cross-checked against the actual src/app tree ((store) folders, admin/(panel) folders, login/logout pages, api/ groups) — nothing invented; lint 0 (docs-only round, no code touched).
+
+Stage Summary:
+- The owner now has one permanent file to answer "which URL was that again?": docs/ROUTES.md — logins and credentials at the top (staff login = /admin/login with the full persona table), then every storefront/account/admin page route and the API group map, linked from both README indexes and help.md.
+- Files: docs/ROUTES.md (new), README.md, docs/README.md, help.md, changelog.md, worklog.md.
+- Next-round candidates: agent-browser sweep of data-heavy admin pages at 375/768/1280 (carried) · per-product image overrides · stock-monitor v2 (parked) · qa-clean.ts purge at go-live.

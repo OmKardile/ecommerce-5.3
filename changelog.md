@@ -2,6 +2,13 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-28 — Task 33 (routes cheat sheet: docs/ROUTES.md — logins + every URL in one file)
+
+**Docs — "which is the file with all the info about routes and all; i cant remember which route was for staff login" → new permanent cheat sheet**
+- **The answer**: staff login is **`/admin/login`** — the same password page as the owner; the account's role decides the landing page (staff persona `staff@patelnetworks.in` / `counter@2026` → auto-lands on the Stock Monitor panel). API handlers were already catalogued in `docs/API.md`, but no single page-route reference existed → **created `docs/ROUTES.md`**.
+- Contents: §1 logins (operator credentials table with all 5 seeded accounts + landing pages, DB-fresh scope note, `/admin/logout` escape hatch, customer OTP login `/account/login` + `/login` alias, test customer `+91 98765 43210`, guest `/track`); §2 storefront pages; §3 customer account pages; §4 admin console access map (owner-only `/admin/staff`, staff home `/admin/stock-monitor`); §5 API group map pointing into `API.md`.
+- Cross-linked from: root `README.md` docs map, `docs/README.md` index (row 2 — deliberately prominent), and `help.md` "First 5 minutes" login step.
+
 ## 2026-09-28 — Task 32 (skeleton loading colour: orange → grey)
 
 **Fix — "change the skeleton loading colour to grey; why its orange??"**

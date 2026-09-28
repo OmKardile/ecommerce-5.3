@@ -9,6 +9,7 @@ The implementation was built from scratch by a multi-agent team; the authoritati
 | Document | Contents |
 | --- | --- |
 | [README.md](./README.md) | This overview: identity, feature map, stack, quick start |
+| [ROUTES.md](./ROUTES.md) | **Routes cheat sheet**: every page URL, login pages + seeded credentials table (owner/staff/customer), admin section access map, API group index |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Modular-monolith layout, services, session design, order FSM, dual-mode integrations, design system |
 | [DATABASE.md](./DATABASE.md) | All 38 Prisma models, relationships, money-in-paise rationale, portability, seed, PostgreSQL switch |
 | [DEPLOYMENT.md](./DEPLOYMENT.md) | Client VPS self-hosting: Docker Compose, nginx, migrations, backups, logging, SSL |

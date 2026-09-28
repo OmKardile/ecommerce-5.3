@@ -43,6 +43,7 @@ Quality gates per round: `bun run lint` (0) · `bunx tsc --noEmit` (0) · `bash 
 | Doc | Purpose |
 |---|---|
 | [`docs/README.md`](docs/README.md) | Full docs index |
+| [`docs/ROUTES.md`](docs/ROUTES.md) | **Routes cheat sheet**: every URL + login pages & credentials (staff login = `/admin/login`) |
 | [`technical-documentation.md`](technical-documentation.md) | **Tech hub**: architecture, module map, API index, conventions |
 | [`business-documentation.md`](business-documentation.md) | Business model, ops flows, GST, vendor integrations, roles |
 | [`changelog.md`](changelog.md) | Release-by-release change log |

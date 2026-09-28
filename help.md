@@ -4,7 +4,7 @@ For the owner and staff. Everything is clickable in the admin console at **/admi
 
 ## First 5 minutes
 
-1. **Log in**: `/admin/login` → email + password. (Sandbox demo: `superadmin@patelnetworks.in / patel@admin2026` — the sidebar shows this account as **Owner**.)
+1. **Log in**: `/admin/login` → email + password. (Sandbox demo: `superadmin@patelnetworks.in / patel@admin2026` — the sidebar shows this account as **Owner**.) Staff sign in on the same page — see the credentials table in [`docs/ROUTES.md`](docs/ROUTES.md) (the routes cheat sheet: every login, page URL and API group).
 2. The **Dashboard** is your morning: pipeline cards (orders to verify, processing, shipped), alerts in red when action is waiting (open returns, new trade inquiries, reviews to moderate), low/out-of-stock lists, 30-day sales chart.
 3. Left sidebar shows live **count badges** on Returns, Trade Desk and Reviews when something needs you.
 
