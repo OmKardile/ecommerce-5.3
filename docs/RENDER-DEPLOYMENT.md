@@ -1,4 +1,4 @@
-# Patel Networks / MegaTech — Render Staging Deployment Guide
+# Patel Networks / MegaTechzy — Render Staging Deployment Guide
 
 > **STATUS (Task 29): LIVE** — the Node-runtime path is deployed at
 > **https://patelnetworks.onrender.com** (`/api/health` → `{db:"up"}` on the
@@ -275,6 +275,6 @@ That's it. Push to `main` → live in 2-3 minutes.
 ---
 
 <p align="center">
-<em>Authored by Omkar Kardile — Patel Networks / MegaTech</em><br/>
+<em>A personal project — authored by <a href="https://omkardile.is-a.dev/">Omkar Kardile</a> — Patel Networks / MegaTechzy</em><br/>
 <sub>Surveillance hardware procurement platform · India</sub>
 </p>

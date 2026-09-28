@@ -1,4 +1,4 @@
-// Patel Networks / MegaTech — full database schema (38 tables)
+// Patel Networks / MegaTechzy — full database schema (38 tables)
 // Paste this whole file into https://dbdiagram.io → New Diagram → paste → instant ERD.
 // Colors group tables by domain. All money columns are integers in paise (1 INR = 100 paise).
 // Generated from prisma/schema.prisma (Task 24).

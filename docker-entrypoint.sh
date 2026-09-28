@@ -1,6 +1,6 @@
 #!/bin/sh
 # =============================================================================
-# Patel Networks / MegaTech — container entrypoint
+# Patel Networks / MegaTechzy — container entrypoint
 #
 # Responsibilities:
 #   1. MIGRATION GATE (RUN_MIGRATIONS=true, see .env.example):

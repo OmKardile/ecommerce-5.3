@@ -1,6 +1,6 @@
 # Business documentation
 
-Patel Networks / MegaTech — what the system does for the business, in business terms.
+Patel Networks / MegaTechzy — what the system does for the business, in business terms.
 
 > For the **sales/pitch version** of this story (features, design rationale, business outcomes), see [`business-pitch.md`](business-pitch.md) — and the designed visual pitch at **`/showcase`** on the site.
 
@@ -8,7 +8,7 @@ Patel Networks / MegaTech — what the system does for the business, in business
 
 **Patel Networks** is a Surat-based (Gujarat, India) trader and installer of CCTV, surveillance and networking hardware: cameras (analog HD + IP), DVRs/NVRs, monitors, cables, connectors, converters, switches, storage, tools, and full install kits. Two revenue lines:
 
-1. **Retail (B2C)** — walk-in and online single-unit buyers; storefront at MegaTech brand.
+1. **Retail (B2C)** — walk-in and online single-unit buyers; storefront at MegaTechzy brand.
 2. **Trade (B2B)** — contractors, installers, electrical dealers; GST invoices, bulk pricing, dealer rates, contractor quotes.
 
 ## How money is made

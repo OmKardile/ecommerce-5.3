@@ -7,7 +7,7 @@ ROUTES=(
   "/cart" "/compare" "/contact" "/faq" "/kit-builder" "/privacy-policy"
   "/return-policy" "/shipping-policy" "/terms" "/track" "/search"
   "/products" "/products?category=cctv-surveillance" "/products?sort=price-asc&q=camera"
-  "/products/cp-plus-ir-bullet-camera" "/account/login" "/order-success"
+  "/products/cp-plus-ir-bullet-camera" "/account/login" "/order-success" "/showcase" "/index-help.html"
 )
 VIEWPORTS=("375 812" "768 1024" "1280 800")
 for vp in "${VIEWPORTS[@]}"; do

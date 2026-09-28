@@ -1,6 +1,6 @@
-# MegaTech — the platform, and what it does for the business
+# MegaTechzy — the platform, and what it does for the business
 
-**Patel Networks / MegaTech · Surat, Gujarat · live at <https://patelnetworks.onrender.com>**
+**Patel Networks / MegaTechzy · Surat, Gujarat · live at <https://patelnetworks.onrender.com>**
 Written by the person who designed and built it — for the people who will run it, fund it, or buy from it. The companion pages: [`business-documentation.md`](business-documentation.md) is the operational manual; this file is the *why*. The visual version of this pitch lives at **`/showcase`** on the site itself — open it on a phone and hand it over.
 
 ---
@@ -9,7 +9,7 @@ Written by the person who designed and built it — for the people who will run 
 
 Patel Networks sells CCTV, surveillance and networking hardware from Surat — to walk-in retail buyers, to installers on a ladder, and to contractors ordering in bulk. Until now that kind of business runs on three disconnected tools: a website, a notebook and hope.
 
-MegaTech is what replaces all three with **one designed system**:
+MegaTechzy is what replaces all three with **one designed system**:
 
 - a **storefront** customers actually enjoy — search, compare, a 5-step CCTV kit builder, OTP sign-in, GST-native checkout;
 - an **operations console** the staff can genuinely run — fulfillment, stock wall, returns, trade desk, all with guarded, logged moves;
@@ -138,4 +138,4 @@ Design isn't how it looks on launch day. It's how it behaves on the busiest day 
 
 ---
 
-*MegaTech platform v1 — designed & built by Omkar Kardile for Patel Networks, Surat. Operational details live in [`business-documentation.md`](business-documentation.md); routes and logins in [`docs/ROUTES.md`](docs/ROUTES.md).*
+*MegaTechzy platform v1 — designed & built by [Omkar Kardile](https://omkardile.is-a.dev/) for Patel Networks, Surat. Operational details live in [`business-documentation.md`](business-documentation.md); routes and logins in [`docs/ROUTES.md`](docs/ROUTES.md).*

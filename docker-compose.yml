@@ -1,5 +1,5 @@
 # =============================================================================
-# Patel Networks / MegaTech — production stack for the client's Ubuntu VPS
+# Patel Networks / MegaTechzy — production stack for the client's Ubuntu VPS
 # App (Next.js standalone) + PostgreSQL 16 + Nginx reverse proxy, one network.
 #
 # RULES (Task 0):

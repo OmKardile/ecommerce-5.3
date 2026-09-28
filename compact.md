@@ -3,7 +3,7 @@
 Last updated: 2026-09-27 (Task 27 — runtime DB switched to Neon PostgreSQL + Render kit). Keep under ~200 lines. Full map in `README.md`.
 
 ## Identity
-- **Patel Networks / MegaTech** — CCTV & networking hardware e-commerce, Surat (GSTIN 24AAACP1234F1Z8).
+- **Patel Networks / MegaTechzy** — CCTV & networking hardware e-commerce, Surat (GSTIN 24AAACP1234F1Z8).
 - Greenfield rebuild of patel-5.2 → **patel-5.3** (`github.com/OmKardile/patel-5.3.git`, deploy from `main`).
 - Sandbox: `/home/z/my-project`, Next.js 16 + bun, port 3000 only. **No AI-generated images** (real files via `prisma/seed-images.json`).
 

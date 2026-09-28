@@ -1,8 +1,10 @@
-# Patel Networks / MegaTech — Documentation
+# Patel Networks / MegaTechzy — Documentation
 
-Greenfield rebuild of the Patel Networks (MegaTech) e-commerce platform: CCTV, surveillance and networking hardware retail for India, B2C plus a B2B trade desk for contractors and installers. Headquarters and fulfillment hub: Surat, Gujarat (origin PIN 395003, state code 24, GSTIN `24AAACP1234F1Z8` — env-overridable).
+Greenfield rebuild of the Patel Networks (MegaTechzy) e-commerce platform: CCTV, surveillance and networking hardware retail for India, B2C plus a B2B trade desk for contractors and installers. Headquarters and fulfillment hub: Surat, Gujarat (origin PIN 395003, state code 24, GSTIN `24AAACP1234F1Z8` — env-overridable).
 
 The implementation was built from scratch by a multi-agent team; the authoritative build history is `/worklog.md` at the repo root, and module ownership rules live in [`CONTRACTS.md`](./CONTRACTS.md).
+
+> **A personal project by [Omkar Kardile](https://omkardile.is-a.dev/)** — designed & built end-to-end (branding, UX, code, data model).
 
 ## Documentation index
 
@@ -30,7 +32,7 @@ The implementation was built from scratch by a multi-agent team; the authoritati
 
 ## Business identity
 
-- **Legal name:** Patel Networks (MegaTech)
+- **Legal name:** Patel Networks (MegaTechzy)
 - **What it sells:** CCTV/surveillance cameras, DVR/NVR recorders, surveillance storage, displays, cables, connectors, fiber media converters, PoE networking
 - **Catalog shape:** Category -> Brand -> Product -> Variant -> SKU -> Inventory; stock exists only at SKU level
 - **Customers:** B2C retail (phone + OTP accounts) and B2B buyers (GSTIN input-tax-credit checkout)

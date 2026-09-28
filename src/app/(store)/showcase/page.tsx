@@ -21,7 +21,7 @@ import { BandDecor } from "@/components/motion/parallax";
 import { Button } from "@/components/ui/button";
 
 export const metadata = {
-  title: "The Platform — MegaTech by Patel Networks",
+  title: "The Platform — a personal project by Omkar Kardile",
   description:
     "One system, three faces: a customer storefront, a staff operations console and an owner's cockpit — designed end-to-end for a Surat CCTV & networking hardware trade. Take the tour.",
 };
@@ -172,7 +172,14 @@ export default function ShowcasePage() {
         <div aria-hidden className="absolute inset-0 bg-[radial-gradient(60%_80%_at_80%_10%,color-mix(in_srgb,var(--primary)_7%,transparent),transparent)]" />
         <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24">
           <div className="rise-in max-w-3xl">
-            <p className="label-caps">MegaTech · by Patel Networks, Surat</p>
+            <a
+              href="https://omkardile.is-a.dev/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="label-caps inline-flex items-center gap-1 transition-colors hover:text-foreground"
+            >
+              A personal project by Omkar Kardile ↗
+            </a>
             <h1 className="mt-4 font-display text-4xl leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.4rem]">
               A shop counter, a stockroom and a back office —
               <span className="block italic text-primary">designed as one system.</span>
@@ -193,7 +200,16 @@ export default function ShowcasePage() {
               </Button>
             </div>
             <p className="mt-6 text-[13px] text-muted-foreground">
-              Designed end-to-end by a designer — typography, color, motion, flows and the data model behind them.
+              Designed end-to-end by{" "}
+              <a
+                href="https://omkardile.is-a.dev/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-foreground/80 underline-offset-2 transition-colors hover:text-foreground hover:underline"
+              >
+                Omkar Kardile
+              </a>{" "}
+              — typography, color, motion, flows and the data model behind them.
             </p>
           </div>
         </div>
@@ -341,9 +357,9 @@ export default function ShowcasePage() {
           {/* palette + type specimen card */}
           <div className="lg:col-span-6">
             <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
-              <div className="grid grid-cols-2 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-px bg-border/60 sm:grid-cols-4">
                 {SWATCHES.map((s) => (
-                  <div key={s.name} className="border-b border-r border-border/60 p-4 sm:[&:nth-child(2n)]:border-r-0 sm:[&:nth-child(n+3)]:border-b-0">
+                  <div key={s.name} className="bg-card p-4">
                     <div className="h-16 w-full rounded-md border border-border/60" style={{ backgroundColor: s.hex }} />
                     <p className="mt-3 text-[12.5px] font-semibold">{s.name}</p>
                     <p className="text-[11px] text-muted-foreground">{s.hex}</p>

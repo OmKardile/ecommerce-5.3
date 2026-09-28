@@ -1,12 +1,14 @@
-# Patel Networks / MegaTech — README
+# Patel Networks / MegaTechzy — README
 
-E-commerce + operations platform for **Patel Networks** (Surat, Gujarat): CCTV, surveillance and networking hardware retail & B2B trade. Storefront brand: **MegaTech** (by Patel Networks); store-ops console: **Patel Networks Operations Console**.
+E-commerce + operations platform for **Patel Networks** (Surat, Gujarat): CCTV, surveillance and networking hardware retail & B2B trade. Storefront brand: **MegaTechzy** (by Patel Networks); store-ops console: **Patel Networks Operations Console**.
 
 > Stack: **Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 · shadcn/ui · Prisma ORM · PostgreSQL (Neon — dev + prod) · bun**
 > 38 Prisma models · 50 pages · 78 API route handlers · 2 operator roles (Owner + scoped Staff) · money always integer paise
 > Appearance: editorial light theme (default) · **trust-pine dark mode** via the nav toggle (storefront header, mobile drawer, admin chrome)
 >
 > **Live on Render (Node runtime)**: <https://patelnetworks.onrender.com> — free plan sleeps after ~15 idle minutes; the first visit wakes it in ~50 s. Runbook: [`deploy/RENDER-STEPS.md`](deploy/RENDER-STEPS.md).
+>
+> **A personal project by [Omkar Kardile](https://omkardile.is-a.dev/)** — designed & built end-to-end (branding, UX, code, data model).
 
 ---
 

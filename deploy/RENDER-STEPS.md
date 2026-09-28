@@ -1,4 +1,4 @@
-# Patel Networks / MegaTech — Render Deployment Runbook (Neon Postgres)
+# Patel Networks / MegaTechzy — Render Deployment Runbook (Neon Postgres)
 
 > **STATUS (Task 29): this setup is LIVE at https://patelnetworks.onrender.com**
 > (Node runtime, Blueprint build commands, Neon Postgres). Free plan: the

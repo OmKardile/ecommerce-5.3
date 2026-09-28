@@ -1,4 +1,4 @@
-# Patel Networks / MegaTech — `.env` Setup Guide
+# Patel Networks / MegaTechzy — `.env` Setup Guide
 
 Companion to `deploy/DEPLOY-STEPS.md` (VPS runbook) and `docs/ENVIRONMENT.md`
 (reference table). This guide is the **step-by-step** version: what to put in

@@ -1,4 +1,4 @@
-# Patel Networks / MegaTech — Routes cheat sheet
+# Patel Networks / MegaTechzy — Routes cheat sheet
 
 > **The one file to check when you can't remember a URL.** Page routes (storefront + admin), login pages, seeded credentials, and the API group map. Full API handler catalog with methods/shapes: [`API.md`](./API.md).
 

@@ -4,7 +4,7 @@
 >
 > This guide covers the **physical server (bare metal) path** — hardware selection → OS installation → remote SSH access → full application deployment → power-cut resilience.
 >
-> **Complete guide** for deploying the Patel Networks / MegaTech storefront on the client's own hardware. Exactly three Docker containers — no Supabase, no managed DB, no pm2.
+> **Complete guide** for deploying the Patel Networks / MegaTechzy storefront on the client's own hardware. Exactly three Docker containers — no Supabase, no managed DB, no pm2.
 >
 > **Read this entire document once before starting.** Each phase has a ✅ checkpoint.
 >
@@ -983,4 +983,4 @@ That's it. Everything else is in this guide.
 
 ---
 
-<p align="center"><em>Authored by Omkar Kardile — Patel Networks / MegaTech</em><br/><sub>Surveillance hardware procurement platform · India</sub></p>
+<p align="center"><em>A personal project — authored by <a href="https://omkardile.is-a.dev/">Omkar Kardile</a> — Patel Networks / MegaTechzy</em><br/><sub>Surveillance hardware procurement platform · India</sub></p>

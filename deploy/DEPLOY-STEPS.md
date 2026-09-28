@@ -1,4 +1,4 @@
-# Patel Networks / MegaTech — VPS Deployment Runbook
+# Patel Networks / MegaTechzy — VPS Deployment Runbook
 
 Target: client-owned **Ubuntu 22.04/24.04 VPS (x86_64)**, Docker Compose stack:
 `app` (Next.js 16 standalone) + `db` (PostgreSQL 16) + `nginx` (reverse proxy, 80/443).

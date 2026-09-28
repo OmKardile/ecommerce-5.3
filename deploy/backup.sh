@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Patel Networks / MegaTech — PostgreSQL backup script (run on the VPS)
+# Patel Networks / MegaTechzy — PostgreSQL backup script (run on the VPS)
 #
 # Usage:
 #   chmod +x deploy/backup.sh        # (already set in the repo)

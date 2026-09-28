@@ -1,4 +1,4 @@
-# Patel Networks / MegaTech — Environment Variables Guide (patel-5.3)
+# Patel Networks / MegaTechzy — Environment Variables Guide (patel-5.3)
 
 > **Complete reference** for every environment variable this codebase reads.
 > Each variable has its own section: what it does, where it's used, how to get it, format, and example values.
@@ -591,6 +591,6 @@ Full hardware + OS + Docker runbooks: **[docs/VPS-SETUP-GUIDE.md](./VPS-SETUP-GU
 ---
 
 <p align="center">
-<em>Authored by Omkar Kardile — Patel Networks / MegaTech</em><br/>
+<em>A personal project — authored by <a href="https://omkardile.is-a.dev/">Omkar Kardile</a> — Patel Networks / MegaTechzy</em><br/>
 <sub>Surveillance hardware procurement platform · India</sub>
 </p>

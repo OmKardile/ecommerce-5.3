@@ -1,5 +1,5 @@
 # =============================================================================
-# Patel Networks / MegaTech — production image (client Ubuntu VPS, x86_64)
+# Patel Networks / MegaTechzy — production image (client Ubuntu VPS, x86_64)
 # Multi-stage: deps (bun install) -> builder (prisma generate + next build)
 #            -> runner (node:22-slim, non-root, Next.js standalone output)
 #

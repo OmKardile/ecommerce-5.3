@@ -1,5 +1,5 @@
 # =============================================================================
-# Patel Networks / MegaTech — Render Blueprint
+# Patel Networks / MegaTechzy — Render Blueprint
 #
 # One-click deploy: Render Dashboard → New + → Blueprint → pick this repo.
 # Render reads this file and prompts for every `sync: false` value.

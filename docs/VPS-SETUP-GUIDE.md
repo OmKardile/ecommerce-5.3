@@ -4,7 +4,7 @@
 >
 > This guide covers the **VPS path** — for when the client prefers a cloud-hosted virtual machine over bare metal.
 >
-> **Single source of truth** for deploying the Patel Networks / MegaTech storefront on the client's own Ubuntu VPS with Docker Compose. No Supabase, no Firebase, no managed DB, no pm2 — exactly three containers.
+> **Single source of truth** for deploying the Patel Networks / MegaTechzy storefront on the client's own Ubuntu VPS with Docker Compose. No Supabase, no Firebase, no managed DB, no pm2 — exactly three containers.
 >
 > This guide is the expanded, checkpointed version of [`deploy/DEPLOY-STEPS.md`](../deploy/DEPLOY-STEPS.md) (the terse runbook). Commands are kept identical to it — if you only need the short version, use that file.
 >
@@ -655,4 +655,4 @@ docker tag patelnetworks-app:prev patelnetworks-app:latest \
 
 ---
 
-<p align="center"><em>Authored by Omkar Kardile — Patel Networks / MegaTech</em><br/><sub>Surveillance hardware procurement platform · India</sub></p>
+<p align="center"><em>A personal project — authored by <a href="https://omkardile.is-a.dev/">Omkar Kardile</a> — Patel Networks / MegaTechzy</em><br/><sub>Surveillance hardware procurement platform · India</sub></p>

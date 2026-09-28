@@ -1,4 +1,4 @@
-// Patel Networks / MegaTech — Unified commerce schema
+// Patel Networks / MegaTechzy — Unified commerce schema
 // PROVIDER: PostgreSQL (Neon). This schema is 100% portable to SQLite (sandbox
 // fallback) — to go back: change provider to "sqlite" + DATABASE_URL=file:./db/custom.db
 // Guarantees: no Prisma enums (string + Zod), no native arrays (Json), all money = integer paise.
