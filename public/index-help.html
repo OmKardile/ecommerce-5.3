@@ -55,6 +55,10 @@
   table.simple th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);font-weight:700;padding:8px 10px;border-bottom:1.5px solid var(--line)}
   table.simple td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
   table.simple tr:last-child td{border-bottom:none}
+  /* small screens: wide tables scroll inside their own box instead of widening the page */
+  @media (max-width:520px){
+    table.simple{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  }
   .k{font-family:var(--mono);font-size:12px;background:var(--pine-soft);color:var(--pine);border-radius:6px;padding:2px 7px;font-weight:600}
 
   /* ── layered architecture bands ──────── */

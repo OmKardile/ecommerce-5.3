@@ -9,7 +9,7 @@ ROUTES=(
   "/products" "/products?category=cctv-surveillance" "/products?sort=price-asc&q=camera"
   "/products/cp-plus-ir-bullet-camera" "/account/login" "/order-success" "/showcase" "/index-help.html"
 )
-VIEWPORTS=("375 812" "768 1024" "1280 800")
+VIEWPORTS=("320 690" "375 812" "768 1024" "1280 800")
 for vp in "${VIEWPORTS[@]}"; do
   w="${vp%% *}"; h="${vp##* }"
   agent-browser set viewport "$w" "$h" >/dev/null 2>&1

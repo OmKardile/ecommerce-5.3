@@ -182,13 +182,13 @@ export function Header() {
         </div>
       </div>
 
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:h-[72px]">
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 max-[374px]:gap-2 sm:px-6 lg:h-[72px]">
         {/* wordmark */}
         <Link href="/" className="group flex shrink-0 flex-col leading-none">
-          <span className="font-display text-[22px] font-semibold tracking-tight text-foreground lg:text-2xl">
+          <span className="font-display text-[22px] font-semibold tracking-tight text-foreground max-[374px]:text-[19px] lg:text-2xl">
             Patel Networks
           </span>
-          <span className="label-caps !text-[9px] !tracking-[0.32em] text-muted-foreground group-hover:text-primary">
+          <span className="label-caps !text-[9px] !tracking-[0.32em] text-muted-foreground group-hover:text-primary max-[374px]:hidden">
             SURVEILLANCE · NETWORKING
           </span>
         </Link>

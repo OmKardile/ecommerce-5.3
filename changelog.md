@@ -2,6 +2,14 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-28 — Task 38 (white-button fix + deeper responsive pass incl. 320px)
+
+**Change — "some buttons are white by default and gets normal when on hover; fix them" + "make the showcase / pitching / help pages strictly and very perfectly responsive" (round 2)**
+- **White buttons**: reproduced in light mode — the two `variant="outline"` CTAs on `/showcase`'s pine CTA band ("Track a demo order", "Meet the shop") inherited `bg-background` (white) from the shadcn outline variant and carried `text-brand-foreground` (near-white) → **white pill, invisible white text**. Fix: `bg-transparent` in className (tailwind-merge drops the variant's `bg-background`; `dark:bg-input/30` untouched — dark mode verified unchanged). Now: transparent ghost buttons on the pine band in light, same as before in dark. Swept the codebase for the same pattern (outline/ghost inside `bg-brand` bands) — no other occurrences.
+- **Responsive round 2**: added a **320px small-phone viewport** to `scripts/responsive-sweep.sh` (now 26 routes × **4** viewports = 104 checks). First run exposed two real defects: (1) the storefront **header** min-width ≈ 358px — the icon cluster + wordmark subline pushed every page +38px at 320 → at ≤374px the wordmark subline now hides, the title drops to 19px and the row gap tightens (icons kept at 36px); (2) `index-help.html`'s **wide tables** (349px) widened the page +49px → `table.simple` becomes a block-level `overflow-x:auto` scroller below 520px. Note: the sweep's "worst element" heuristic can point at internal scrollers (header rail, table wrappers) — the real pusher was found by walking unclipped elements' bounding rects.
+- **Dev-env lesson**: after the header edit, Turbopack's incremental Tailwind pipeline generated the new `max-[374px]:gap-2` but silently dropped `max-[374px]:text-[19px]` / `max-[374px]:hidden` (classes in DOM, no CSS rule, computed styles unchanged) — `touch globals.css` didn't help; a **full `.next` wipe + restart** regenerated all rules. If new utility variants don't apply, don't trust the incremental cache: restart clean.
+- **Verified (agent-browser)**: light-mode band buttons `rgba(0,0,0,0)` + white text; dark mode `dark:bg-input/30` preserved; full sweep **104/104 zero overflow**; 320px screenshots eyeballed (compact header, wrapped eyebrow, scrollable rail); **lint 0 · tsc 0**.
+
 ## 2026-09-28 — Task 37 (strict responsive pass + MegaTechzy rebrand & personal-project attribution)
 
 **Change — "make the showcase / pitching / help pages strictly and very perfectly responsive" + "rename everything related to mega tech to MegaTechzy; only keep that megatechzy and related at footer of storefront; other else make this as my personal project (omkardile.is-a.dev)"**

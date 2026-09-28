@@ -437,7 +437,7 @@ export default function ShowcasePage() {
                 asChild
                 size="lg"
                 variant="outline"
-                className="rounded-full border-brand-foreground/30 px-6 text-brand-foreground hover:bg-brand-foreground/10 hover:text-brand-foreground"
+                className="rounded-full border-brand-foreground/30 bg-transparent px-6 text-brand-foreground hover:bg-brand-foreground/10 hover:text-brand-foreground"
               >
                 <Link href="/track">Track a demo order</Link>
               </Button>
@@ -445,7 +445,7 @@ export default function ShowcasePage() {
                 asChild
                 size="lg"
                 variant="outline"
-                className="rounded-full border-brand-foreground/30 px-6 text-brand-foreground hover:bg-brand-foreground/10 hover:text-brand-foreground"
+                className="rounded-full border-brand-foreground/30 bg-transparent px-6 text-brand-foreground hover:bg-brand-foreground/10 hover:text-brand-foreground"
               >
                 <Link href="/about">Meet the shop</Link>
               </Button>
