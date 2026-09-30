@@ -135,7 +135,7 @@ If your provider offers an external cloud firewall (Hetzner Cloud Firewalls, Dig
 
 ```bash
 sudo mkdir -p /opt/patelnetworks && sudo chown "$USER" /opt/patelnetworks
-git clone https://github.com/OmKardile/patel-5.3.git /opt/patelnetworks
+git clone https://github.com/OmKardile/patel-networks.git /opt/patelnetworks
 cd /opt/patelnetworks
 ```
 
@@ -565,7 +565,7 @@ Remember: if `NEXT_PUBLIC_APP_URL` ever changes, rebuild the image (`docker comp
 curl -fsSL https://get.docker.com | sudo sh && sudo usermod -aG docker "$USER" && newgrp docker
 
 # 2. Code + env (host MUST be `db` in DATABASE_URL)
-cd /opt && git clone https://github.com/OmKardile/patel-5.3.git patelnetworks \
+cd /opt && git clone https://github.com/OmKardile/patel-networks.git patelnetworks \
   && cd patelnetworks && cp .env.example .env && nano .env
 
 # 3. Build + start the 3-container stack

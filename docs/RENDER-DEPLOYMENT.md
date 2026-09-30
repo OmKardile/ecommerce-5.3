@@ -27,7 +27,7 @@
 ## How it works
 
 ```
-  You commit to GitHub (patel-5.3)
+  You commit to GitHub (patel-networks)
          │
          ▼
   Render detects the push to main
@@ -69,7 +69,7 @@ The repo carries **`bun.lock` but no `package-lock.json`**. Render's native Node
 
 ## Prerequisites
 
-1. The GitHub repo: https://github.com/OmKardile/patel-5.3 (branch `main`)
+1. The GitHub repo: https://github.com/OmKardile/patel-networks (branch `main`) — continued from `patel-5.3` (kept as an identical mirror; either can be connected to Render, but this one is the living origin).
 2. A Render account (free signup at https://render.com — sign in with GitHub)
 3. A managed **staging PostgreSQL** — SQLite is impossible on Render:
    - Render's filesystem is **ephemeral**: a SQLite file is wiped on every deploy.
@@ -87,7 +87,7 @@ The repo carries **`bun.lock` but no `package-lock.json`**. Render's native Node
 
 2. Connect your GitHub account if prompted, then select the repo:
    ```
-   OmKardile/patel-5.3
+   OmKardile/patel-networks
    ```
 
 3. Configure the service:
@@ -265,7 +265,7 @@ Keep Render as the permanent staging environment; production stays on the client
 
 ## Quick reference — Render setup in 4 steps
 
-1. **Render dashboard** → New Web Service → connect `OmKardile/patel-5.3` → Runtime **Docker** (leave Build/Start Command empty — the committed Dockerfile + `docker-entrypoint.sh` define them)
+1. **Render dashboard** → New Web Service → connect `OmKardile/patel-networks` → Runtime **Docker** (leave Build/Start Command empty — the committed Dockerfile + `docker-entrypoint.sh` define them)
 2. **Health Check Path**: `/api/health` · port `3000` (auto-detected from `EXPOSE`)
 3. **Environment vars**: `DATABASE_URL` (staging Postgres), `JWT_SECRET`, `NEXT_PUBLIC_APP_URL`, `NODE_ENV=production`, `RUN_MIGRATIONS=true`, `ADMIN_EMAIL`/`ADMIN_PASSWORD`
 4. Push to `main` → live in 2-3 minutes

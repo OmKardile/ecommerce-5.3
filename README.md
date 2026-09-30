@@ -65,7 +65,7 @@ Quality gates per round: `bun run lint` (0) · `bunx tsc --noEmit` (0) · `bash 
 
 ## Repo
 
-Official: `https://github.com/OmKardile/patel-5.3.git` (deploy from `main`).
+Official: `https://github.com/OmKardile/patel-networks.git` (deploy from `main`).
 
 ## Rule of the house
 

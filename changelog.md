@@ -2,6 +2,16 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-30 — Task 45 (repo duplicated: patel-networks is now the living origin)
+
+**Change — "first push all then create one more repo with my token, rename it patel-networks and clone our current repo contents in it (duplicating current repo, continuing on the new one)"**
+
+- **Push all first**: the sandbox had re-applied `+x` on 17 tracked files — normalized back to 644 and pushed as a chore (`39fdb9f..ad32c64` on patel-5.3). Also stopped tracking the runtime `.zscripts/dev.pid` (gitignored; nothing reads it — the keeper uses pgrep).
+- **New repo via token API**: authenticated as `OmKardile` with the remote-URL token (same posture as before — never committed), created **`OmKardile/patel-networks`** (public, matching patel-5.3's visibility, no auto-init).
+- **Full mirror pushed**: `main` → `main` (+ tags, none exist); verified the new repo's tip `ad32c64` equals the local tip commit-for-commit. Local remotes switched: `origin` → patel-networks (living, upstream of `main`), `patel-5.3` kept as a secondary remote (identical mirror, receives the same pushes).
+- **Operational references updated** (clone URLs, Render docs, README official URL, compact.md identity line): 12 references across README.md, docs/RENDER-DEPLOYMENT.md, docs/VPS-SETUP-GUIDE.md, docs/PHYSICAL-SERVER-SETUP-GUIDE.md, docs/ENVIRONMENT-VARIABLES-GUIDE.md (title + parity-table status column), compact.md. Historical mentions (worklog, changelog, patel-5.2 parity prose) intentionally untouched.
+- **Verified**: API commit-sha comparison (`ad32c64` both sides); both remotes receive pushes; `git status` clean, `main...origin/main` in sync.
+
 ## 2026-09-30 — Task 44 (.env.example completed: DEVELOPER_* documented, coverage proven)
 
 **Change — "config .env example properly and then push"** — Task 43 added two env vars (`DEVELOPER_EMAIL`, `DEVELOPER_WHATSAPP`) but left them out of the environment template; audited the whole env surface and closed every gap.

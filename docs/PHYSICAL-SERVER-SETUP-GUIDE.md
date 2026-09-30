@@ -426,7 +426,7 @@ docker run hello-world    # success message
 
 ```bash
 sudo mkdir -p /opt/patelnetworks && sudo chown "$USER" /opt/patelnetworks
-git clone https://github.com/OmKardile/patel-5.3.git /opt/patelnetworks
+git clone https://github.com/OmKardile/patel-networks.git /opt/patelnetworks
 cd /opt/patelnetworks
 ```
 
@@ -869,7 +869,7 @@ sudo ufw allow 22/tcp && sudo ufw allow 80/tcp && sudo ufw allow 443/tcp && sudo
 
 # 4. Code + env (host MUST be `db` in DATABASE_URL)
 sudo mkdir -p /opt/patelnetworks && sudo chown "$USER" /opt/patelnetworks \
-  && git clone https://github.com/OmKardile/patel-5.3.git /opt/patelnetworks \
+  && git clone https://github.com/OmKardile/patel-networks.git /opt/patelnetworks \
   && cd /opt/patelnetworks && cp .env.example .env && nano .env
 
 # 5. Build + start the 3-container stack

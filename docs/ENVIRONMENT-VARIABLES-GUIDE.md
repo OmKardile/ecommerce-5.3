@@ -1,4 +1,4 @@
-# Patel Networks / MegaTechzy — Environment Variables Guide (patel-5.3)
+# Patel Networks / MegaTechzy — Environment Variables Guide (patel-networks)
 
 > **Complete reference** for every environment variable this codebase reads.
 > Each variable has its own section: what it does, where it's used, how to get it, format, and example values.
@@ -530,7 +530,7 @@ RUN_MIGRATIONS=true
 
 Nothing required from patel-5.2 was lost in the rebuild — but several variables 5.2 carried are **deliberately gone**. This section is the parity proof: if you migrate a `.env` from 5.2, delete these rows.
 
-| Variable | What it did in patel-5.2 | patel-5.3 status |
+| Variable | What it did in patel-5.2 | patel-networks status |
 |---|---|---|
 | `DIRECT_URL` | Non-pooled Postgres URL for migrations beside PgBouncer (5432 direct vs 6432 pooled — transaction-mode pooling breaks `prisma migrate`) | **Do not set; no effect.** No PgBouncer in this stack — one `DATABASE_URL` over the compose network serves queries *and* the entrypoint's schema sync; `prisma/schema.prisma` has no `directUrl`. |
 | `JWT_EXPIRES_IN` | Declared in 5.2's `.env.example` as the session TTL | **Do not set; no effect.** The session TTL is a code constant (`'7d'` in `src/lib/session.ts`). |
