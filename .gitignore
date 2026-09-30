@@ -69,3 +69,6 @@ upload/
 # root-level scratch images (unreferenced)
 /b.jpg
 /c.jpg
+
+# runtime artifacts
+.zscripts/dev.pid
