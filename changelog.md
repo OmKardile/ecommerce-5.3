@@ -2,6 +2,15 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-30 — Task 44 (.env.example completed: DEVELOPER_* documented, coverage proven)
+
+**Change — "config .env example properly and then push"** — Task 43 added two env vars (`DEVELOPER_EMAIL`, `DEVELOPER_WHATSAPP`) but left them out of the environment template; audited the whole env surface and closed every gap.
+
+- **Audit**: extracted every `process.env.*` read across `src/` + `prisma/` (23 distinct names) and diffed against `.env.example` — exactly two undocumented: the Task 43 developer-desk vars. Everything else (Razorpay trio, Shiprocket/Delhivery, SMS/WhatsApp, ADMIN bootstrap, STORE overrides, compose-only `POSTGRES_*`/`RUN_MIGRATIONS`/`PORT`, Dockerfile build args) was already present and accurate.
+- **`.env.example`**: new "developer / showcase pitch" section between store overrides and the compose tail — documents that platform (showcase) enquiries land on the developer's desk and NOT the store trade desk, the `src/lib/constants.ts` defaults (`omkardile84@gmail.com` / omkardile.is-a.dev), the sim-safe posture of both optional overrides, and that the WhatsApp ping (`platform_enquiry` template) fires only when the Cloud API credentials AND `DEVELOPER_WHATSAPP` are set (digits only, 91 prefix).
+- **Docs kept honest**: `docs/ENVIRONMENT.md` gains the "Developer / showcase (platform enquiries)" table, its WhatsApp template list now includes `platform_enquiry`, and the quick-matrix OPTIONAL row includes both vars; `deploy/ENV-SETUP.md` gains a §3 "Developer showcase desk" credential block and a §7 provenance row (`DEVELOPER_*` → `src/lib/constants.ts` `DEVELOPER`).
+- **Verified**: automated coverage check — `comm` of code-read vars vs template keys is empty (every runtime read is documented); lint 0; template still honors the house rule (leave unset rather than invent fake values).
+
 ## 2026-09-30 — Task 43 (showcase enquiries rerouted to the developer — new PlatformInquiry pipeline)
 
 **Change — "that form should received at developers end right, showcase / pitching is for the commerce site like this, not the patel networks store; rework on this and change all required"** — the showcase pitch is about the PLATFORM (a commerce system the developer built), so its enquiries were pointing at the wrong audience: the store's hardware trade desk. Rerouted end-to-end.

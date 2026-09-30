@@ -51,7 +51,7 @@ Pickup postcode is hardcoded to the Surat hub `395003` in the provider calls (ma
 | `WHATSAPP_PHONE_NUMBER_ID` | REQUIRED in prod | Meta Graph v20 `/{phone-id}/messages` target |
 | `WHATSAPP_VERIFY_TOKEN` | optional (webhook subscription) | Meta webhook GET verify accepts `placeholder_verify_token` when unset — set a real token in prod |
 
-WhatsApp templates referenced by code: `order_confirmation`, `order_dispatched`, `out_for_delivery`, `order_delivered`, `cod_verification`, `b2b_quote_inquiry`.
+WhatsApp templates referenced by code: `order_confirmation`, `order_dispatched`, `out_for_delivery`, `order_delivered`, `cod_verification`, `b2b_quote_inquiry`, `platform_enquiry` (developer-side ping for showcase leads — only dispatches when `DEVELOPER_WHATSAPP` is configured).
 
 ## Store overrides
 
@@ -61,6 +61,13 @@ WhatsApp templates referenced by code: `order_confirmation`, `order_dispatched`,
 | `NEXT_PUBLIC_SUPPORT_WHATSAPP` | optional | `919876543210` | wa.me deep links (contact page, floating widget) |
 
 Runtime COD/fee settings are **not** env vars — they live in the `Setting` table (`store.codMaxOrderValuePaise` default 1500000, `store.codFeePaise` 4900, `store.shippingFeePaise` 9900, `store.freeShippingThresholdPaise` 50000, dispatchCutoff, supportPhone, announcement) and are editable at `/admin/settings` (PUT gated to SUPER_ADMIN/ADMIN).
+
+## Developer / showcase (platform enquiries)
+
+| Variable | Required | Default | Notes |
+| --- | --- | --- | --- |
+| `DEVELOPER_EMAIL` | optional | `omkardile84@gmail.com` | Recipient shown on the `/showcase` enquiry success card (prefilled mailto) and closing pitch band via `src/lib/constants.ts` `DEVELOPER` — the developer's desk, deliberately NOT the store trade desk (`/contact`) |
+| `DEVELOPER_WHATSAPP` | optional | unset (no ping) | Digits only, `91` prefix, no `+`. When set AND the WhatsApp Cloud API credentials exist, `POST /api/platform-enquiry` submissions additionally ping the developer with the `platform_enquiry` template; unset = no ping, enquiries still persist in the `platform_inquiries` table |
 
 ## Admin bootstrap
 
@@ -75,5 +82,5 @@ Hardcoded seed staff (`inventory@patelnetworks.in` / `warehouse@2026`, `orders@p
 
 - **Truly REQUIRED to boot:** `DATABASE_URL` (JWT_SECRET technically has a dev fallback — treat as required in prod).
 - **REQUIRED for real operations:** Razorpay trio, one shipping provider's credentials, `SMS_GATEWAY_API_KEY`, WhatsApp token + phone id, `ADMIN_EMAIL`/`ADMIN_PASSWORD`, `NEXT_PUBLIC_APP_URL`, strong `JWT_SECRET`.
-- **OPTIONAL:** `STORE_GSTIN`, `NEXT_PUBLIC_SUPPORT_WHATSAPP`, `SHIPROCKET_API_URL`, `SMS_SENDER_ID`, `SMS_TEMPLATE_ID`, `WHATSAPP_VERIFY_TOKEN`.
+- **OPTIONAL:** `STORE_GSTIN`, `NEXT_PUBLIC_SUPPORT_WHATSAPP`, `DEVELOPER_EMAIL`, `DEVELOPER_WHATSAPP`, `SHIPROCKET_API_URL`, `SMS_SENDER_ID`, `SMS_TEMPLATE_ID`, `WHATSAPP_VERIFY_TOKEN`.
 - Anything unset/placeholder degrades that subsystem to **documented deterministic simulation**, never a fabricated live success.

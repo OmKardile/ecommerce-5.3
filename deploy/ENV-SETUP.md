@@ -190,6 +190,19 @@ The client's real GSTIN replaces the ADR-014 placeholder
 > cutoff, support phone and the storefront announcement are **not** env vars
 > — they live in the `Setting` table and are edited at `/admin/settings`.
 
+### Developer showcase desk (`DEVELOPER_EMAIL`, `DEVELOPER_WHATSAPP`)
+
+Platform-pitch enquiries from `/showcase` route to the **developer's desk**
+(`src/lib/constants.ts` `DEVELOPER`, default `omkardile84@gmail.com` — the
+portfolio's confirmed public channel), deliberately NOT the store trade desk
+above. `DEVELOPER_EMAIL` overrides the built-in email shown on the showcase
+success card and pitch band. `DEVELOPER_WHATSAPP` (digits only, `91` prefix,
+no `+`) additionally pings the developer on every
+`POST /api/platform-enquiry` — but only when the WhatsApp Cloud API
+credentials from §3 above are also set. Both are optional: unset, enquiries
+still persist in the `platform_inquiries` table and the success card offers
+a one-click prefilled mailto.
+
 ---
 
 ## 4. Prove each subsystem switched (verification checklist)
@@ -266,4 +279,5 @@ Every runtime read, so future greps can re-verify this guide:
 | `SHIPROCKET_*`, `DELHIVERY_API_KEY` | `src/server/services/shipping.service.ts` |
 | `SMS_*`, `WHATSAPP_*` | `src/server/services/notification.service.ts`; verify token also `src/app/api/webhooks/whatsapp/route.ts` |
 | `STORE_GSTIN`, `NEXT_PUBLIC_SUPPORT_WHATSAPP` | `src/lib/constants.ts` (`STORE`) |
+| `DEVELOPER_EMAIL`, `DEVELOPER_WHATSAPP` | `src/lib/constants.ts` (`DEVELOPER` — showcase/pitch audience) |
 | `POSTGRES_*`, `RUN_MIGRATIONS`, `PORT` | `docker-compose.yml` (postgres image + healthchecks), `docker-entrypoint.sh`, standalone server |

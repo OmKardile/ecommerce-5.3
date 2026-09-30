@@ -1068,3 +1068,22 @@ Stage Summary:
 - The showcase now pitches the platform and converts on the developer's desk: enquiries persist in platform_inquiries, ping the developer when WhatsApp creds exist, and every success card offers a one-click prefilled email to omkardile84@gmail.com. The store's trade desk (/contact) is untouched for hardware buyers, and the two audiences can't cross paths.
 - Files: prisma/schema.prisma (staged postgresql), src/lib/constants.ts, src/lib/validators.ts, src/app/api/platform-enquiry/route.ts (new), src/server/services/notification.service.ts, src/components/content/platform-enquiry-form.tsx (new), src/app/(store)/showcase/page.tsx, public/index-help.html, README.md, docs/README.md, docs/DATABASE.md, docs/ROUTES.md, technical-documentation.md, changelog.md, worklog.md.
 - Next-round candidates: developer-leads viewer (tiny protected page or CLI) · wire DEVELOPER_EMAIL to a real relay when available · restore Neon .env when re-shared · stock-monitor v2 (parked) · qa-clean.ts purge at go-live.
+
+---
+Task ID: 44
+Agent: Z.ai Code (lead)
+Task: User: "config .env example properly and then push" — complete the environment template with the Task 43 developer-desk vars, prove full coverage against the code, ship.
+
+Work Log:
+- START STATE: HEAD 1894c28 (Task 43) already in sync with origin/main; working tree clean; dev server up (pgrep 18737); local .env carries only DATABASE_URL (sqlite sandbox).
+- AUDIT: extracted every process.env.* read across src/ + prisma/ via rg -o | sort -u — 23 distinct names (NODE_ENV excluded as runtime-provided). Diffed against .env.example keys: exactly TWO undocumented — DEVELOPER_EMAIL and DEVELOPER_WHATSAPP (introduced by Task 43's DEVELOPER const in src/lib/constants.ts). Seed (prisma/seed.ts ADMIN_EMAIL/ADMIN_PASSWORD), mini-services (none) and render.yaml (DATABASE_URL/JWT_SECRET/NEXT_PUBLIC_APP_URL/ADMIN_*/NODE_VERSION) all covered by existing sections.
+- .env.example: inserted a "developer / showcase pitch" section between store overrides and the compose-only tail: platform enquiries land on the DEVELOPER's desk (not the store trade desk), defaults from src/lib/constants.ts (omkardile84@gmail.com / omkardile.is-a.dev portfolio — confirmed public channel), DEVELOPER_EMAIL override, DEVELOPER_WHATSAPP ping semantics (fires only when WhatsApp Cloud API creds AND the var are set; digits only, 91 prefix; unset = no ping, rows still persist in platform_inquiries + success-card mailto remains).
+- DOCS CONSISTENCY: docs/ENVIRONMENT.md — added "Developer / showcase (platform enquiries)" table (both vars with defaults + behavior), appended platform_enquiry to the WhatsApp templates list (was stale after Task 43), added both vars to the quick-matrix OPTIONAL row. deploy/ENV-SETUP.md — new §3 subsection "Developer showcase desk (DEVELOPER_EMAIL, DEVELOPER_WHATSAPP)" and §7 provenance row (DEVELOPER_* -> src/lib/constants.ts DEVELOPER).
+- COVERAGE PROOF: comm -23 of code-read vars vs .env.example keys is EMPTY (every runtime read documented; no invented vars either). Cross-checked compose/Dockerfile: POSTGRES_*/RUN_MIGRATIONS/PORT already documented; PRISMA_PROVIDER deliberately NOT added (Docker build arg with a correct default, not an env var — documenting it in .env would mislead).
+- lint 0. No code changes this round — template + docs only.
+- DOCS DUTY: changelog Task 44 · worklog (this entry).
+
+Stage Summary:
+- .env.example now documents 100% of the runtime env surface (23 vars) including the Task 43 developer-desk pair, and the two referenced runbooks (docs/ENVIRONMENT.md, deploy/ENV-SETUP.md) agree with it.
+- Files: .env.example, docs/ENVIRONMENT.md, deploy/ENV-SETUP.md, changelog.md, worklog.md.
+- Next-round candidates: developer-leads viewer (tiny protected page or CLI) for platform_inquiries · wire DEVELOPER_EMAIL to a real relay when available · restore Neon .env when re-shared · stock-monitor v2 (parked) · qa-clean.ts purge at go-live.
