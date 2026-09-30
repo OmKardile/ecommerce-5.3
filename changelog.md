@@ -2,6 +2,15 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-30 — Task 42 (contact-form E2E walkthrough + trade-desk reference visibility fix)
+
+**Change — "how the contact form is working?"** — traced and live-verified the full inquiry pipeline, and fixed one real gap found on the way.
+
+- **E2E demo (agent-browser)**: submitted a labeled QA inquiry through /contact → success card ("Inquiry received · REFERENCE LOGGED"); owner sign-in → /admin/inquiries shows it atop the New tab with tel/WhatsApp links; trade-desk note + "Mark contacted" → PATCH 200, row moved New 6→5, CONTACTED badge, "First handled" stamp, audit row `INQUIRY_STATUS {from: NEW, to: CONTACTED, note}` recorded. (Along the way: the sandbox had wiped the SQLite DB — re-seeded via `bun run db:seed`; /tmp/devup.sh keeper recreated.)
+- **Fix — unresolvable product references were invisible to the desk**: the intake API keeps free-text references (id/slug/SKU resolution falls back to raw text), and the admin GET returned only the resolved product — so showcase-sourced enquiries ("Product reference: Platform enquiry (showcase page)") showed no origin. Now the GET passes `productRef` through when unresolved, and the inbox card renders "Re: <raw reference>" in place of the product deep-link. Resolvable references keep the existing "Re: <product name>" PDP link.
+- **Harness note**: agent-browser coordinate clicks on the inbox were intercepted by the sticky admin header (JS clicks fine) — test artifact, not a product bug.
+- **Verified**: lint 0 · tsc 0; browser — reference line renders on the QA card, pipeline move + note + handledAt + audit all confirmed via UI and DB.
+
 ## 2026-09-30 — Task 41 (attribution restored minus the word "personal" + showcase CTAs → enquiry-first)
 
 Two-part round: (a) a correction of Task 40, (b) the pending showcase CTA rework.

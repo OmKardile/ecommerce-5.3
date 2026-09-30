@@ -27,6 +27,8 @@ interface InquiryRow {
   handledAt: string | null;
   createdAt: string;
   product: { name: string; slug: string } | null;
+  /** Raw reference text when it did not resolve to a real product (e.g. "Product reference: Platform enquiry (showcase page)"). */
+  productRef: string | null;
 }
 
 interface ListResponse {
@@ -214,6 +216,12 @@ export function InquiryInbox() {
                   >
                     Re: {row.product.name} <ExternalLink className="h-2.5 w-2.5 shrink-0" aria-hidden />
                   </a>
+                )}
+
+                {!row.product && row.productRef && (
+                  <p className="mt-2 truncate text-xs text-muted-foreground">
+                    <span className="font-medium text-foreground/70">Re:</span> {row.productRef}
+                  </p>
                 )}
 
                 <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end">

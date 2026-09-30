@@ -65,6 +65,10 @@ export async function GET(req: NextRequest) {
         handledAt: r.handledAt?.toISOString() ?? null,
         createdAt: r.createdAt.toISOString(),
         product: product ? { name: product.name, slug: product.slug } : null,
+        // When the reference didn't resolve to a real product, surface the raw
+        // text (e.g. "Product reference: Platform enquiry (showcase page)") so
+        // the desk still sees where the inquiry came from.
+        productRef: product ? null : (r.productId ?? null),
       };
     }),
     total,

@@ -1030,3 +1030,21 @@ Stage Summary:
 - Attribution is back exactly as the user originally wanted: Omkar Kardile credited everywhere with links, the word "personal" gone. The showcase page now behaves like a pitch: every primary action drives an enquiry (form/WhatsApp/call/email), the private consoles invite a walkthrough instead of a dead-end sign-in, and the storefront remains available as live proof rather than as the call to action.
 - Files: src/app/(store)/showcase/page.tsx, src/components/storefront/footer.tsx, public/index-help.html, README.md, docs/README.md, business-pitch.md, docs/DEPLOYMENT.md, 5 doc bylines, changelog.md, worklog.md.
 - Next-round candidates: restore Neon .env when re-shared (un-skip-worktree + provider postgresql) · per-product image overrides · stock-monitor v2 (parked) · qa-clean.ts purge at go-live.
+
+---
+Task ID: 42
+Agent: Z.ai Code (lead)
+Task: User: "how the contact form is working?" — explain the contact/inquiry pipeline; verify it live; fix anything found.
+
+Work Log:
+- TRACED the pipeline end-to-end in code: B2BInquiryForm (client) -> POST /api/contact (IP rate-limit 5/10min -> zod b2bInquirySchema -> product-ref resolution id/slug/SKU -> B2BInquiry row status NEW -> fire-and-forget WhatsApp b2b_quote_inquiry template, simulated without credentials) -> B2BInquiry table (NEW|CONTACTED|CLOSED, note, handledAt) -> /admin/inquiries inbox (scope `inquiries`: status tabs, search, pagination, Re: product deep-link) -> PATCH [id] forward-only FSM with note + handledAt stamp + audit log.
+- ENV: sandbox had killed the dev server AND wiped /tmp/devup.sh + the SQLite DB (users table empty -> admin login 401). Recreated the keeper script, restarted dev, `bun run db:seed` restored (admin creds reprinted by seed).
+- E2E DEMO (agent-browser): /contact submit as "(QA) Ramesh Patel" -> success card; owner login -> inbox shows row (tel/WhatsApp links, NEW badge); note + Mark contacted -> PATCH 200, New tab 6->5, CONTACTED badge, "First handled" stamp, audit row INQUIRY_STATUS recorded (verified in DB).
+- FIX FOUND DURING WALKTHROUGH: unresolvable product refs (e.g. showcase CTAs' free-text reference) were stored but never shown to the desk — admin GET dropped the raw productId when no product matched. Added `productRef` passthrough in GET + "Re: <raw reference>" line in the inbox card (product-matched rows keep the PDP deep-link). lint 0 / tsc 0 / browser-verified.
+- HARNESS NOTE: agent-browser coordinate clicks were intercepted by the sticky admin header on /admin/inquiries (JS element.click() works) — test artifact only.
+- DOCS DUTY: changelog Task 42 · worklog (this entry).
+
+Stage Summary:
+- The contact form pipeline is documented and proven working end-to-end in a real browser, and the trade desk now sees the origin reference even when it doesn't match a catalog product (the case for every showcase-sourced enquiry since Task 41).
+- Files: src/app/api/admin/inquiries/route.ts, src/components/admin/inquiry-inbox.tsx, changelog.md, worklog.md (+ /tmp/devup.sh recreated, local DB re-seeded).
+- Next-round candidates: restore Neon .env when re-shared (un-skip-worktree + provider postgresql) · per-product image overrides · stock-monitor v2 (parked) · qa-clean.ts purge at go-live.
