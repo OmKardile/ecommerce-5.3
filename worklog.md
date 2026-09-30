@@ -995,3 +995,21 @@ Stage Summary:
 - The platform survives a full adversarial review: both consoles walk clean, every QA-found defect is fixed and re-verified in a real browser, and the UX gaps that remained (order-success dead end, track deep-linking, desktop Track discovery, empty-cart cross-sell) are closed.
 - Files: src/app/(store)/track/page.tsx, src/app/(store)/order-success/page.tsx (new), 18 title-metadata files, src/components/storefront/kit-builder-wizard.tsx, header.tsx, cart-view.tsx, checkout-view.tsx, src/app/admin/(panel)/page.tsx, prisma/seed.ts, scripts/responsive-sweep.sh, changelog.md, worklog.md (+ local-only: .env, prisma/schema.prisma skip-worktree).
 - Next-round candidates: restore Neon .env when the user re-shares the URL (un-skip-worktree + provider postgresql) · per-product image overrides · stock-monitor v2 (parked) · qa-clean.ts purge at go-live.
+
+---
+Task ID: 40
+Agent: Z.ai Code (lead)
+Task: User: "remove personal prefix from the project .. by omkar — from everywhere" (reverses the Task 37 personal-project attribution).
+
+Work Log:
+- INVENTORY: rg -in "omkar|omkardile.is-a.dev|personal project|authored by" across the repo (live files only) → 10 code surfaces + 9 doc surfaces carried the Task 37 attribution.
+- CODE: showcase metadata title neutralized ("The Platform — one system for the counter, stockroom and back office"); hero eyebrow external link → neutral `Patel Networks · Surat` label-caps; designer line de-named; storefront footer drops "authored by Omkar Kardile" + portfolio link (MegaTechzy branding kept per Task 37); /index-help.html lede + footer attribution sentences removed.
+- DOCS: README + docs/README attribution blockquotes deleted; five decorated bylines (VPS-SETUP, PRODUCTION-CHECKLIST, RENDER-DEPLOYMENT, PHYSICAL-SERVER, ENV-VARS-GUIDE) → neutral "Patel Networks / MegaTechzy" line; business-pitch.md closing de-named + "by one person" → "as one whole"; "The designer's pitch" rows → "The platform pitch" (README, docs/README); DEPLOYMENT.md stale agent-process status note neutralized.
+- KEPT: github.com/OmKardile/patel-5.3 repo URLs (operational deploy facts, not attribution); worklog/changelog history (untouched by design).
+- VERIFIED: residual rg → only repo URLs; agent-browser — showcase title/eyebrow/no-portfolio-links, footer no-Omkar + MegaTechzy intact, index-help clean; lint 0 · tsc 0; overflow 0px at 320/375/1280 on the three edited surfaces.
+- DOCS DUTY: changelog Task 40 · worklog (this entry).
+
+Stage Summary:
+- The project presents as Patel Networks / MegaTechzy with zero personal attribution anywhere user-visible; the only remaining personal token is the GitHub repo handle inside deploy instructions, which is functional.
+- Files: src/app/(store)/showcase/page.tsx, src/components/storefront/footer.tsx, public/index-help.html, README.md, docs/README.md, docs/DEPLOYMENT.md, 5 setup-guide bylines, business-pitch.md, changelog.md, worklog.md.
+- Next-round candidates: restore Neon .env when re-shared · per-product image overrides · stock-monitor v2 (parked) · qa-clean.ts purge at go-live.

@@ -15,7 +15,7 @@ MegaTechzy is what replaces all three with **one designed system**:
 - an **operations console** the staff can genuinely run — fulfillment, stock wall, returns, trade desk, all with guarded, logged moves;
 - an **owner's cockpit** where the truth lives — GMV, GST, pipeline, low stock, GSTR-1 CSV, staff scopes, coupons and banners, no developer required.
 
-Same catalog, same stock, same books. Designed end-to-end by one person, so it behaves like one product.
+Same catalog, same stock, same books. Designed end-to-end as one whole, so it behaves like one product.
 
 ---
 
@@ -138,4 +138,4 @@ Design isn't how it looks on launch day. It's how it behaves on the busiest day 
 
 ---
 
-*MegaTechzy platform v1 — designed & built by [Omkar Kardile](https://omkardile.is-a.dev/) for Patel Networks, Surat. Operational details live in [`business-documentation.md`](business-documentation.md); routes and logins in [`docs/ROUTES.md`](docs/ROUTES.md).*
+*MegaTechzy platform v1 — designed & built for Patel Networks, Surat. Operational details live in [`business-documentation.md`](business-documentation.md); routes and logins in [`docs/ROUTES.md`](docs/ROUTES.md).*

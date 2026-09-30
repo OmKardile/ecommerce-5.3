@@ -21,7 +21,7 @@ import { BandDecor } from "@/components/motion/parallax";
 import { Button } from "@/components/ui/button";
 
 export const metadata = {
-  title: "The Platform — a personal project by Omkar Kardile",
+  title: "The Platform — one system for the counter, stockroom and back office",
   description:
     "One system, three faces: a customer storefront, a staff operations console and an owner's cockpit — designed end-to-end for a Surat CCTV & networking hardware trade. Take the tour.",
 };
@@ -172,14 +172,7 @@ export default function ShowcasePage() {
         <div aria-hidden className="absolute inset-0 bg-[radial-gradient(60%_80%_at_80%_10%,color-mix(in_srgb,var(--primary)_7%,transparent),transparent)]" />
         <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24">
           <div className="rise-in max-w-3xl">
-            <a
-              href="https://omkardile.is-a.dev/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="label-caps inline-flex items-center gap-1 transition-colors hover:text-foreground"
-            >
-              A personal project by Omkar Kardile ↗
-            </a>
+            <p className="label-caps">Patel Networks · Surat</p>
             <h1 className="mt-4 font-display text-4xl leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.4rem]">
               A shop counter, a stockroom and a back office —
               <span className="block italic text-primary">designed as one system.</span>
@@ -200,16 +193,7 @@ export default function ShowcasePage() {
               </Button>
             </div>
             <p className="mt-6 text-[13px] text-muted-foreground">
-              Designed end-to-end by{" "}
-              <a
-                href="https://omkardile.is-a.dev/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-foreground/80 underline-offset-2 transition-colors hover:text-foreground hover:underline"
-              >
-                Omkar Kardile
-              </a>{" "}
-              — typography, color, motion, flows and the data model behind them.
+              Designed end-to-end — typography, color, motion, flows and the data model behind them.
             </p>
           </div>
         </div>

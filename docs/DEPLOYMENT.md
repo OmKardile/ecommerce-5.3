@@ -2,7 +2,7 @@
 
 Target: the client's own VPS running Docker Compose — **no Supabase, no Firebase, no managed DB** (client requirement; resolution C1/C8 in [DECISIONS.md](./DECISIONS.md)). The app is a single Next.js standalone container behind an nginx reverse proxy, with PostgreSQL in a container and optional redis/minio.
 
-Status note: the deploy artifacts (`Dockerfile`, `docker-compose.yml`, `nginx/`, `.env.example`) are authored by infrastructure agent 3-b (tracked in `/worklog.md`). This document is the operational contract those files implement; where a file is not yet present, the "expected" description below is what to verify once 3-b lands it.
+Status note: this document is the operational contract the committed deploy artifacts (`Dockerfile`, `docker-compose.yml`, `nginx/`, `.env.example`) implement. Where a file is not yet present, the "expected" description below is what to verify once it lands.
 
 ## Topology (docker-compose)
 

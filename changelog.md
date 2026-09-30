@@ -1,6 +1,14 @@
 # Changelog
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
+## 2026-09-28 — Task 40 (de-personalization: "by Omkar" attribution removed everywhere)
+
+**Change — "remove personal prefix from the project .. by omkar — from everywhere"**
+- **Code surfaces**: `/showcase` metadata title → "The Platform — one system for the counter, stockroom and back office"; hero eyebrow link ("A personal project by Omkar Kardile ↗" → omkardile.is-a.dev) replaced with a neutral `Patel Networks · Surat` label-caps eyebrow; the designer line → "Designed end-to-end — typography, color, motion, flows and the data model behind them." Storefront footer keeps the MegaTechzy branding but drops "— authored by Omkar Kardile (link)". `/index-help.html` lede + footer attribution sentences removed.
+- **Docs**: README + docs/README "A personal project by Omkar Kardile" blockquotes deleted; the five decorated doc bylines (VPS-SETUP, PRODUCTION-CHECKLIST, RENDER-DEPLOYMENT, PHYSICAL-SERVER, ENV-VARS-GUIDE) reduced to the neutral "Patel Networks / MegaTechzy" identity line; business-pitch.md closing line de-named ("designed & built for Patel Networks, Surat") + "by one person" → "as one whole"; README/docs-README pitch rows renamed "The designer's pitch" → "The platform pitch"; stale agent-process status note in docs/DEPLOYMENT.md neutralized.
+- **Kept (operational, not attribution)**: the GitHub repo URLs (`github.com/OmKardile/patel-5.3`) in deploy docs/README — they are where the code lives and deploy instructions depend on them. History files (worklog/changelog) untouched by design.
+- **Verified**: repo-wide rg for `omkar|omkardile.is-a.dev|personal project|authored by` → only repo URLs remain; agent-browser — showcase (title/eyebrow/zero portfolio links), footer (no Omkar, MegaTechzy intact), index-help clean; lint 0 · tsc 0; overflow 0px at 320/375/1280 on all three edited surfaces.
+All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
 ## 2026-09-28 — Task 39 (review & iterate: QA-driven bug batch + UX pass)
 

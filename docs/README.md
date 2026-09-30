@@ -4,14 +4,12 @@ Greenfield rebuild of the Patel Networks (MegaTechzy) e-commerce platform: CCTV,
 
 The implementation was built from scratch by a multi-agent team; the authoritative build history is `/worklog.md` at the repo root, and module ownership rules live in [`CONTRACTS.md`](./CONTRACTS.md).
 
-> **A personal project by [Omkar Kardile](https://omkardile.is-a.dev/)** — designed & built end-to-end (branding, UX, code, data model).
-
 ## Documentation index
 
 | Document | Contents |
 | --- | --- |
 | [README.md](./README.md) | This overview: identity, feature map, stack, quick start |
-| [../business-pitch.md](../business-pitch.md) | **The designer's pitch**: features, design story, business benefits, what the platform can achieve — visual version at `/showcase` |
+| [../business-pitch.md](../business-pitch.md) | **The platform pitch**: features, design story, business benefits, what the platform can achieve — visual version at `/showcase` |
 | [ROUTES.md](./ROUTES.md) | **Routes cheat sheet**: every page URL, login pages + seeded credentials table (owner/staff/customer), admin section access map, API group index |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Modular-monolith layout, services, session design, order FSM, dual-mode integrations, design system |
 | [DATABASE.md](./DATABASE.md) | All 38 Prisma models, relationships, money-in-paise rationale, portability, seed, PostgreSQL switch |
