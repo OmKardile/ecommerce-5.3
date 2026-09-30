@@ -88,7 +88,8 @@ export type WhatsAppTemplate =
   | 'back_in_stock'
   | 'cod_verification'
   | 'b2b_quote_inquiry'
-  | 'address_updated';
+  | 'address_updated'
+  | 'platform_enquiry'; // developer-side ping for showcase leads (sent to DEVELOPER.whatsapp, not the buyer)
 
 export interface WhatsAppSendResult {
   simulated: boolean;

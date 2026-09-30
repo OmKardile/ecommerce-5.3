@@ -15,6 +15,18 @@ export const STORE = {
   dispatchCutoff: '4:00 PM IST',
 } as const;
 
+// The platform's developer (showcase / pitching audience). Platform-pitch
+// enquiries from /showcase land HERE — deliberately separate from the store's
+// trade desk (STORE above), whose audience is hardware buyers.
+// Email is the confirmed public channel (portfolio contact page);
+// WhatsApp is optional and only fires when DEVELOPER_WHATSAPP is configured.
+export const DEVELOPER = {
+  name: 'Omkar Kardile',
+  portfolio: 'https://omkardile.is-a.dev/',
+  email: process.env.DEVELOPER_EMAIL ?? 'omkardile84@gmail.com',
+  whatsapp: process.env.DEVELOPER_WHATSAPP ?? null,
+} as const;
+
 export const ROLES = {
   SUPER_ADMIN: 'SUPER_ADMIN',
   STAFF: 'STAFF',

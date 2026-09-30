@@ -1048,3 +1048,23 @@ Stage Summary:
 - The contact form pipeline is documented and proven working end-to-end in a real browser, and the trade desk now sees the origin reference even when it doesn't match a catalog product (the case for every showcase-sourced enquiry since Task 41).
 - Files: src/app/api/admin/inquiries/route.ts, src/components/admin/inquiry-inbox.tsx, changelog.md, worklog.md (+ /tmp/devup.sh recreated, local DB re-seeded).
 - Next-round candidates: restore Neon .env when re-shared (un-skip-worktree + provider postgresql) · per-product image overrides · stock-monitor v2 (parked) · qa-clean.ts purge at go-live.
+
+---
+Task ID: 43
+Agent: Z.ai Code (lead)
+Task: User: "that form should received at developers end right, showcase / pitching is for the commerce site like this, not the patel networks store; rework on this and change all required" — reroute showcase enquiries from the store trade desk to the developer with a dedicated pipeline.
+
+Work Log:
+- CONTACT DISCOVERY: scraped omkardile.is-a.dev (+ /contact) — confirmed public channel is mailto omkardile84@gmail.com; the phone-looking hit was a false positive (JS chunk filename). DEVELOPER const in src/lib/constants.ts: name/portfolio/email (env overrides DEVELOPER_EMAIL, DEVELOPER_WHATSAPP optional; whatsapp null unless configured).
+- DATA: PlatformInquiry model added (39th). Skip-worktree dance executed cleanly: un-skip -> edit (local sqlite) -> db:push + create/count/delete probe -> sed provider to postgresql -> git add (staged = postgresql + new model) -> sed back to sqlite -> re-skip. Verified staged vs working with git show :file.
+- BACKEND: platformEnquirySchema in validators (contact accepts email OR phone via refine; interest enum default platform); POST /api/platform-enquiry (rate-limit platenq:ip 5/10min, zod, DB create status NEW, fire-and-forget sendWhatsAppTemplate('platform_enquiry') to DEVELOPER.whatsapp only when configured); WhatsAppTemplate union extended.
+- FRONTEND: PlatformEnquiryForm client component (fields + interest select; success card with "Email a copy now" prefilled mailto compose = real synchronous channel + portfolio link). Showcase: hero Enquire now -> #enquire; both walkthrough cards -> #enquire; closing band rebuilt two-column with pitch copy ("pitches the platform — not the shop"), developer email + portfolio channels, "buy hardware instead? -> /contact" pointer; STORE trade-desk phone/WhatsApp/email removed from the band. Fixed white-on-white card text (inherited text-brand-foreground on pine) via text-foreground on card roots — light+dark verified.
+- COUNTERS: 39 models / 79 API files propagated (showcase STATS + OUTCOMES, index-help chips + footer, README, docs/README, docs/DATABASE.md incl. entity-map row, technical-documentation.md); ROUTES.md API index updated.
+- SANDBOX LESSON: chmod 644 on the new route DIRECTORY removed its traverse bit -> Turbopack watchpack EACCES + stale manifest -> POST 404 despite the file existing. Fix: chmod 755 dir + full .next wipe + restart (Task-38 lesson replayed). Keeper recreated.
+- VERIFIED: lint 0 · tsc 0; E2E — form submit -> POST 200 -> DB row correct (interest: walkthrough) -> success card; mailto compose carries subject+body; hero anchor scrolls; /contact untouched (200, form intact); sweep 108/108; light+dark screenshots.
+- DOCS DUTY: changelog Task 43 · worklog (this entry).
+
+Stage Summary:
+- The showcase now pitches the platform and converts on the developer's desk: enquiries persist in platform_inquiries, ping the developer when WhatsApp creds exist, and every success card offers a one-click prefilled email to omkardile84@gmail.com. The store's trade desk (/contact) is untouched for hardware buyers, and the two audiences can't cross paths.
+- Files: prisma/schema.prisma (staged postgresql), src/lib/constants.ts, src/lib/validators.ts, src/app/api/platform-enquiry/route.ts (new), src/server/services/notification.service.ts, src/components/content/platform-enquiry-form.tsx (new), src/app/(store)/showcase/page.tsx, public/index-help.html, README.md, docs/README.md, docs/DATABASE.md, docs/ROUTES.md, technical-documentation.md, changelog.md, worklog.md.
+- Next-round candidates: developer-leads viewer (tiny protected page or CLI) · wire DEVELOPER_EMAIL to a real relay when available · restore Neon .env when re-shared · stock-monitor v2 (parked) · qa-clean.ts purge at go-live.

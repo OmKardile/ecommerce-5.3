@@ -741,3 +741,20 @@ model Setting {
 
   @@map("settings")
 }
+
+// Platform-pitch enquiries (showcase page) — leads for the developer, NOT
+// store trade-desk traffic. Separate from B2BInquiry on purpose: the audience,
+// owner and follow-up flow are different (the developer, not shop staff).
+model PlatformInquiry {
+  id        String   @id @default(cuid())
+  name      String
+  contact   String   // email or phone — whichever the prospect prefers
+  interest  String   @default("platform") // platform | walkthrough | other
+  message   String
+  status    String   @default("NEW") // NEW | REPLIED | CLOSED (developer's own pipeline)
+  note      String?  // developer's follow-up notes
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("platform_inquiries")
+}

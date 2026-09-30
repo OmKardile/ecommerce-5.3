@@ -278,6 +278,23 @@ export const b2bInquirySchema = z.object({
   productId: z.string().optional(),
 });
 
+// Platform-pitch intake (showcase page) — the developer's leads, not the
+// store's trade desk. Contact is deliberately loose: email OR phone.
+export const platformEnquirySchema = z.object({
+  name: z.string().trim().min(2).max(80),
+  contact: z
+    .string()
+    .trim()
+    .min(5)
+    .max(120)
+    .refine(
+      (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) || /^\+?[\d\s-]{10,15}$/.test(v),
+      'Provide an email address or a phone number',
+    ),
+  interest: z.enum(['platform', 'walkthrough', 'other']).optional().default('platform'),
+  message: z.string().trim().min(10).max(2000),
+});
+
 export const settingsSchema = z.object({
   codMaxOrderValuePaise: z.number().int().positive().optional(),
   codFeePaise: z.number().int().nonnegative().optional(),

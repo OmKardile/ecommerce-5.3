@@ -34,7 +34,7 @@ src/
   |                      that talks to Prisma besides thin API reads
   lib/                ← session, api-helpers (ok/fail/requireRole), validators,
   |                      money, phone, pincodes, rate-limit, constants
-prisma/schema.prisma  ← 38 models · prisma/seed.ts + seed-images.json (real images only)
+prisma/schema.prisma  ← 39 models · prisma/seed.ts + seed-images.json (real images only)
 scripts/              ← qa-fixtures.ts / qa-clean.ts / checkdb.ts / rma-e2e.sh
   |                    / responsive-sweep.sh + responsive-sweep-admin.sh
 ```

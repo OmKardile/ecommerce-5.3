@@ -14,7 +14,7 @@ The implementation was built from scratch by a multi-agent team; the authoritati
 | [../business-pitch.md](../business-pitch.md) | **The designer's pitch**: features, design story, business benefits, what the platform can achieve — visual version at `/showcase` |
 | [ROUTES.md](./ROUTES.md) | **Routes cheat sheet**: every page URL, login pages + seeded credentials table (owner/staff/customer), admin section access map, API group index |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Modular-monolith layout, services, session design, order FSM, dual-mode integrations, design system |
-| [DATABASE.md](./DATABASE.md) | All 38 Prisma models, relationships, money-in-paise rationale, portability, seed, PostgreSQL switch |
+| [DATABASE.md](./DATABASE.md) | All 39 Prisma models, relationships, money-in-paise rationale, portability, seed, PostgreSQL switch |
 | [DEPLOYMENT.md](./DEPLOYMENT.md) | Client VPS self-hosting: Docker Compose, nginx, migrations, backups, logging, SSL |
 | [ENVIRONMENT.md](./ENVIRONMENT.md) | Every environment variable, required vs optional, simulation behavior |
 | [../deploy/ENV-SETUP.md](../deploy/ENV-SETUP.md) | `.env` setup runbook: fill-in order, credential sources, sim→live verification, rotation, troubleshooting |

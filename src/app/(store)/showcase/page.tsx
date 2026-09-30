@@ -6,11 +6,11 @@ import {
   ClipboardCheck,
   Contrast,
   Database,
+  ExternalLink,
   GitCompare,
-  MessageCircle,
+  Mail,
   MousePointerClick,
   PackageSearch,
-  Phone,
   Receipt,
   Search,
   ShieldCheck,
@@ -21,7 +21,8 @@ import {
 } from "lucide-react";
 import { BandDecor } from "@/components/motion/parallax";
 import { Button } from "@/components/ui/button";
-import { STORE } from "@/lib/constants";
+import { DEVELOPER } from "@/lib/constants";
+import { PlatformEnquiryForm } from "@/components/content/platform-enquiry-form";
 
 export const metadata = {
   title: "The Platform — a project by Omkar Kardile",
@@ -34,9 +35,9 @@ export const metadata = {
 /* ------------------------------------------------------------------ */
 
 const STATS = [
-  { value: "38", label: "domain data models" },
+  { value: "39", label: "domain data models" },
   { value: "50+", label: "designed screens" },
-  { value: "78", label: "API endpoints" },
+  { value: "79", label: "API endpoints" },
   { value: "13", label: "state order lifecycle" },
   { value: "2", label: "complete themes" },
   { value: "100%", label: "paise-exact billing" },
@@ -56,7 +57,7 @@ const FACES = [
     kicker: "For the team",
     title: "The operations console",
     body: "Fulfillment, inventory, returns, trade desk and moderation — every order state is server-enforced, every stock move is reasoned and logged. Staff see only what they're granted.",
-    href: "/contact?product=Platform walkthrough (operations console)",
+    href: "#enquire",
     cta: "Request a walkthrough",
   },
   {
@@ -64,7 +65,7 @@ const FACES = [
     kicker: "For the owner",
     title: "The cockpit",
     body: "GMV, GST collections, order pipeline and low stock on one dashboard; GSTR-1-ready CSVs, staff scopes, coupons, banners and store rules — no developer required.",
-    href: "/contact?product=Platform walkthrough (owner cockpit)",
+    href: "#enquire",
     cta: "Request a walkthrough",
   },
 ];
@@ -161,17 +162,11 @@ const OUTCOMES = [
   },
   {
     title: "Own your data",
-    body: "A 38-model PostgreSQL core you can export, back up and move — customers, orders, serials and ledgers stay yours, not a marketplace's.",
+    body: "A 39-model PostgreSQL core you can export, back up and move — customers, orders, serials and ledgers stay yours, not a marketplace's.",
   },
 ];
 
 /* ------------------------------------------------------------------ */
-
-const ENQUIRE_HREF = "/contact?product=Platform enquiry (showcase page)";
-const WHATSAPP_HREF = `https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent(
-  "Hello Patel Networks — I saw the platform showcase and would like to enquire about it.",
-)}`;
-const TEL_HREF = `tel:${STORE.supportPhone.replace(/\s/g, "")}`;
 
 export default function ShowcasePage() {
   return (
@@ -196,12 +191,12 @@ export default function ShowcasePage() {
             <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-muted-foreground">
               Most local trade businesses run on three disconnected tools: a website, a notebook and hope. This platform
               is one designed whole — a storefront customers enjoy, a console the staff can actually run, and a cockpit
-              where the owner sees the truth. Take the tour below — every number on this page is real — and enquire at
-              the end when it fits your counter.
+              where the owner sees the truth. Take the tour below — every number on this page is real — and send the
+              developer an enquiry at the end when it fits your business.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button asChild size="lg" className="rounded-full px-6">
-                <Link href={ENQUIRE_HREF}>
+                <Link href="#enquire">
                   Enquire now <ArrowRight className="ml-1 h-4 w-4" />
                 </Link>
               </Button>
@@ -423,63 +418,63 @@ export default function ShowcasePage() {
         </div>
       </section>
 
-      {/* ---------- closing CTA: enquire ---------- */}
-      <section className="relative overflow-hidden bg-brand text-brand-foreground">
+      {/* ---------- closing CTA: enquire with the developer ---------- */}
+      <section id="enquire" className="relative scroll-mt-16 overflow-hidden bg-brand text-brand-foreground">
         <BandDecor />
         <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-20">
-          <div className="max-w-2xl">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-foreground/60">Put it to work</p>
-            <h2 className="mt-3 font-display text-3xl leading-tight tracking-tight sm:text-4xl">
-              The best pitch is the product. Open it, click around — then enquire.
-            </h2>
-            <p className="mt-4 text-[14px] leading-relaxed text-brand-foreground/75">
-              The storefront is{" "}
-              <Link href="/products" className="underline underline-offset-2 transition-colors hover:text-brand-foreground">
-                fully browsable
-              </Link>{" "}
-              — search, compare, build a kit, place a COD order, track it back. Six months of realistic operating
-              history is loaded, so every console and report shows real movement, not empty charts. When you're done
-              clicking, tell the desk what your business needs — live walkthroughs of the console come with the reply.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg" variant="secondary" className="rounded-full px-6">
-                <Link href={ENQUIRE_HREF}>
-                  Enquire now <ArrowRight className="ml-1 h-4 w-4" />
+          <div className="grid gap-10 lg:grid-cols-12">
+            <div className="lg:col-span-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-foreground/60">
+                Start a conversation
+              </p>
+              <h2 className="mt-3 font-display text-3xl leading-tight tracking-tight sm:text-4xl">
+                Want a system like this for your trade?
+              </h2>
+              <p className="mt-4 text-[14px] leading-relaxed text-brand-foreground/75">
+                This page pitches the platform — not the shop. Enquiries land directly with{" "}
+                <a
+                  href={DEVELOPER.portfolio}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-brand-foreground underline underline-offset-2 transition-colors hover:text-brand-foreground/80"
+                >
+                  {DEVELOPER.name}
+                </a>
+                , the developer — replies usually go out within a working day. The storefront here is{" "}
+                <Link href="/products" className="underline underline-offset-2 transition-colors hover:text-brand-foreground">
+                  fully browsable
+                </Link>{" "}
+                with six months of realistic operating history, so everything you click shows real movement.
+              </p>
+              <div className="mt-6 flex flex-col gap-2.5">
+                <a
+                  href={`mailto:${DEVELOPER.email}`}
+                  className="inline-flex w-fit items-center gap-2 text-[13.5px] font-medium text-brand-foreground transition-colors hover:text-brand-foreground/80"
+                >
+                  <Mail className="h-4 w-4" aria-hidden />
+                  {DEVELOPER.email}
+                </a>
+                <a
+                  href={DEVELOPER.portfolio}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex w-fit items-center gap-2 text-[13.5px] font-medium text-brand-foreground transition-colors hover:text-brand-foreground/80"
+                >
+                  <ExternalLink className="h-4 w-4" aria-hidden />
+                  Portfolio — {DEVELOPER.portfolio.replace("https://", "")}
+                </a>
+              </div>
+              <p className="mt-6 text-[12.5px] text-brand-foreground/55">
+                Looking to buy hardware instead? The shop's own trade desk is at{" "}
+                <Link href="/contact" className="underline underline-offset-2 transition-colors hover:text-brand-foreground">
+                  /contact
                 </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="rounded-full border-brand-foreground/30 bg-transparent px-6 text-brand-foreground hover:bg-brand-foreground/10 hover:text-brand-foreground"
-              >
-                <a href={WHATSAPP_HREF} target="_blank" rel="noopener noreferrer">
-                  <MessageCircle className="mr-2 h-4 w-4" aria-hidden />
-                  WhatsApp the desk
-                </a>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="rounded-full border-brand-foreground/30 bg-transparent px-6 text-brand-foreground hover:bg-brand-foreground/10 hover:text-brand-foreground"
-              >
-                <a href={TEL_HREF}>
-                  <Phone className="mr-2 h-4 w-4" aria-hidden />
-                  {STORE.supportPhone}
-                </a>
-              </Button>
+                .
+              </p>
             </div>
-            <p className="mt-6 text-[12.5px] text-brand-foreground/55">
-              Prefer email?{" "}
-              <a
-                href={`mailto:${STORE.email}`}
-                className="underline underline-offset-2 transition-colors hover:text-brand-foreground"
-              >
-                {STORE.email}
-              </a>{" "}
-              — the desk replies within one working day.
-            </p>
+            <div className="lg:col-span-7">
+              <PlatformEnquiryForm />
+            </div>
           </div>
         </div>
       </section>

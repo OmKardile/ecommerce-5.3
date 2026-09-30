@@ -2,6 +2,17 @@
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
+## 2026-09-30 — Task 43 (showcase enquiries rerouted to the developer — new PlatformInquiry pipeline)
+
+**Change — "that form should received at developers end right, showcase / pitching is for the commerce site like this, not the patel networks store; rework on this and change all required"** — the showcase pitch is about the PLATFORM (a commerce system the developer built), so its enquiries were pointing at the wrong audience: the store's hardware trade desk. Rerouted end-to-end.
+
+- **New pipeline (developer-side)**: `PlatformInquiry` model (39th — name, contact as email-or-phone, interest platform/walkthrough/other, message, status NEW/REPLIED/CLOSED, note) → `POST /api/platform-enquiry` (IP rate-limit 5/10min → `platformEnquirySchema` zod → DB row → fire-and-forget WhatsApp ping to `DEVELOPER.whatsapp` when configured; the row is the durable record). `DEVELOPER` const in lib/constants: name + portfolio + `omkardile84@gmail.com` (the confirmed public channel on omkardile.is-a.dev/contact; env-overridable via DEVELOPER_EMAIL / DEVELOPER_WHATSAPP).
+- **Showcase rework**: hero "Enquire now" + both "Request a walkthrough" cards → `#enquire` anchor (scroll-mt for the sticky header); closing band rebuilt as a two-column "Start a conversation" section — left: pitch copy ("This page pitches the platform — not the shop…"), direct channels (developer email + portfolio), and a clear "Looking to buy hardware instead? → /contact" pointer; right: new `PlatformEnquiryForm` (client) — name, email-or-phone, interest select, message → success card ("lands directly with Omkar Kardile…") with an "Email a copy now" prefilled mailto compose as a real synchronous channel + portfolio link. All store trade-desk channels (Patel Networks phone/WhatsApp/sales@) removed from the pitch band; /contact itself untouched for store buyers.
+- **Contrast fix (Task-38 bug class)**: the paper form/success cards inside the pine band inherited `text-brand-foreground` → white-on-white headings/labels/buttons; fixed with `text-foreground` on the card roots. Verified in light + dark.
+- **Counters kept honest**: 38→39 models and 78→79 API files across /showcase stats, /index-help.html chips + footer, README, docs/README, docs/DATABASE.md (incl. new entity-map row), technical-documentation.md; ROUTES.md API index lists `/api/platform-enquiry` and relabels `/api/contact` as the store's trade desk.
+- **Verified**: lint 0 · tsc 0; agent-browser E2E — showcase form submit → `POST /api/platform-enquiry 200` → row in DB (name/contact/interest/message/status NEW) → success card with prefilled mailto (`subject=Platform enquiry — a live walkthrough — <name>`); hero anchor scrolls (hash #enquire); /contact trade-desk form untouched; light + dark band screenshots clean; full sweep 108/108.
+- **Sandbox**: the 644-dir permission stumble (chmod'd the new route dir non-traversable) poisoned Turbopack's manifest → route 404 until a full `.next` wipe + restart; watchpack EACCES errors were the tell. Keeper/devup recreated and armed.
+
 ## 2026-09-30 — Task 42 (contact-form E2E walkthrough + trade-desk reference visibility fix)
 
 **Change — "how the contact form is working?"** — traced and live-verified the full inquiry pipeline, and fixed one real gap found on the way.

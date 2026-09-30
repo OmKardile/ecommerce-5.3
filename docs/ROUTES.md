@@ -106,7 +106,8 @@ All handlers live under `src/app/api/**`; responses use the envelope `{ ok, data
 | `/api/stock-alerts` | Back-in-stock notify-me |
 | `/api/admin/**` | The whole operations console (orders, inventory, staff, reports, GSTR-1, …) |
 | `/api/webhooks/**` | Razorpay + shipping events (shared-secret) |
-| `/api/contact` | B2B inquiry form |
+| `/api/contact` | B2B inquiry form (store's trade desk) |
+| `/api/platform-enquiry` | Showcase platform-pitch form (developer's leads — separate from the trade desk) |
 | `/api/health` | Liveness + DB ping (`{"ok":true,"data":{"status":"healthy","db":"up"}}`) |
 
 ---

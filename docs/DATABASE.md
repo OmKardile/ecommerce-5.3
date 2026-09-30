@@ -1,6 +1,6 @@
 # Database
 
-Single Prisma schema at `prisma/schema.prisma` with **38 models**, table names mapped to snake_case via `@@map`. The schema header documents the portability contract:
+Single Prisma schema at `prisma/schema.prisma` with **39 models**, table names mapped to snake_case via `@@map`. The schema header documents the portability contract:
 
 ```
 // PORTABILITY NOTE: This schema is 100% valid for BOTH SQLite (sandbox dev)
@@ -8,7 +8,7 @@ Single Prisma schema at `prisma/schema.prisma` with **38 models**, table names m
 // no native arrays (Json/Json-string), all money = integer paise.
 ```
 
-## Entity map (all 38 models)
+## Entity map (all 39 models)
 
 Identity & access:
 
@@ -72,6 +72,7 @@ Marketing & content:
 | `Post` | title, slug (unique), excerpt, content (markdown), coverImageUrl (nullable by design), status (DRAFT/PUBLISHED), publishedAt, tags (JSON string[]) |
 | `Review` | productId (cascade), userId (cascade), rating 1-5, title, comment, isVerified (delivered purchase), isApproved (moderation); unique (productId, userId), index (productId, isApproved) |
 | `B2BInquiry` | name, phone, email, companyName, gstin, message, productId, status (NEW/CONTACTED/CLOSED) |
+| `PlatformInquiry` | name, contact (email or phone), interest (platform/walkthrough/other), message, status (NEW/REPLIED/CLOSED), note — showcase-pitch leads for the developer, separate from the store's B2BInquiry |
 
 Platform:
 
