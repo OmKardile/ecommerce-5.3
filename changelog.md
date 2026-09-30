@@ -1,6 +1,17 @@
 # Changelog
 
 All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
+
+## 2026-09-30 — Task 41 (attribution restored minus the word "personal" + showcase CTAs → enquiry-first)
+
+Two-part round: (a) a correction of Task 40, (b) the pending showcase CTA rework.
+
+**Part A — attribution correction ("i didnt told u to remove personal references i just told u to remove the word 'personal'")** — Task 40 over-removed. Every Omkar Kardile / omkardile.is-a.dev attribution from the Task 37 state is restored, with only the word "personal" dropped ("A personal project by Omkar Kardile" → "A project by Omkar Kardile"): `/showcase` metadata title + hero eyebrow link + designer line; storefront footer "— authored by Omkar Kardile" link; `/index-help.html` lede + footer credits; README + docs/README blockquotes and "The designer's pitch" rows; business-pitch.md "designed end-to-end by one person" + closing credit line; the five decorated doc bylines (VPS-SETUP, PRODUCTION-CHECKLIST, RENDER-DEPLOYMENT, PHYSICAL-SERVER, ENV-VARS-GUIDE) → "A project — authored by Omkar Kardile"; docs/DEPLOYMENT.md agent-process status note. Remaining `personal` hits in the repo are ordinary English (GitHub Personal Access Tokens, personal-name orders, Sensitive Personal Data, "personalize").
+
+**Part B — showcase CTAs now pitch the enquiry, not the catalog ("why the hell showcase page having those unrelated CTA?")** — hero primary → **"Enquire now"** → `/contact?product=Platform enquiry (showcase page)` (prefills the trade-desk form's reference field); hero secondary → "Open the live storefront" (demo proof; replaces "Walk the storefront", drops "Build a CCTV kit"); the three-faces console cards swap their private `/admin/login` sign-in links for "Request a walkthrough" → `/contact` prefilled per console; closing band rebuilt enquiry-first — "Enquire now" + "WhatsApp the desk" (wa.me with a prefilled message) + tap-to-call +91 98765 43210 + a mailto footnote ("the desk replies within one working day"); the developer-flavored docs/ROUTES.md credentials note is gone, and "Track a demo order" / "Meet the shop" buttons are dropped (demo evidence survives as an inline "fully browsable" link to /products).
+
+**Verified**: agent-browser — showcase title "The Platform — a project by Omkar Kardile", eyebrow, hero CTAs, faces cards and closing band all render; "Enquire now" click → `/contact` with "Product reference: Platform enquiry (showcase page)" prefilled in the form; footer shows "authored by Omkar Kardile / MegaTechzy — Patel Networks"; light + dark pine-band buttons all visible (ghost pattern holds); 375px & 1280px overflow 0; full sweep 108/108 (27 routes × 4 viewports); lint 0 · tsc 0.
+
 ## 2026-09-28 — Task 40 (de-personalization: "by Omkar" attribution removed everywhere)
 
 **Change — "remove personal prefix from the project .. by omkar — from everywhere"**
@@ -8,7 +19,6 @@ All notable changes, newest first. One entry per shipped round (see `worklog.md`
 - **Docs**: README + docs/README "A personal project by Omkar Kardile" blockquotes deleted; the five decorated doc bylines (VPS-SETUP, PRODUCTION-CHECKLIST, RENDER-DEPLOYMENT, PHYSICAL-SERVER, ENV-VARS-GUIDE) reduced to the neutral "Patel Networks / MegaTechzy" identity line; business-pitch.md closing line de-named ("designed & built for Patel Networks, Surat") + "by one person" → "as one whole"; README/docs-README pitch rows renamed "The designer's pitch" → "The platform pitch"; stale agent-process status note in docs/DEPLOYMENT.md neutralized.
 - **Kept (operational, not attribution)**: the GitHub repo URLs (`github.com/OmKardile/patel-5.3`) in deploy docs/README — they are where the code lives and deploy instructions depend on them. History files (worklog/changelog) untouched by design.
 - **Verified**: repo-wide rg for `omkar|omkardile.is-a.dev|personal project|authored by` → only repo URLs remain; agent-browser — showcase (title/eyebrow/zero portfolio links), footer (no Omkar, MegaTechzy intact), index-help clean; lint 0 · tsc 0; overflow 0px at 320/375/1280 on all three edited surfaces.
-All notable changes, newest first. One entry per shipped round (see `worklog.md` for the full per-round journal).
 
 ## 2026-09-28 — Task 39 (review & iterate: QA-driven bug batch + UX pass)
 

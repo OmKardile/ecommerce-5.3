@@ -126,7 +126,15 @@ export function Footer() {
           </div>
           <div className="mt-3 flex flex-col gap-2 border-t border-border/60 pt-3 sm:flex-row sm:items-center sm:justify-between">
             <p>
-              Surveillance Hardware Procurement Platform/Store · India{" "}
+              Surveillance Hardware Procurement Platform/Store · India — authored by{" "}
+              <a
+                href="https://omkardile.is-a.dev/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-foreground/80 underline-offset-2 transition-colors hover:text-foreground hover:underline"
+              >
+                Omkar Kardile
+              </a>{" "}
               <span className="text-foreground/80">/ MegaTechzy — Patel Networks</span>
             </p>
             <Link

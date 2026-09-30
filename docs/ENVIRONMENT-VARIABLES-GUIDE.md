@@ -591,6 +591,6 @@ Full hardware + OS + Docker runbooks: **[docs/VPS-SETUP-GUIDE.md](./VPS-SETUP-GU
 ---
 
 <p align="center">
-<em>Patel Networks / MegaTechzy</em><br/>
+<em>A project — authored by <a href="https://omkardile.is-a.dev/">Omkar Kardile</a> — Patel Networks / MegaTechzy</em><br/>
 <sub>Surveillance hardware procurement platform · India</sub>
 </p>
