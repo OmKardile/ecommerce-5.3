@@ -1,54 +1,140 @@
 # =============================================================================
-# Patel Networks / MegaTechzy — Render Blueprint
+# Patel Networks / MegaTechzy — Render Blueprint · OG 5.3 (frozen mirror)
+# Repo: OmKardile/ecommerce-5.3 — the pre-fork snapshot this repo was
+# duplicated from (frozen at Task 45; code here does NOT evolve).
 #
-# One-click deploy: Render Dashboard → New + → Blueprint → pick this repo.
-# Render reads this file and prompts for every `sync: false` value.
+# One-click deploy: Render Dashboard → New + → Blueprint → pick
+# OmKardile/ecommerce-5.3 → hit Apply. EVERY env var the code reads is
+# HARDCODED below — zero creation prompts, zero sync:false, zero
+# generateValue (the old version of this file prompted for 4 values and
+# generated a mismatched JWT_SECRET; that is fixed). The complete .env
+# surface mirrors patel-networks' Task-62 blueprint, adapted for THIS
+# service. Reference docs (same lineage): deploy/RENDER-STEPS.md,
+# docs/ENVIRONMENT.md.
 #
 # Manual alternative (New + → Web Service): use exactly these commands.
 #   Runtime:      Node
+#   Region:       Singapore
+#   Branch:       main
 #   Build:        npm install && npm run db:sync && npm run build
 #   Start:        npm run start
+#   Health check: /api/health
 #
-# ⚠️ START-COMMAND GOTCHA (verified live 2026-09): Render sets HOSTNAME to the
-# service hostname, and Next standalone binds to it → 502. `npm run start` now
-# pins HOSTNAME=0.0.0.0 PORT=${PORT:-3000} (Task 29). The dashboard variant
-#   HOSTNAME=0.0.0.0 PORT=$PORT NODE_ENV=production bun .next/standalone/server.js
-# is equivalent (bun ships in Render's Node image) — keep the two in sync.
+# ⚠️ FIRST-DEPLOY URL FIX: the service name "ecommerce-5.3" slugifies to
+# ecommerce-5-3, so NEXT_PUBLIC_APP_URL below pre-assigns
+# https://ecommerce-5-3.onrender.com. If Render appends a random suffix
+# (name taken), correct THIS value + Dashboard → Environment to the real
+# URL and run "Manual Deploy → Clear build cache & deploy" (the value is
+# inlined into client bundles at BUILD time).
 #
-# The database is EXTERNAL (Neon Postgres) — Render's ephemeral disk holds
-# nothing of value, so free-plan restarts/spin-downs lose no data.
+# ⚠️ SHARED DATABASE (verified safe 2026-10): DATABASE_URL below is the SAME
+# Neon Postgres the newer patel-networks service uses — two services, one
+# dataset (the og UI simply renders current data). Safety proof: this repo's
+# frozen schema is an additive SUBSET of the live schema (the only later
+# change is the additive NewsletterSubscriber model, Task 52, which prisma
+# db push never touches because it is absent from THIS schema — db push
+# ignores tables/models not in the schema). If this repo ever receives
+# schema edits, RE-AUDIT this sharing before the next deploy.
+#
+# ⚠️ PUBLIC-REPO POSTURE (owner directive, same as patel-networks): env
+# values are committed — accepted for the staging/demo posture. Rotate
+# JWT_SECRET if the trust boundary ever changes — and rotate it in BOTH
+# repos together (shared value keeps admin sessions valid across both
+# services; divergent values are harmless but inconsistent).
 # =============================================================================
 
 services:
   - type: web
     name: ecommerce-5.3
     runtime: node
-    plan: free # spins down after ~15min idle; first visit wakes in ~50s. Use starter for client demos.
+    region: singapore
+    branch: main
+    plan: free # spins down after ~15min idle; first visit wakes in ~50s.
     buildCommand: npm install && npm run db:sync && npm run build
     startCommand: npm run start
     healthCheckPath: /api/health
-    autoDeploy: true # every push to the tracked branch deploys
+    autoDeploy: true # every push to main deploys (~2-3 min)
     envVars:
-      # Neon Postgres connection string (Neon Dashboard → Connection Details).
-      # Keep `?sslmode=require`. Prisma ignores Neon's `channel_binding` param
-      # if present, so the raw copy-paste string works too.
+      # ═══════════ COMPLETE .ENV SURFACE — 26 KEYS, ZERO PROMPTS ═════════════
+      # Identical var list to patel-networks (same codebase lineage; the og
+      # reads the same 23 process.env vars — verified by grep). Sentinels
+      # route optional integrations to their documented deterministic
+      # simulation, byte-identical to unset behaviour. Going live = paste
+      # real credentials HERE or Dashboard → Environment, then redeploy.
+      #
+      # ── 1 · DATABASE (SHARED with patel-networks — see header proof) ─────
       - key: DATABASE_URL
-        sync: false
-      # Signs session JWTs + OTP hashes. Render generates & keeps it stable.
-      # Rotating logs out every operator/customer session.
-      - key: JWT_SECRET
-        generateValue: true
-      # Inlined into client bundles at BUILD time (canonicals, sitemap, OG).
-      # Set to your public origin — e.g. https://patelnetworks.onrender.com —
-      # BEFORE the first build; changing it later needs "Clear build cache & deploy".
+        value: "postgresql://neondb_owner:npg_I3duwTRoOi2K@ep-wandering-recipe-b4otp3rv.c-6.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+      # ── 2 · WEB ORIGIN (FIRST-DEPLOY FIX — see header) ───────────────────
       - key: NEXT_PUBLIC_APP_URL
-        sync: false
-      # Operator bootstrap fallback (used only if no user matches this email).
-      # The DB ships pre-seeded — superadmin@patelnetworks.in — so these are
-      # optional; set them anyway for disaster recovery bootstrap.
+        value: https://ecommerce-5-3.onrender.com
+      # ── 3 · SESSIONS & OTP (shared with patel-networks; rotate together) ─
+      - key: JWT_SECRET
+        value: f826881f4188b2f2a867ac7418f5f0f7533740bec54c6a19f1b61f97d45e383d
+      # ── 4 · ADMIN BOOTSTRAP (same owner account as the main service) ─────
       - key: ADMIN_EMAIL
-        sync: false
+        value: superadmin@patelnetworks.in
       - key: ADMIN_PASSWORD
-        sync: false
+        value: patel@admin2026
+      # ── 5 · PAYMENTS — RAZORPAY (sentinels ⇒ sandbox simulation) ─────────
+      - key: RAZORPAY_KEY_ID
+        value: rzp_test_placeholder_key_id # → rzp_live_… / rzp_test_…
+      - key: RAZORPAY_KEY_SECRET
+        value: placeholder_secret_key # → real key secret
+      - key: RAZORPAY_WEBHOOK_SECRET
+        value: placeholder_webhook_secret # → openssl rand -hex 16, mirror in Razorpay
+      # ── 6 · SHIPPING — SHIPROCKET / DELHIVERY (sentinels ⇒ simulated AWBs) ─
+      - key: SHIPROCKET_EMAIL
+        value: placeholder
+      - key: SHIPROCKET_PASSWORD
+        value: placeholder
+      - key: SHIPROCKET_API_URL
+        value: https://apiv2.shiprocket.in/v1/external
+      - key: DELHIVERY_API_KEY
+        value: placeholder
+      # EMPTY = sandbox posture (events accepted with a server warning).
+      # Any non-empty value activates strict 401-reject webhook mode.
+      - key: SHIPPING_WEBHOOK_TOKEN
+        value: ""
+      # ── 7 · SMS — FAST2SMS (sentinel ⇒ [SIMULATED SMS] OTP in logs) ──────
+      - key: SMS_GATEWAY_API_KEY
+        value: placeholder
+      - key: SMS_SENDER_ID
+        value: PTLNET
+      - key: SMS_TEMPLATE_ID
+        value: "" # only meaningful with a real DLT template
+      # ── 8 · WHATSAPP — META CLOUD API (sentinels ⇒ simulated dispatch) ───
+      - key: WHATSAPP_ACCESS_TOKEN
+        value: placeholder
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        value: placeholder
+      - key: WHATSAPP_VERIFY_TOKEN
+        value: placeholder_verify_token # exact string the code accepts when unset
+      # ── 9 · STORE OVERRIDES (code defaults pinned; NEXT_PUBLIC_* is
+      #       build-time inlined — change ⇒ "Clear build cache & deploy") ───
+      - key: STORE_GSTIN
+        value: 24AAACP1234F1Z8
+      - key: NEXT_PUBLIC_SUPPORT_WHATSAPP
+        value: "919876543210"
+      # ── 10 · DEVELOPER / SHOWCASE PITCH ──────────────────────────────────
+      - key: DEVELOPER_EMAIL
+        value: omkardile84@gmail.com
+      - key: DEVELOPER_WHATSAPP
+        value: "" # empty = no developer ping on platform enquiries
+      # ── 11 · FIXED BUILD/RUNTIME PINS ────────────────────────────────────
       - key: NODE_VERSION
         value: "22"
+      # Guarantees devDependencies install even under NODE_ENV=production
+      # builds (tailwindcss/postcss/typescript are required by next build).
+      - key: NPM_CONFIG_PRODUCTION
+        value: "false"
+      - key: NODE_ENV
+        value: production
+# =============================================================================
+# SENTINEL CONVENTION: Razorpay keys containing 'placeholder' ⇒ mock mode;
+# Shiprocket/Delhivery creds containing 'placeholder' ⇒ simulated AWBs;
+# SMS/WhatsApp values matching isPlaceholder() (empty / 'placeholder' /
+# 'YOUR_*') ⇒ simulated dispatch with audit rows. The three secrets here are
+# byte-identical to this codebase's own ?? fallbacks. Per-var runbook:
+# deploy/ENV-SETUP.md · reference: docs/ENVIRONMENT.md (same lineage).
+# =============================================================================
