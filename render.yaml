@@ -21,7 +21,7 @@
 
 services:
   - type: web
-    name: patelnetworks
+    name: ecommerce-5.3
     runtime: node
     plan: free # spins down after ~15min idle; first visit wakes in ~50s. Use starter for client demos.
     buildCommand: npm install && npm run db:sync && npm run build
